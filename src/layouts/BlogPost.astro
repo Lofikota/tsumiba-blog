@@ -1,0 +1,52 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  heroImage?: string;
+  category: string;
+  affiliate?: boolean;
+}
+
+const { title, description, pubDate, updatedDate, heroImage, category, affiliate = true } = Astro.props;
+
+const dateStr = pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<BaseLayout title={title} description={description} image={heroImage} article={true} pubDate={pubDate}>
+  <article>
+    <div style="margin-bottom:0.5rem;">
+      <span style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.8rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:4px;">{category}</span>
+    </div>
+
+    <h1 style="font-size:1.6rem;font-weight:700;line-height:1.4;margin-bottom:0.75rem;">{title}</h1>
+
+    <div style="font-size:0.8rem;color:var(--color-text-muted);margin-bottom:1.25rem;">
+      <time datetime={pubDate.toISOString()}>公開：{dateStr}</time>
+      {updatedDate && <span style="margin-left:0.75rem;"><time datetime={updatedDate.toISOString()}>更新：{updatedStr}</time></span>}
+    </div>
+
+    {affiliate && (
+      <div class="affiliate-disclosure">
+        ※ このページにはアフィリエイト広告（PR）が含まれています。
+      </div>
+    )}
+
+    {heroImage && <img src={heroImage} alt={title} style="width:100%;border-radius:var(--radius);margin-bottom:1.5rem;" />}
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    <div class="disclaimer">
+      <strong>【免責事項】</strong>
+      当記事は情報提供を目的としており、特定の金融商品・サービスへの投資・申し込みを推奨するものではありません。
+      投資にはリスクが伴い、元本を割り込む可能性があります。最終的な判断はご自身の責任でお願いします。
+      掲載情報は作成時点のものであり、最新情報は各社公式サイトをご確認ください。
+    </div>
+  </article>
+</BaseLayout>

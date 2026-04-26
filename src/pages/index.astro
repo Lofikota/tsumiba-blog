@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const categoryColors: Record<string, string> = {
+  'NISA・投資': '#2563eb',
+  '副業・節税': '#16a34a',
+  'お得情報': '#d97706',
+  'FX・外貨': '#dc2626',
+};
+---
+
+<BaseLayout
+  title="田中蓮のマネーブログ"
+  description="副業・NISA・節税でFIREを目指す32歳IT会社員、田中蓮のリアルな体験と情報を発信。"
+>
+  <section style="text-align:center;padding:2rem 0 1.5rem;">
+    <h1 style="font-size:1.75rem;font-weight:700;margin-bottom:0.75rem;">副業・投資・節税でFIREを目指す</h1>
+    <p style="color:var(--color-text-muted);max-width:520px;margin:0 auto;">
+      借金200万円から始めた僕が、副業月収20万円・資産500万円を達成するまでのリアルな記録。
+      NISAの始め方から副業節税まで、実体験ベースでまとめています。
+    </p>
+  </section>
+
+  <section>
+    <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;border-left:4px solid var(--color-primary);padding-left:0.6rem;">最新記事</h2>
+    <div style="display:grid;gap:1rem;">
+      {posts.map(post => (
+        <a href={`/blog/${post.id}/`} style="display:block;background:white;border-radius:var(--radius);padding:1.1rem 1.25rem;border:1px solid var(--color-border);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.boxShadow=''">
+          <div style="margin-bottom:0.3rem;">
+            <span style={`background:${categoryColors[post.data.category] || '#64748b'}22;color:${categoryColors[post.data.category] || '#64748b'};font-size:0.75rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:4px;`}>
+              {post.data.category}
+            </span>
+          </div>
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.3rem;color:var(--color-text);">{post.data.title}</h3>
+          <p style="font-size:0.85rem;color:var(--color-text-muted);">{post.data.description}</p>
+          <p style="font-size:0.75rem;color:var(--color-text-muted);margin-top:0.4rem;">
+            {post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,37 @@
+---
+interface Column {
+  label: string;
+  key: string;
+}
+
+interface Row {
+  [key: string]: string;
+  highlight?: string;
+}
+
+interface Props {
+  columns: Column[];
+  rows: Row[];
+  caption?: string;
+}
+
+const { columns, rows, caption } = Astro.props;
+---
+
+<div style="overflow-x:auto;margin:1.25rem 0;">
+  <table>
+    {caption && <caption style="caption-side:bottom;font-size:0.8rem;color:var(--color-text-muted);margin-top:0.5rem;">{caption}</caption>}
+    <thead>
+      <tr>
+        {columns.map(col => <th>{col.label}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(row => (
+        <tr style={row.highlight ? 'background:var(--color-primary-light);font-weight:700;' : ''}>
+          {columns.map(col => <td>{row[col.key]}</td>)}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>

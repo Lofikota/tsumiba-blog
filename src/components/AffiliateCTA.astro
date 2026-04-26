@@ -1,0 +1,19 @@
+---
+interface Props {
+  href: string;
+  text: string;
+  label?: string;
+  color?: 'blue' | 'green' | 'orange';
+  note?: string;
+}
+
+const { href, text, label = 'PR', color = 'blue', note } = Astro.props;
+---
+
+<div style="text-align:center;margin:1.75rem 0;">
+  {note && <p style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:0.6rem;">{note}</p>}
+  <a href={href} target="_blank" rel="noopener noreferrer sponsored" class={`cta-button ${color}`}>
+    {text}
+  </a>
+  <p style="font-size:0.75rem;color:var(--color-text-muted);margin-top:0.4rem;">{label} ・ 公式サイトへ移動します</p>
+</div>
