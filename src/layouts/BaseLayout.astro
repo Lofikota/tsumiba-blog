@@ -59,7 +59,7 @@ const absoluteImageUrl = new URL(image, siteUrl);
 
   <link rel="sitemap" href="/sitemap-index.xml" />
 </head>
-<style>
+<style is:global>
   /* ─── Design Tokens（記事ページ共通） ─── */
   :root {
     --ink:    #0A0A0A; --paper:  #F6F3EC;
@@ -172,10 +172,6 @@ const absoluteImageUrl = new URL(image, siteUrl);
         <a href="/#reasons">このブログについて</a>
         <a href="/#faq">よくある質問</a>
       </nav>
-      <div class="bl-header-right">
-        <span class="bl-header-pr">PR・アフィリエイト</span>
-        <a href="/about" class="bl-header-about">運営者情報を見る</a>
-      </div>
     </div>
   </header>
 
@@ -196,7 +192,9 @@ const absoluteImageUrl = new URL(image, siteUrl);
       </svg>
       田中蓮のマネーブログ
     </div>
+    <p style="font-size:10px;color:#9CA3AF;margin-bottom:10px;letter-spacing:.06em;">PR・アフィリエイト広告を含みます</p>
     <nav class="bl-footer-nav">
+      <a href="/about">運営者情報</a>
       <a href="/privacy">プライバシーポリシー</a>
       <a href="/disclaimer">免責事項</a>
       <a href="/about">このブログについて</a>
