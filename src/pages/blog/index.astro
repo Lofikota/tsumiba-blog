@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const catColors: Record<string, { bg: string; text: string }> = {
+  'NISA・投資': { bg: '#DBEAFE', text: '#1E40AF' },
+  '副業・節税': { bg: '#D1FAE5', text: '#065F46' },
+  'お得情報':   { bg: '#FEF3C7', text: '#92400E' },
+  'FX・外貨':   { bg: '#FEE2E2', text: '#991B1B' },
+};
+---
+
+<BaseLayout
+  title="記事一覧"
+  description="副業・NISA・節税・FX・クレカなど、お金に関する実体験ベースの記事を読めます。"
+>
+  <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:0.5rem;">記事一覧</h1>
+  <p style="font-size:0.875rem;color:var(--color-text-muted);margin-bottom:1.5rem;">{posts.length}件の記事</p>
+
+  <div style="display:flex;flex-direction:column;gap:1rem;">
+    {posts.map(post => {
+      const cat = catColors[post.data.category] ?? { bg: '#E5E7EB', text: '#374151' };
+      const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+      return (
+        <a
+          href={`/blog/${post.id}/`}
+          style="display:block;padding:1.25rem 1.5rem;border:1px solid var(--color-border);border-radius:10px;text-decoration:none;color:inherit;transition:box-shadow .15s;background:#fff;"
+          onmouseover="this.style.boxShadow='0 2px 12px rgba(0,0,0,.08)'"
+          onmouseout="this.style.boxShadow='none'"
+        >
+          <div style="margin-bottom:0.4rem;">
+            <span style={`background:${cat.bg};color:${cat.text};font-size:0.75rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:4px;`}>
+              {post.data.category}
+            </span>
+          </div>
+          <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.4rem;line-height:1.5;color:#1F2937;">{post.data.title}</h2>
+          <p style="font-size:0.8rem;color:#6B7280;margin:0 0 0.5rem;line-height:1.6;">{post.data.description}</p>
+          <span style="font-size:0.75rem;color:#9CA3AF;">{dateStr}</span>
+        </a>
+      );
+    })}
+  </div>
+</BaseLayout>
