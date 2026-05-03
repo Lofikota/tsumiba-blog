@@ -1,0 +1,102 @@
+---
+import { affiliateLinks, type AffiliateLink } from '../../data/affiliateLinks';
+
+export function getStaticPaths() {
+  return affiliateLinks.map((link) => ({
+    params: { slug: link.slug },
+    props: { link },
+  }));
+}
+
+interface Props {
+  link: AffiliateLink;
+}
+
+const { link } = Astro.props;
+const destinationJson = JSON.stringify(link.destinationUrl);
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>{link.name} 公式サイトへ移動します</title>
+    <meta name="description" content={`${link.name} の公式サイトへ移動します。`} />
+    <script is:inline define:vars={{ destinationJson }}>
+      const destination = JSON.parse(destinationJson);
+      window.setTimeout(() => {
+        window.location.replace(destination);
+      }, 900);
+    </script>
+  </head>
+  <body>
+    <main class="go-page">
+      <section class="go-card">
+        <p class="go-label">PR</p>
+        <h1>{link.name} 公式サイトへ移動します</h1>
+        <p>{link.disclosure}</p>
+        <p class="go-small">掲載情報やキャンペーン条件は変更される場合があります。申込前に公式サイトで最新情報をご確認ください。</p>
+        <a class="go-button" href={link.destinationUrl} rel="sponsored nofollow noopener noreferrer">公式サイトを開く</a>
+      </section>
+    </main>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Noto Sans JP", system-ui, sans-serif;
+        background: #f5f7fa;
+        color: #1e293b;
+      }
+      .go-page {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+      .go-card {
+        width: min(100%, 520px);
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 28px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      }
+      .go-label {
+        display: inline-block;
+        margin: 0 0 10px;
+        padding: 2px 10px;
+        border-radius: 999px;
+        background: #fef3c7;
+        color: #92400e;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      h1 {
+        margin: 0 0 14px;
+        font-size: 22px;
+        line-height: 1.5;
+      }
+      p {
+        margin: 0 0 12px;
+        line-height: 1.8;
+      }
+      .go-small {
+        color: #64748b;
+        font-size: 13px;
+      }
+      .go-button {
+        display: block;
+        margin-top: 18px;
+        padding: 13px 18px;
+        border-radius: 8px;
+        background: #ea580c;
+        color: #fff;
+        text-align: center;
+        font-weight: 700;
+        text-decoration: none;
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,133 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getLineAddUrl, lineOfficial } from '../../data/lineLinks';
+
+const addUrl = getLineAddUrl('direct-line-page');
+---
+
+<BaseLayout
+  title="田中蓮の公式LINE"
+  description="NISA、副業税金、クレカ、キャンペーン条件を悩み別に整理して届ける田中蓮の公式LINEです。"
+>
+  <section class="line-hero">
+    <p class="line-kicker">公式LINE</p>
+    <h1>お金の設定ミスを減らすLINE</h1>
+    <p>
+      NISA、証券口座、副業税金、クレカ、キャンペーン条件を、悩み別に整理して届けます。
+      登録直後に、今いちばん知りたいテーマを1つ選べます。
+    </p>
+    <a class="line-button" href={addUrl} rel="noopener noreferrer">LINEで受け取る</a>
+    <p class="line-note">LINE ID: {lineOfficial.accountId}</p>
+  </section>
+
+  <section class="line-section">
+    <h2>登録後に選べるテーマ</h2>
+    <div class="line-grid">
+      <article>
+        <h3>NISA・証券口座</h3>
+        <p>口座選び、積立設定、ポイント条件を整理します。</p>
+      </article>
+      <article>
+        <h3>副業税金・確定申告</h3>
+        <p>収入、経費、青色申告、控除の確認順を整理します。</p>
+      </article>
+      <article>
+        <h3>クレカ・ポイント</h3>
+        <p>年会費、還元条件、クレカ積立の相性を整理します。</p>
+      </article>
+      <article>
+        <h3>キャンペーン条件</h3>
+        <p>特典額だけでなく、対象者、期限、取引条件を確認します。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="line-caution">
+    <strong>PR・免責</strong>
+    <p>
+      アフィリエイト広告を含む場合があります。投資には元本割れのリスクがあります。
+      税金・保険等の個別判断は専門家へご相談ください。
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .line-hero {
+    background: #0f172a;
+    color: #fff;
+    border-radius: 12px;
+    padding: 32px 24px;
+  }
+  .line-kicker {
+    color: #38bdf8;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    margin-bottom: 8px;
+  }
+  .line-hero h1 {
+    font-size: clamp(28px, 7vw, 44px);
+    line-height: 1.25;
+    margin-bottom: 14px;
+  }
+  .line-hero p {
+    color: #cbd5e1;
+    line-height: 1.8;
+    max-width: 620px;
+  }
+  .line-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 14px 22px;
+    border-radius: 8px;
+    background: #06c755;
+    color: #fff;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .line-note {
+    font-size: 13px;
+    margin-top: 10px;
+  }
+  .line-section {
+    margin-top: 28px;
+  }
+  .line-section h2 {
+    font-size: 22px;
+    margin-bottom: 14px;
+  }
+  .line-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .line-grid article {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .line-grid h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  .line-grid p {
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .line-caution {
+    margin-top: 24px;
+    border: 1px solid #fde68a;
+    background: #fffbeb;
+    border-radius: 10px;
+    padding: 16px;
+    color: #78350f;
+    font-size: 14px;
+  }
+  @media (max-width: 640px) {
+    .line-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

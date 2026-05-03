@@ -938,8 +938,14 @@ const catStyle: Record<string, CatStyle> = {
         <span class="brand-text">やさしいお金の教室</span>
       </a>
       <nav class="nav">
-        {["学ぶ","稼ぐ","始める","節約","投資"].map(n => (
-          <a href="#" class="nav-link">{n}</a>
+        {[
+          { label: "学ぶ", href: "/blog/" },
+          { label: "稼ぐ", href: "/blog/fukugyo-zeikin/" },
+          { label: "始める", href: "/blog/nisa-hajimekata/" },
+          { label: "節約", href: "/blog/credit-card-osusume/" },
+          { label: "投資", href: "/blog/sbi-rakuten-hikaku/" },
+        ].map((item) => (
+          <a href={item.href} class="nav-link">{item.label}</a>
         ))}
       </nav>
       <div class="header-right">
@@ -1366,7 +1372,7 @@ const catStyle: Record<string, CatStyle> = {
               <td>マネーフォワード ME</td>
               <td>マネーフォワード ME</td>
               <td>ZAIM</td>
-              <td><a class="btn-compare" href="#">公式を見る →</a></td>
+              <td><a class="btn-compare" href="/blog/fukugyo-zeikin/">管理方法を読む</a></td>
             </tr>
             <tr>
               <td>証券口座</td>
@@ -1394,7 +1400,7 @@ const catStyle: Record<string, CatStyle> = {
               <td>Udemy</td>
               <td>ポイント投資</td>
               <td class="highlight-cell">ブログ副業</td>
-              <td><a class="btn-compare" href="#">始め方を読む</a></td>
+              <td><a class="btn-compare" href="/blog/fukugyo-zeikin/">副業税金を読む</a></td>
             </tr>
           </tbody>
         </table>
@@ -1459,7 +1465,7 @@ const catStyle: Record<string, CatStyle> = {
         <a class="btn btn-ghost btn-lg" href="#compare">
           サービスを比較する
         </a>
-        <a class="btn btn-sage btn-lg" href="#">
+        <a class="btn btn-sage btn-lg" href="/line/lp-manga-main/">
           LINEで相談する
         </a>
       </div>
@@ -1497,8 +1503,8 @@ const catStyle: Record<string, CatStyle> = {
       <div>
         <div class="footer-h">LINE相談窓口</div>
         <ul class="footer-list">
-          <li><a href="#">登録はこちら</a></li>
-          <li><a href="#">お知らせ</a></li>
+          <li><a href="/line/lp-manga-main/">登録はこちら</a></li>
+          <li><a href="/line/">お知らせ</a></li>
         </ul>
       </div>
     </div>
