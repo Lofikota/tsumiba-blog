@@ -12,12 +12,14 @@ interface Props {
 }
 
 const { title, description, pubDate, updatedDate, heroImage, category, affiliate = true } = Astro.props;
+const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
+const ogImage = heroImage ?? `/og/${slug}.svg`;
 
 const dateStr = pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 
-<BaseLayout title={title} description={description} image={heroImage} article={true} pubDate={pubDate} updatedDate={updatedDate}>
+<BaseLayout title={title} description={description} image={ogImage} article={true} pubDate={pubDate} updatedDate={updatedDate}>
   <article>
     <div style="margin-bottom:0.5rem;">
       <span style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.8rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:4px;">{category}</span>

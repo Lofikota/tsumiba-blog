@@ -10,7 +10,7 @@ interface Props {
   updatedDate?: Date;
 }
 
-const { title, description, image = '/og-default.jpg', article = false, pubDate, updatedDate } = Astro.props;
+const { title, description, image = '/og-default.svg', article = false, pubDate, updatedDate } = Astro.props;
 const siteUrl = 'https://ren-money.com';
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
 const siteName = '田中蓮のマネーブログ';
