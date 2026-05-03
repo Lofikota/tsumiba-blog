@@ -200,18 +200,37 @@ const catStyle: Record<string, CatStyle> = {
     background: rgba(255,255,255,.08);
     border: 1px solid rgba(255,255,255,.2);
     border-radius: 16px;
-    padding: 24px 20px 10px;
+    padding: 28px 24px;
     backdrop-filter: blur(2px);
     animation: fadeUp .7s ease .2s both;
   }
-  .hero-char-caption {
-    display: inline-block;
-    background: rgba(255,255,255,.15);
-    border: 1px solid rgba(255,255,255,.3);
-    border-radius: 20px;
-    padding: 5px 14px;
-    font-size: 11px; font-weight: 700;
-    color: #fff; margin-bottom: 12px;
+  .hero-tl-heading {
+    font-size: 11px; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: rgba(255,255,255,.6);
+    margin-bottom: 20px;
+  }
+  .hero-tl-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+  }
+  .hero-tl-item:last-child { border-bottom: none; }
+  .hero-tl-dot {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; margin-top: 2px;
+  }
+  .hero-tl-dot--red    { background: rgba(220,38,38,.25); border: 1.5px solid rgba(220,38,38,.5); }
+  .hero-tl-dot--amber  { background: rgba(251,191,36,.2);  border: 1.5px solid rgba(251,191,36,.5); }
+  .hero-tl-dot--green  { background: rgba(22,163,74,.2);   border: 1.5px solid rgba(22,163,74,.5); }
+  .hero-tl-year  { font-size: 10px; color: rgba(255,255,255,.5); margin-bottom: 2px; }
+  .hero-tl-num   { font-size: 22px; font-weight: 900; color: var(--c-yellow); line-height: 1; }
+  .hero-tl-desc  { font-size: 11.5px; color: rgba(255,255,255,.75); margin-top: 3px; }
+  .hero-tl-footer {
+    margin-top: 16px; padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,.15);
+    font-size: 12px; font-weight: 700; color: var(--c-yellow);
+    text-align: center; letter-spacing: .04em;
   }
 
   @keyframes fadeUp {
@@ -548,43 +567,32 @@ const catStyle: Record<string, CatStyle> = {
         </div>
       </div>
       <div class="hero-art">
-        <div class="hero-char-caption">田中 蓮・32歳 IT会社員</div>
-        <svg viewBox="0 0 240 300" width="100%" style="max-width:280px;display:block;margin:0 auto;">
-          <!-- Background circle glow -->
-          <circle cx="120" cy="140" r="100" fill="rgba(184,120,14,.12)"/>
-          <!-- Shadow -->
-          <ellipse cx="120" cy="295" rx="80" ry="8" fill="rgba(0,0,0,.12)"/>
-          <!-- Body / suit -->
-          <path d="M20 300 L52 200 Q80 212 80 230 L120 245 L160 230 Q160 212 188 200 L220 300 Z" fill="#0B1942"/>
-          <!-- White shirt -->
-          <path d="M80 230 L120 218 L160 230 L160 248 Q120 238 80 248 Z" fill="#fff"/>
-          <!-- Lapels -->
-          <path d="M80 230 L92 260" stroke="#071030" stroke-width="1.5"/>
-          <path d="M160 230 L148 260" stroke="#071030" stroke-width="1.5"/>
-          <!-- Neck -->
-          <rect x="104" y="170" width="32" height="34" rx="4" fill="#F4D5BA"/>
-          <!-- Head -->
-          <ellipse cx="120" cy="130" rx="48" ry="54" fill="#F4D5BA"/>
-          <!-- Hair -->
-          <path d="M72 118 Q72 64 120 64 Q168 64 168 118 Q168 96 158 82 Q144 68 120 72 Q96 76 84 88 Q76 98 72 118Z" fill="#1A1A1A"/>
-          <path d="M84 88 Q98 76 120 76 Q142 76 158 88 L158 72 Q142 60 120 60 Q98 60 84 72 Z" fill="#0A0A0A"/>
-          <!-- Eyes — confident, slight squint -->
-          <ellipse cx="103" cy="130" rx="5" ry="6.5" fill="#0A0A0A"/>
-          <ellipse cx="137" cy="130" rx="5" ry="6.5" fill="#0A0A0A"/>
-          <ellipse cx="104.5" cy="128.5" rx="1.8" ry="2" fill="#fff"/>
-          <ellipse cx="138.5" cy="128.5" rx="1.8" ry="2" fill="#fff"/>
-          <!-- Brows -->
-          <path d="M95 118 L112 120" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
-          <path d="M128 120 L145 118" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
-          <!-- Cheeks -->
-          <ellipse cx="90" cy="142" rx="7" ry="4" fill="#F2A491" opacity=".55"/>
-          <ellipse cx="150" cy="142" rx="7" ry="4" fill="#F2A491" opacity=".55"/>
-          <!-- Smile -->
-          <path d="M104 152 Q120 166 136 152" stroke="#8B4A3C" stroke-width="3" fill="#FFC0B0" stroke-linecap="round"/>
-          <!-- Decoration: sparkle near head -->
-          <path d="M176 72 L178 66 L180 72 L186 74 L180 76 L178 82 L176 76 L170 74 Z" fill="#E8940F"/>
-          <path d="M56 90 L57.5 85 L59 90 L64 91.5 L59 93 L57.5 98 L56 93 L51 91.5 Z" fill="#E8940F" opacity=".7"/>
-        </svg>
+        <div class="hero-tl-heading">3年間の軌跡</div>
+        <div class="hero-tl-item">
+          <div class="hero-tl-dot hero-tl-dot--red">📋</div>
+          <div>
+            <div class="hero-tl-year">2021年</div>
+            <div class="hero-tl-num">−200万円</div>
+            <div class="hero-tl-desc">借金が膨らみ、将来が見えなかった</div>
+          </div>
+        </div>
+        <div class="hero-tl-item">
+          <div class="hero-tl-dot hero-tl-dot--amber">💡</div>
+          <div>
+            <div class="hero-tl-year">2022年</div>
+            <div class="hero-tl-num">月+20万円</div>
+            <div class="hero-tl-desc">副業・ブログで収入の柱を追加</div>
+          </div>
+        </div>
+        <div class="hero-tl-item">
+          <div class="hero-tl-dot hero-tl-dot--green">📈</div>
+          <div>
+            <div class="hero-tl-year">2024年</div>
+            <div class="hero-tl-num">資産500万円</div>
+            <div class="hero-tl-desc">NISA・投資で着実に積み上げた</div>
+          </div>
+        </div>
+        <div class="hero-tl-footer">▶ 35歳FIREへ、進行中</div>
       </div>
     </div>
   </section>
@@ -651,7 +659,7 @@ const catStyle: Record<string, CatStyle> = {
 
       <div class="manga-img-wrap">
         <img
-          src="/images/yonkoma.jpg"
+          src="/images/yonkoma.png"
           alt="4コマでわかるお金の改善ストーリー：借金200万円→どん底の毎日→きっかけとの出会い→資産500万円達成！"
           class="manga-strip-img"
           width="1081"
