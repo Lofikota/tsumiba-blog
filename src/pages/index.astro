@@ -357,6 +357,7 @@ const catStyle: Record<string, CatStyle> = {
     font-size: 14px; font-weight: 700; margin: 8px 0 10px;
     line-height: 1.55; color: var(--c-ink);
   }
+  .article-desc { font-size: 12px; color: var(--c-gray); line-height: 1.65; margin: 6px 0 8px; }
   .article-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--c-gray); }
 
   /* ═══════════════════════════════════════
@@ -898,6 +899,9 @@ const catStyle: Record<string, CatStyle> = {
                 <div class="article-body">
                   <span class={`article-cat ${cls}`}>{post.data.category}</span>
                   <h3 class="article-title">{post.data.title}</h3>
+                  {post.data.description && (
+                    <p class="article-desc">{post.data.description}</p>
+                  )}
                   <div class="article-meta">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B6560" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7 V12 L15 14" stroke-linecap="round"/></svg>
                     <span>{dateStr}</span>

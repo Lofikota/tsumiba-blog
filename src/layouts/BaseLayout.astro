@@ -16,6 +16,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
 const siteName = '田中蓮のマネーブログ';
 const pageTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 const absoluteImageUrl = new URL(image, siteUrl);
+const gaId = import.meta.env.PUBLIC_GA_ID;
 ---
 
 <!doctype html>
@@ -58,6 +59,18 @@ const absoluteImageUrl = new URL(image, siteUrl);
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@700;900&display=swap" rel="stylesheet" />
 
   <link rel="sitemap" href="/sitemap-index.xml" />
+
+  {gaId && (
+    <>
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+      <script define:vars={{ gaId }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', gaId);
+      </script>
+    </>
+  )}
 </head>
 <style is:global>
   /* ─── Design Tokens（記事ページ共通） ─── */
