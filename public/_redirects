@@ -1,3 +1,5 @@
 # Cloudflare Pages リダイレクトルール
 # /old-path /new-path 301
 /sitemap.xml /sitemap-index.xml 301
+/lp/ / 301
+/lp  / 301
