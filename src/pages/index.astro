@@ -398,6 +398,11 @@ const catStyle: Record<string, CatStyle> = {
   .compare-table td:first-child { font-weight: 700; background: var(--c-blue-50); color: var(--c-ink); }
   .compare-table td:not(:first-child) { text-align: center; }
   .highlight-cell { color: var(--c-blue); font-weight: 700; }
+  .badge-top {
+    display: inline-block; background: #F59E0B; color: #fff;
+    font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 3px;
+    margin-left: 4px; vertical-align: middle; letter-spacing: .03em;
+  }
   .btn-compare {
     display: inline-flex; align-items: center; justify-content: center;
     background: var(--c-blue); color: #fff;
@@ -918,47 +923,52 @@ const catStyle: Record<string, CatStyle> = {
           <thead>
             <tr>
               <th style="text-align:left">カテゴリ</th>
-              <th>節約・家計</th>
-              <th>資産形成</th>
+              <th>節約・家計向き</th>
+              <th>資産形成向き</th>
               <th>副収入を増やしたい</th>
-              <th style="width:150px">公式サイト</th>
+              <th style="width:150px">詳細・比較</th>
             </tr>
           </thead>
           <tbody>
+            <!-- FX口座: 最高単価カテゴリ。Plus500(A8.net)が承認後トップ推し -->
             <tr>
-              <td>家計管理</td>
-              <td>マネーフォワード ME</td>
-              <td>マネーフォワード ME</td>
-              <td>ZAIM</td>
-              <td><a class="btn-compare" href="#">公式を見る →</a></td>
+              <td>FX口座</td>
+              <td>みんなのFX</td>
+              <td>GMOクリック証券</td>
+              <td class="highlight-cell">Plus500証券<span class="badge-top">高単価</span></td>
+              <td><a class="btn-compare" href="/blog/fx-kouza-hikaku/">FX比較を読む</a></td>
             </tr>
+            <!-- 証券口座: SBI・楽天(A8.net申請中) -->
             <tr>
               <td>証券口座</td>
               <td>SBI証券</td>
-              <td class="highlight-cell">楽天証券</td>
+              <td class="highlight-cell">楽天証券<span class="badge-top">人気No.1</span></td>
               <td>松井証券</td>
-              <td><a class="btn-compare" href="/blog/sbi-rakuten-hikaku/">比較記事を読む</a></td>
+              <td><a class="btn-compare" href="/blog/sbi-rakuten-hikaku/">証券口座を比較</a></td>
             </tr>
+            <!-- NISA: SBI証券NISAをメイン推し -->
             <tr>
-              <td>NISA</td>
+              <td>NISA口座</td>
               <td>つみたてNISA</td>
-              <td class="highlight-cell">つみたてNISA</td>
-              <td>ロボアドバイザー</td>
+              <td class="highlight-cell">SBI証券 NISA<span class="badge-top">おすすめ</span></td>
+              <td>楽天証券 NISA</td>
               <td><a class="btn-compare" href="/blog/nisa-hajimekata/">始め方を読む</a></td>
             </tr>
+            <!-- クレカ: JCBカード(ValueCommerce ¥5,940)→三井住友NL(A8.net ¥4,800) -->
             <tr>
-              <td>FX口座</td>
-              <td>—</td>
-              <td>GMOクリック証券</td>
-              <td class="highlight-cell">DMM FX</td>
-              <td><a class="btn-compare" href="/blog/fx-kouza-hikaku/">FX比較を読む</a></td>
+              <td>クレジットカード</td>
+              <td class="highlight-cell">JCBカード<span class="badge-top">還元率◎</span></td>
+              <td>三井住友カード(NL)</td>
+              <td>エポスカード</td>
+              <td><a class="btn-compare" href="/blog/credit-card-osusume/">クレカ比較を読む</a></td>
             </tr>
+            <!-- 副業: ブログ副業が本命（田中蓮の実体験） -->
             <tr>
-              <td>副業・スキル</td>
-              <td>Udemy</td>
-              <td>ポイント投資</td>
-              <td class="highlight-cell">ブログ副業</td>
-              <td><a class="btn-compare" href="#">始め方を読む</a></td>
+              <td>副業・節税</td>
+              <td>ふるさと納税</td>
+              <td>iDeCo</td>
+              <td class="highlight-cell">ブログ副業<span class="badge-top">蓮おすすめ</span></td>
+              <td><a class="btn-compare" href="/blog/fukugyo-zeikin/">副業×節税を読む</a></td>
             </tr>
           </tbody>
         </table>
