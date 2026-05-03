@@ -7,11 +7,15 @@ interface Props {
   image?: string;
   article?: boolean;
   pubDate?: Date;
+  updatedDate?: Date;
 }
 
-const { title, description, image = '/og-default.jpg', article = false, pubDate } = Astro.props;
+const { title, description, image = '/og-default.jpg', article = false, pubDate, updatedDate } = Astro.props;
 const siteUrl = 'https://ren-money.com';
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
+const siteName = '田中蓮のマネーブログ';
+const pageTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+const absoluteImageUrl = new URL(image, siteUrl);
 ---
 
 <!doctype html>
@@ -19,26 +23,34 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{title} | 田中蓮のマネーブログ</title>
+  <title>{pageTitle}</title>
   <meta name="description" content={description} />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="theme-color" content="#2563eb" />
   <link rel="canonical" href={canonicalUrl} />
+  <link rel="alternate" type="application/rss+xml" title={`${siteName} RSS`} href={new URL('/rss.xml', siteUrl)} />
 
   <!-- OGP -->
   <meta property="og:type" content={article ? 'article' : 'website'} />
   <meta property="og:url" content={canonicalUrl} />
-  <meta property="og:title" content={title} />
+  <meta property="og:title" content={pageTitle} />
   <meta property="og:description" content={description} />
-  <meta property="og:image" content={new URL(image, siteUrl)} />
-  <meta property="og:site_name" content="田中蓮のマネーブログ" />
+  <meta property="og:image" content={absoluteImageUrl} />
+  <meta property="og:image:alt" content={title} />
+  <meta property="og:site_name" content={siteName} />
   <meta property="og:locale" content="ja_JP" />
   {article && pubDate && <meta property="article:published_time" content={pubDate.toISOString()} />}
+  {article && updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />}
+  {article && <meta property="article:author" content="田中蓮" />}
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@tanaka_ren_fire" />
-  <meta name="twitter:title" content={title} />
+  <meta name="twitter:title" content={pageTitle} />
   <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={new URL(image, siteUrl)} />
+  <meta name="twitter:image" content={absoluteImageUrl} />
+  <meta name="twitter:image:alt" content={title} />
 
   <!-- フォント -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />

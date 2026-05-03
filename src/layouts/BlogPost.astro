@@ -17,7 +17,7 @@ const dateStr = pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'l
 const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 
-<BaseLayout title={title} description={description} image={heroImage} article={true} pubDate={pubDate}>
+<BaseLayout title={title} description={description} image={heroImage} article={true} pubDate={pubDate} updatedDate={updatedDate}>
   <article>
     <div style="margin-bottom:0.5rem;">
       <span style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.8rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:4px;">{category}</span>
@@ -36,7 +36,7 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
       </div>
     )}
 
-    {heroImage && <img src={heroImage} alt={title} style="width:100%;border-radius:var(--radius);margin-bottom:1.5rem;" />}
+    {heroImage && <img src={heroImage} alt={title} decoding="async" fetchpriority="high" style="width:100%;border-radius:var(--radius);margin-bottom:1.5rem;" />}
 
     <div class="prose">
       <slot />

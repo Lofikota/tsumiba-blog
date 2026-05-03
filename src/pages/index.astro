@@ -30,7 +30,7 @@ const categoryColors: Record<string, string> = {
     <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;border-left:4px solid var(--color-primary);padding-left:0.6rem;">最新記事</h2>
     <div style="display:grid;gap:1rem;">
       {posts.map(post => (
-        <a href={`/blog/${post.id}/`} style="display:block;background:white;border-radius:var(--radius);padding:1.1rem 1.25rem;border:1px solid var(--color-border);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.boxShadow=''">
+        <a href={`/blog/${post.id}/`} class="post-card">
           <div style="margin-bottom:0.3rem;">
             <span style={`background:${categoryColors[post.data.category] || '#64748b'}22;color:${categoryColors[post.data.category] || '#64748b'};font-size:0.75rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:4px;`}>
               {post.data.category}
