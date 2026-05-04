@@ -10,7 +10,7 @@ export interface LineRef {
 export const lineOfficial = {
   accountId: '@610htila',
   addFriendUrl: 'https://line.me/R/ti/p/@610htila',
-  harnessAuthBaseUrl: '',
+  harnessAuthBaseUrl: import.meta.env.PUBLIC_LINE_HARNESS_AUTH_BASE_URL || '',
 };
 
 export const lineRefs: LineRef[] = [
