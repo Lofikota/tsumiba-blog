@@ -1,8 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getLineAddUrl, lineOfficial } from '../../data/lineLinks';
+import { getLineAddUrl, getLineRef, lineOfficial, type LineRef } from '../../data/lineLinks';
 
 const addUrl = getLineAddUrl('direct-line-page');
+const featuredRefs: LineRef[] = ['blog-main', 'blog-nisa-mistake', 'blog-tax-basic', 'blog-card-roundup', 'blog-fx-roundup']
+  .map((ref) => getLineRef(ref))
+  .filter((ref): ref is LineRef => Boolean(ref));
 ---
 
 <BaseLayout
@@ -39,6 +42,36 @@ const addUrl = getLineAddUrl('direct-line-page');
         <h3>キャンペーン条件</h3>
         <p>特典額だけでなく、対象者、期限、取引条件を確認します。</p>
       </article>
+    </div>
+  </section>
+
+  <section class="line-section">
+    <h2>登録後の流れ</h2>
+    <div class="line-flow">
+      <article>
+        <h3>1. 追加してすぐ</h3>
+        <p>あいさつメッセージで、今ほしいテーマを1つだけ選べます。</p>
+      </article>
+      <article>
+        <h3>2. 悩み別に受け取る</h3>
+        <p>選んだテーマに合わせて、記事・チェック項目・注意点を整理して届けます。</p>
+      </article>
+      <article>
+        <h3>3. 必要なときだけ開く</h3>
+        <p>通知が多すぎないようにしつつ、必要なときに見返せる形で残します。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="line-section">
+    <h2>記事別の入口</h2>
+    <div class="line-topic-list">
+      {featuredRefs.map((ref) => (
+        <article>
+          <h3>{ref.label}</h3>
+          <p>{ref.description}</p>
+        </article>
+      ))}
     </div>
   </section>
 
@@ -116,6 +149,34 @@ const addUrl = getLineAddUrl('direct-line-page');
     font-size: 14px;
     line-height: 1.7;
   }
+  .line-flow {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .line-topic-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .line-flow article,
+  .line-topic-list article {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .line-flow h3,
+  .line-topic-list h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  .line-flow p,
+  .line-topic-list p {
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.7;
+  }
   .line-caution {
     margin-top: 24px;
     border: 1px solid #fde68a;
@@ -127,6 +188,10 @@ const addUrl = getLineAddUrl('direct-line-page');
   }
   @media (max-width: 640px) {
     .line-grid {
+      grid-template-columns: 1fr;
+    }
+    .line-flow,
+    .line-topic-list {
       grid-template-columns: 1fr;
     }
   }

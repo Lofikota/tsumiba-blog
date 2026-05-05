@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import { getLineAddUrl, getLineRef, getLineRefForArticle } from '../data/lineLinks';
 
 interface Props {
   title: string;
@@ -14,6 +15,8 @@ interface Props {
 const { title, description, pubDate, updatedDate, heroImage, category, affiliate = true } = Astro.props;
 const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 const ogImage = heroImage ?? `/og/${slug}.svg`;
+const lineRef = getLineRef(getLineRefForArticle(slug, category));
+const lineAddUrl = lineRef ? getLineAddUrl(lineRef.ref) : getLineAddUrl('blog-main');
 
 const dateStr = pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -44,6 +47,19 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
       <slot />
     </div>
 
+    <section class="line-cta">
+      <p class="line-cta-label">この記事の続き</p>
+      <h2>悩み別にLINEで整理して受け取る</h2>
+      <p>{lineRef ? lineRef.description : '記事で読んだ内容を、LINEで悩み別に見返せるようにまとめています。'}</p>
+      <ul class="line-cta-list">
+        <li>登録直後に、今いちばん知りたいテーマを1つ選べます。</li>
+        <li>悩みごとに記事やチェック項目をまとめて受け取れます。</li>
+        <li>必要ないときはいつでも解除できます。</li>
+      </ul>
+      <a class="line-cta-button" href={lineAddUrl} rel="noopener noreferrer">公式LINEを開く</a>
+      {lineRef && <p class="line-cta-note">流入元: {lineRef.label}</p>}
+    </section>
+
     <div class="disclaimer">
       <strong>【免責事項】</strong>
       当記事は情報提供を目的としており、特定の金融商品・サービスへの投資・申し込みを推奨するものではありません。
@@ -52,3 +68,60 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
     </div>
   </article>
 </BaseLayout>
+
+<style>
+  .line-cta {
+    margin-top: 2rem;
+    padding: 1.2rem 1.25rem;
+    border: 1px solid #cfe2ff;
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+  }
+  .line-cta-label {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .line-cta h2 {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+  .line-cta p {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--color-text-muted);
+    margin-bottom: 0.9rem;
+  }
+  .line-cta-list {
+    margin: 0 0 1rem 1.1rem;
+    padding: 0;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .line-cta-list li + li {
+    margin-top: 0.35rem;
+  }
+  .line-cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.25rem;
+    border-radius: 10px;
+    background: #06c755;
+    color: #fff;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .line-cta-note {
+    margin-top: 0.65rem;
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+</style>

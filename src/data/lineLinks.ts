@@ -15,6 +15,14 @@ export const lineOfficial = {
 
 export const lineRefs: LineRef[] = [
   {
+    ref: 'blog-main',
+    label: 'ブログ共通',
+    source: 'blog',
+    intent: 'general',
+    headline: 'ブログで読んだ内容をLINEで整理する',
+    description: '記事の続きや悩み別の見返し方を、テーマごとにまとめて受け取れます。',
+  },
+  {
     ref: 'x-profile-main',
     label: 'Xプロフィール常設',
     source: 'x',
@@ -63,6 +71,22 @@ export const lineRefs: LineRef[] = [
     description: '確定申告前に見るべき項目を整理して届けます。',
   },
   {
+    ref: 'blog-card-roundup',
+    label: 'ブログ クレカ記事CTA',
+    source: 'blog',
+    intent: 'card',
+    headline: 'クレカ・ポイントの条件をLINEで整理する',
+    description: '年会費、還元率、キャンペーン条件を見返しやすくまとめて届けます。',
+  },
+  {
+    ref: 'blog-fx-roundup',
+    label: 'ブログ FX記事CTA',
+    source: 'blog',
+    intent: 'fx',
+    headline: 'FXの口座比較をLINEで整理する',
+    description: 'スプレッド、スワップ、口座開設条件の見直しポイントを受け取れます。',
+  },
+  {
     ref: 'lp-manga-main',
     label: '漫画LP',
     source: 'lp',
@@ -80,6 +104,28 @@ export function getLineAddUrl(ref?: string): string {
   }
 
   return lineOfficial.addFriendUrl;
+}
+
+export function getLineRefForArticle(slug: string, category: string): string {
+  const normalizedSlug = slug.toLowerCase();
+
+  if (normalizedSlug.includes('fx') || category === 'FX・外貨') {
+    return 'blog-fx-roundup';
+  }
+
+  if (normalizedSlug.includes('card') || normalizedSlug.includes('epos') || normalizedSlug.includes('sbi-rakuten') || category === 'お得情報') {
+    return 'blog-card-roundup';
+  }
+
+  if (normalizedSlug.includes('zeikin') || normalizedSlug.includes('tax') || category === '副業・節税') {
+    return 'blog-tax-basic';
+  }
+
+  if (normalizedSlug.includes('nisa') || category === 'NISA・投資') {
+    return 'blog-nisa-mistake';
+  }
+
+  return 'blog-main';
 }
 
 export function getLineRef(ref: string): LineRef | undefined {
