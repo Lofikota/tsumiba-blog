@@ -41,6 +41,14 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
       </div>
     )}
 
+    <section class="line-cta line-cta--top">
+      <p class="line-cta-label">最短導線</p>
+      <h2>この記事の続きは、LINEで1分だけ整理する</h2>
+      <p>{lineRef ? lineRef.description : '記事で読んだ内容を、LINEで悩み別に見返せるようにまとめています。'}</p>
+      <a class="line-cta-button" href={lineAddUrl} rel="noopener noreferrer">1分でLINE診断する</a>
+      {lineRef && <p class="line-cta-note">流入元: {lineRef.label}</p>}
+    </section>
+
     {heroImage && <img src={heroImage} alt={title} decoding="async" fetchpriority="high" style="width:100%;border-radius:var(--radius);margin-bottom:1.5rem;" />}
 
     <div class="prose">
@@ -77,6 +85,10 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
     border-radius: var(--radius);
     background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
   }
+  .line-cta--top {
+    margin-top: 1rem;
+    margin-bottom: 1.25rem;
+  }
   .line-cta-label {
     display: inline-block;
     margin-bottom: 0.5rem;
@@ -97,6 +109,9 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
     line-height: 1.75;
     color: var(--color-text-muted);
     margin-bottom: 0.9rem;
+  }
+  .line-cta--top p {
+    margin-bottom: 0.8rem;
   }
   .line-cta-list {
     margin: 0 0 1rem 1.1rem;
