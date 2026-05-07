@@ -3,23 +3,26 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getLineAddUrl, getLineRef, lineOfficial, type LineRef } from '../../data/lineLinks';
 
 const addUrl = getLineAddUrl('direct-line-page');
-const featuredRefs: LineRef[] = ['blog-main', 'blog-nisa-mistake', 'blog-tax-basic', 'blog-card-roundup', 'blog-fx-roundup']
+const featuredRefs: LineRef[] = ['blog-main', 'blog-tax-basic', 'blog-card-roundup', 'blog-fx-roundup', 'blog-nisa-mistake']
+  .map((ref) => getLineRef(ref))
+  .filter((ref): ref is LineRef => Boolean(ref));
+const campaignRefs: LineRef[] = ['campaign-dmm-fx', 'campaign-jfx', 'campaign-fxtf', 'campaign-epos-card']
   .map((ref) => getLineRef(ref))
   .filter((ref): ref is LineRef => Boolean(ref));
 ---
 
 <BaseLayout
   title="田中蓮の公式LINE"
-  description="NISA、副業税金、クレカ、キャンペーン条件を悩み別に整理して届ける田中蓮の公式LINEです。"
+  description="FX、クレカ、副業税金を先に整理し、NISAは補助入口として届ける田中蓮の公式LINEです。"
 >
   <section class="line-hero">
     <p class="line-kicker">公式LINE</p>
-    <h1>お金の設定ミスを減らすLINE</h1>
+    <h1>今の悩みを1つ選べるLINE</h1>
     <p>
-      NISA、証券口座、副業税金、クレカ、キャンペーン条件を、悩み別に整理して届けます。
-      登録直後に、今いちばん知りたいテーマを1つ選べます。
+      FX、クレカ、副業税金を先に整理し、NISAは補助として届けます。
+      登録したら、まずは4択から1つだけ選ぶだけです。
     </p>
-    <a class="line-button" href={addUrl} rel="noopener noreferrer">LINEで受け取る</a>
+    <a class="line-button" href={addUrl} rel="noopener noreferrer">1分で診断を始める</a>
     <p class="line-note">LINE ID: {lineOfficial.accountId}</p>
   </section>
 
@@ -27,8 +30,8 @@ const featuredRefs: LineRef[] = ['blog-main', 'blog-nisa-mistake', 'blog-tax-bas
     <h2>登録後に選べるテーマ</h2>
     <div class="line-grid">
       <article>
-        <h3>NISA・証券口座</h3>
-        <p>口座選び、積立設定、ポイント条件を整理します。</p>
+        <h3>FX・高単価キャンペーン</h3>
+        <p>口座条件、取引条件、スプレッド、リスクを整理します。</p>
       </article>
       <article>
         <h3>副業税金・確定申告</h3>
@@ -39,8 +42,8 @@ const featuredRefs: LineRef[] = ['blog-main', 'blog-nisa-mistake', 'blog-tax-bas
         <p>年会費、還元条件、クレカ積立の相性を整理します。</p>
       </article>
       <article>
-        <h3>キャンペーン条件</h3>
-        <p>特典額だけでなく、対象者、期限、取引条件を確認します。</p>
+        <h3>NISA・証券口座</h3>
+        <p>口座選び、積立設定、ポイント条件を整理します。</p>
       </article>
     </div>
   </section>
@@ -60,6 +63,18 @@ const featuredRefs: LineRef[] = ['blog-main', 'blog-nisa-mistake', 'blog-tax-bas
         <h3>3. 必要なときだけ開く</h3>
         <p>通知が多すぎないようにしつつ、必要なときに見返せる形で残します。</p>
       </article>
+    </div>
+  </section>
+
+  <section class="line-section">
+    <h2>案件別の入口</h2>
+    <div class="line-topic-list">
+      {campaignRefs.map((ref) => (
+        <article>
+          <h3>{ref.label}</h3>
+          <p>{ref.description}</p>
+        </article>
+      ))}
     </div>
   </section>
 

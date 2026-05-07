@@ -1,7 +1,7 @@
 export interface LineRef {
   ref: string;
   label: string;
-  source: 'x' | 'blog' | 'lp' | 'line_menu' | 'direct';
+  source: 'x' | 'blog' | 'lp' | 'campaign' | 'line_menu' | 'direct';
   intent: 'general' | 'nisa' | 'tax' | 'card' | 'campaign' | 'fx';
   headline: string;
   description: string;
@@ -93,6 +93,38 @@ export const lineRefs: LineRef[] = [
     intent: 'general',
     headline: '蓮の失敗談から学ぶお金のLINE',
     description: '借金、家計、副業、資産形成の失敗をもとに、判断材料を届けます。',
+  },
+  {
+    ref: 'campaign-dmm-fx',
+    label: '案件 DMM FX',
+    source: 'campaign',
+    intent: 'campaign',
+    headline: 'DMM FXの条件を先に整理するLINE',
+    description: '口座開設条件、スプレッド、初心者が迷いやすい点を短く整理します。',
+  },
+  {
+    ref: 'campaign-jfx',
+    label: '案件 JFX',
+    source: 'campaign',
+    intent: 'campaign',
+    headline: 'JFXを見る前に条件を整理するLINE',
+    description: '短期売買向きか、ツールの使いやすさ、取引条件を先に見直します。',
+  },
+  {
+    ref: 'campaign-fxtf',
+    label: '案件 FXTF',
+    source: 'campaign',
+    intent: 'campaign',
+    headline: 'FXTFの迷いを先に潰すLINE',
+    description: 'スプレッド、約定、ツール面を見てから判断したい人向けです。',
+  },
+  {
+    ref: 'campaign-epos-card',
+    label: '案件 エポスカード',
+    source: 'campaign',
+    intent: 'campaign',
+    headline: 'エポスカードの条件を整理するLINE',
+    description: '年会費、ポイントの使い道、普段使いしやすさを先に確認します。',
   },
 ];
 
