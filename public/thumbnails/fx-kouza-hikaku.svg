@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 256" width="384" height="256">
+  <!-- background -->
+  <rect width="384" height="256" fill="#FFF3E0" rx="12"/>
+  <!-- top accent bar -->
+  <rect width="384" height="8" fill="#FF8C00" rx="0"/>
+  <rect width="384" height="8" y="0" rx="12" fill="#FF8C00"/>
+  <!-- category badge -->
+  <rect x="20" y="24" width="88" height="22" fill="#FF8C00" rx="6"/>
+  <text x="64" y="39" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">FX・外貨</text>
+  <!-- large icon area -->
+  <text x="192" y="140" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="64" text-anchor="middle" dominant-baseline="middle">💱</text>
+  <!-- main title -->
+  <text x="192" y="198" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="22" font-weight="700" fill="#1A1A2E" text-anchor="middle">FX口座　比較</text>
+  <!-- subtitle -->
+  <text x="192" y="228" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="13" fill="#FF8C00" text-anchor="middle" font-weight="700">初心者おすすめ3社</text>
+</svg>

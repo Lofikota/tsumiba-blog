@@ -27,7 +27,7 @@ const catColors: Record<string, { bg: string; text: string }> = {
     {posts.map(post => {
       const cat = catColors[post.data.category] ?? { bg: '#E5E7EB', text: '#374151' };
       const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
-      const ogSrc = `/og/${post.id}.svg`;
+      const ogSrc = `/thumbnails/${post.id}.svg`;
       return (
         <a
           href={`/blog/${post.id}/`}

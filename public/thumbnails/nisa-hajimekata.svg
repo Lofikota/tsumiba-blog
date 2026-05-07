@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 256" width="384" height="256">
+  <rect width="384" height="256" fill="#E8F5E9" rx="12"/>
+  <rect width="384" height="8" fill="#4CAF7D" rx="12"/>
+  <rect x="20" y="24" width="88" height="22" fill="#4CAF7D" rx="6"/>
+  <text x="64" y="39" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">NISA・投資</text>
+  <text x="192" y="140" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="64" text-anchor="middle" dominant-baseline="middle">🌱</text>
+  <text x="192" y="198" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="22" font-weight="700" fill="#1A1A2E" text-anchor="middle">新NISAの始め方</text>
+  <text x="192" y="228" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="13" fill="#2E7D32" text-anchor="middle" font-weight="700">SBI証券で口座開設する手順</text>
+</svg>

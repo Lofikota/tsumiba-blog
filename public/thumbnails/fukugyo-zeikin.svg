@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 256" width="384" height="256">
+  <rect width="384" height="256" fill="#E0F7FA" rx="12"/>
+  <rect width="384" height="8" fill="#00BCD4" rx="12"/>
+  <rect x="20" y="24" width="88" height="22" fill="#00BCD4" rx="6"/>
+  <text x="64" y="39" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">副業・節税</text>
+  <text x="192" y="140" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="64" text-anchor="middle" dominant-baseline="middle">📝</text>
+  <text x="192" y="198" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="22" font-weight="700" fill="#1A1A2E" text-anchor="middle">副業の税金・節税</text>
+  <text x="192" y="228" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="13" fill="#00838F" text-anchor="middle" font-weight="700">確定申告が必要なケース</text>
+</svg>
