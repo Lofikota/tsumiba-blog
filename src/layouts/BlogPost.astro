@@ -10,9 +10,10 @@ interface Props {
   heroImage?: string;
   category: string;
   affiliate?: boolean;
+  headings?: { depth: number; slug: string; text: string }[];
 }
 
-const { title, description, pubDate, updatedDate, heroImage, category, affiliate = true } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, category, affiliate = true, headings = [] } = Astro.props;
 const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 const ogImage = heroImage ?? `/og/${slug}.svg`;
 const lineRef = getLineRef(getLineRefForArticle(slug, category));
@@ -20,6 +21,8 @@ const lineAddUrl = lineRef ? getLineAddUrl(lineRef.ref) : getLineAddUrl('blog-ma
 
 const dateStr = pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+
+const tocHeadings = headings.filter(h => h.depth === 2);
 ---
 
 <BaseLayout title={title} description={description} image={ogImage} article={true} pubDate={pubDate} updatedDate={updatedDate}>
@@ -36,6 +39,22 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
     </div>
 
     {heroImage && <img src={heroImage} alt={title} decoding="async" fetchpriority="high" style="width:100%;border-radius:var(--radius);margin-bottom:1.5rem;" />}
+
+    {tocHeadings.length > 2 && (
+      <nav class="toc" aria-label="目次">
+        <p class="toc-title">この記事の内容</p>
+        <ol class="toc-list">
+          {tocHeadings.map((h, i) => (
+            <li class="toc-item">
+              <a href={`#${h.slug}`} class="toc-link">
+                <span class="toc-num">{i + 1}</span>
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
 
     <div class="prose">
       <slot />
@@ -57,25 +76,56 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
 </BaseLayout>
 
 <style>
+  /* ── 目次 ── */
+  .toc {
+    margin: 1.5rem 0;
+    padding: 1.1rem 1.25rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+  }
+  .toc-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin: 0 0 0.75rem;
+  }
+  .toc-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .toc-item { margin: 0; }
+  .toc-link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    color: #1d4ed8;
+    text-decoration: none;
+    line-height: 1.5;
+  }
+  .toc-link:hover { text-decoration: underline; }
+  .toc-num {
+    flex-shrink: 0;
+    width: 1.3rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+  }
+
+  /* ── LINE CTA ── */
   .line-cta {
     margin-top: 2rem;
     padding: 1.2rem 1.25rem;
     border: 1px solid #cfe2ff;
     border-radius: var(--radius);
     background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
-  }
-  .line-cta--top {
-    margin-top: 1rem;
-    margin-bottom: 1.25rem;
-  }
-  .line-cta-label {
-    display: inline-block;
-    margin-bottom: 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #1d4ed8;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
   .line-cta h2 {
     font-size: 1.1rem;
@@ -89,19 +139,6 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
     color: var(--color-text-muted);
     margin-bottom: 0.9rem;
   }
-  .line-cta--top p {
-    margin-bottom: 0.8rem;
-  }
-  .line-cta-list {
-    margin: 0 0 1rem 1.1rem;
-    padding: 0;
-    color: #475569;
-    font-size: 0.9rem;
-    line-height: 1.7;
-  }
-  .line-cta-list li + li {
-    margin-top: 0.35rem;
-  }
   .line-cta-button {
     display: inline-flex;
     align-items: center;
@@ -112,10 +149,5 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
     color: #fff;
     font-weight: 800;
     text-decoration: none;
-  }
-  .line-cta-note {
-    margin-top: 0.65rem;
-    font-size: 0.78rem;
-    color: #64748b;
   }
 </style>
