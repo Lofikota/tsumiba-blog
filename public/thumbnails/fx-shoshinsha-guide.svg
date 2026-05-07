@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="64" viewBox="0 0 96 64">
+  <rect width="96" height="64" rx="6" fill="#FF8C00"/>
+  <rect x="4" y="4" width="88" height="56" rx="4" fill="#FFA533"/>
+  <text x="48" y="22" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="18" fill="#FFFFFF" text-anchor="middle">💱</text>
+  <text x="48" y="38" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="8" fill="#FFFFFF" text-anchor="middle">FX初心者</text>
+  <text x="48" y="51" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="7" fill="#FFE0B2" text-anchor="middle">始め方ガイド</text>
+</svg>
