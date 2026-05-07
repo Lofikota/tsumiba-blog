@@ -61,7 +61,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     </div>
 
     <section class="line-cta">
-      <h2>気になった内容をLINEで整理する</h2>
+      <h2>{lineRef ? lineRef.headline : '気になった内容をLINEで整理する'}</h2>
       <p>{lineRef ? lineRef.description : '登録後に4択から1つ選ぶと、悩みに合わせた情報をまとめて受け取れます。不要なときはすぐ解除できます。'}</p>
       <a class="line-cta-button" href={lineAddUrl} rel="noopener noreferrer">LINEで受け取る（無料）</a>
     </section>

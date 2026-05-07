@@ -83,8 +83,8 @@ export const lineRefs: LineRef[] = [
     label: 'ブログ FX記事CTA',
     source: 'blog',
     intent: 'fx',
-    headline: 'FXの口座比較をLINEで整理する',
-    description: 'スプレッド、スワップ、口座開設条件の見直しポイントを受け取れます。',
+    headline: '口座を開く前に3分だけ確認してほしいこと',
+    description: 'DMM FX・JFX・FXTFの比較ポイント、初心者が見落としやすい条件、開設後に最初にやることを整理して届けます。「開いてから気づいた」をなくすためのチェックリストです。',
   },
   {
     ref: 'lp-manga-main',
