@@ -35,20 +35,6 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
       {updatedDate && <span style="margin-left:0.75rem;"><time datetime={updatedDate.toISOString()}>更新：{updatedStr}</time></span>}
     </div>
 
-    {affiliate && (
-      <div class="affiliate-disclosure">
-        ※ このページにはアフィリエイト広告（PR）が含まれています。
-      </div>
-    )}
-
-    <section class="line-cta line-cta--top">
-      <p class="line-cta-label">最短導線</p>
-      <h2>この記事の続きは、LINEで1分だけ整理する</h2>
-      <p>{lineRef ? lineRef.description : '記事で読んだ内容を、LINEで悩み別に見返せるようにまとめています。'}</p>
-      <a class="line-cta-button" href={lineAddUrl} rel="noopener noreferrer">1分でLINE診断する</a>
-      {lineRef && <p class="line-cta-note">流入元: {lineRef.label}</p>}
-    </section>
-
     {heroImage && <img src={heroImage} alt={title} decoding="async" fetchpriority="high" style="width:100%;border-radius:var(--radius);margin-bottom:1.5rem;" />}
 
     <div class="prose">
@@ -56,16 +42,9 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
     </div>
 
     <section class="line-cta">
-      <p class="line-cta-label">この記事の続き</p>
-      <h2>悩み別にLINEで整理して受け取る</h2>
-      <p>{lineRef ? lineRef.description : '記事で読んだ内容を、LINEで悩み別に見返せるようにまとめています。'}</p>
-      <ul class="line-cta-list">
-        <li>登録直後に、今いちばん知りたいテーマを1つ選べます。</li>
-        <li>悩みごとに記事やチェック項目をまとめて受け取れます。</li>
-        <li>必要ないときはいつでも解除できます。</li>
-      </ul>
-      <a class="line-cta-button" href={lineAddUrl} rel="noopener noreferrer">1分でLINE診断する</a>
-      {lineRef && <p class="line-cta-note">流入元: {lineRef.label}</p>}
+      <h2>気になった内容をLINEで整理する</h2>
+      <p>{lineRef ? lineRef.description : '登録後に4択から1つ選ぶと、悩みに合わせた情報をまとめて受け取れます。不要なときはすぐ解除できます。'}</p>
+      <a class="line-cta-button" href={lineAddUrl} rel="noopener noreferrer">LINEで受け取る（無料）</a>
     </section>
 
     <div class="disclaimer">
