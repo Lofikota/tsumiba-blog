@@ -6,14 +6,20 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "gsc:import": "node scripts/import-search-console.mjs"
+    "gsc:import": "node scripts/import-search-console.mjs",
+    "article:generate": "node scripts/generate-article.mjs",
+    "article:check": "node scripts/quality-gate.mjs",
+    "seo:improve": "node scripts/seo-analyzer.mjs",
+    "seo:fetch": "node scripts/gsc-api.mjs"
   },
   "license": "ISC",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.95.1",
     "@astrojs/cloudflare": "^13.2.1",
     "@astrojs/mdx": "^5.0.4",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.2",
-    "astro": "^6.1.9"
+    "astro": "^6.1.9",
+    "googleapis": "^171.4.0"
   }
 }

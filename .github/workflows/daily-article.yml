@@ -1,0 +1,43 @@
+name: 毎日記事自動生成
+
+on:
+  schedule:
+    - cron: '0 1 * * *'   # 毎日 10:00 JST
+  workflow_dispatch:        # 手動実行も可能
+
+jobs:
+  generate-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 依存関係インストール
+        run: npm ci
+
+      - name: 記事生成
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/generate-article.mjs
+
+      - name: Astroビルド（品質確認）
+        run: npm run build
+
+      - name: 変更をコミット＆プッシュ
+        env:
+          TODAY: ${{ github.run_id }}
+        run: |
+          git config user.name "ren-bot[bot]"
+          git config user.email "bot@ren-money.com"
+          git add src/content/blog/ data/keyword-queue.json
+          git diff --staged --quiet || git commit -m "feat(auto): 記事自動生成"
+          git push

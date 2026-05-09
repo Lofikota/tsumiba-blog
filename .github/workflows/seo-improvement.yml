@@ -1,0 +1,43 @@
+name: 週次SEO自動改善
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'   # 毎週月曜 11:00 JST
+  workflow_dispatch:
+
+jobs:
+  seo-rewrite:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 依存関係インストール
+        run: npm ci
+
+      - name: SEO分析＆リライト実行
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+        run: node scripts/seo-analyzer.mjs
+
+      - name: Astroビルド（品質確認）
+        run: npm run build
+
+      - name: 変更をコミット＆プッシュ
+        run: |
+          git config user.name "ren-bot[bot]"
+          git config user.email "bot@ren-money.com"
+          git add src/content/blog/ KPI管理/
+          git diff --staged --quiet || git commit -m "feat(seo): 週次自動リライト"
+          git push
