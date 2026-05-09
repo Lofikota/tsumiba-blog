@@ -11,7 +11,7 @@ interface Props {
   badge?: string;
 }
 
-const { href, product, text, label = 'PR', color = 'blue', note, badge } = Astro.props;
+const { href, product, text = '公式サイトで確認する', label = 'PR', color = 'blue', note, badge } = Astro.props;
 const ctaHref = product ? getAffiliatePath(product) : href ?? '#';
 
 const colorMap: Record<string, string> = {

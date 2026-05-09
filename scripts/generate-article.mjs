@@ -74,7 +74,10 @@ affiliate: true
 ---
 
 import AffiliateCTA from '../../components/AffiliateCTA.astro';
-import ComparisonTable from '../../components/ComparisonTable.astro';
+
+【コンポーネント使用ルール】
+- ComparisonTableは使わない。比較表はMarkdownのテーブル記法で書く
+- AffiliateCTAは必ずtextプロパティを指定する: <AffiliateCTA text="公式サイトで詳細を確認する" href="https://example.com" />
 
 【参考スタイル（この文体・構成を模倣すること）】
 ${exampleContent}`;
