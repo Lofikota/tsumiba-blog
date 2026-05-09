@@ -71,6 +71,18 @@ export function checkArticle(content, slug) {
     }
   }
 
+  // アフィリエイトリンクチェック（AffiliateCTAコンポーネントまたは直リンク）
+  const hasAffiliateLink =
+    content.includes('<AffiliateCTA') ||
+    content.includes('a8.net') ||
+    content.includes('accesstrade') ||
+    content.includes('affiliate') ||
+    content.includes('tc-link') ||
+    content.includes('valuecommerce');
+  if (!hasAffiliateLink) {
+    warnings.push('アフィリエイトリンクが見当たらない（AffiliateCTAコンポーネントまたはASPリンクを確認してください）');
+  }
+
   // heroImage存在チェック
   if (!content.includes('heroImage:')) {
     warnings.push('heroImageがない（設定推奨）');

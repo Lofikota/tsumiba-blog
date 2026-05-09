@@ -1,0 +1,44 @@
+name: 競合モニタリング
+
+on:
+  schedule:
+    - cron: '0 3 * * 3'   # 毎週水曜 12:00 JST
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 依存関係インストール
+        run: npm ci
+
+      - name: 競合記事モニタリング実行
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/competitor-monitor.mjs
+
+      - name: 変更をコミット＆プッシュ
+        run: |
+          git config user.name "ren-bot[bot]"
+          git config user.email "bot@ren-money.com"
+          git add data/competitor-snapshots.json data/competitor-targets.json KPI管理/competitor-reports/
+          git diff --staged --quiet || git commit -m "feat(monitor): 競合モニタリングレポート更新"
+          git push
+
+      - name: LINE通知（モニタリング完了）
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: node scripts/notify-line.mjs --type info --message "競合モニタリング完了"

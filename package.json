@@ -9,8 +9,13 @@
     "gsc:import": "node scripts/import-search-console.mjs",
     "article:generate": "node scripts/generate-article.mjs",
     "article:check": "node scripts/quality-gate.mjs",
+    "article:links": "node scripts/internal-links.mjs",
     "seo:improve": "node scripts/seo-analyzer.mjs",
-    "seo:fetch": "node scripts/gsc-api.mjs"
+    "seo:fetch": "node scripts/gsc-api.mjs",
+    "queue:refill": "node scripts/refill-keyword-queue.mjs",
+    "x:post": "node scripts/auto-post-x.mjs",
+    "notify:line": "node scripts/notify-line.mjs",
+    "monitor:competitor": "node scripts/competitor-monitor.mjs"
   },
   "license": "ISC",
   "dependencies": {
@@ -20,6 +25,7 @@
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.2",
     "astro": "^6.1.9",
-    "googleapis": "^171.4.0"
+    "googleapis": "^171.4.0",
+    "twitter-api-v2": "^1.29.0"
   }
 }

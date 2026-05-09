@@ -34,10 +34,23 @@ jobs:
       - name: Astroビルド（品質確認）
         run: npm run build
 
+      - name: キーワードキュー自動補充
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+        run: node scripts/refill-keyword-queue.mjs
+
       - name: 変更をコミット＆プッシュ
         run: |
           git config user.name "ren-bot[bot]"
           git config user.email "bot@ren-money.com"
-          git add src/content/blog/ KPI管理/
-          git diff --staged --quiet || git commit -m "feat(seo): 週次自動リライト"
+          git add src/content/blog/ KPI管理/ data/keyword-queue.json
+          git diff --staged --quiet || git commit -m "feat(seo): 週次自動リライト＋キュー補充"
           git push
+
+      - name: LINE通知（SEO完了）
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: node scripts/notify-line.mjs --type seo --message "週次SEO改善完了"

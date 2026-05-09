@@ -32,6 +32,9 @@ jobs:
       - name: Astroビルド（品質確認）
         run: npm run build
 
+      - name: 内部リンク自動挿入
+        run: node scripts/internal-links.mjs
+
       - name: 変更をコミット＆プッシュ
         env:
           TODAY: ${{ github.run_id }}
@@ -41,3 +44,26 @@ jobs:
           git add src/content/blog/ data/keyword-queue.json
           git diff --staged --quiet || git commit -m "feat(auto): 記事自動生成"
           git push
+
+      - name: Xスレッド投稿
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+        run: node scripts/auto-post-x.mjs
+
+      - name: LINE通知（公開完了）
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: |
+          SLUG=$(node -e "
+            const q=JSON.parse(require('fs').readFileSync('data/keyword-queue.json','utf-8'));
+            const latest=[...q].reverse().find(k=>k.status==='published');
+            console.log(latest ? latest.slug : '');
+          ")
+          if [ -n "$SLUG" ]; then
+            node scripts/notify-line.mjs --type publish --slug "$SLUG"
+          fi
