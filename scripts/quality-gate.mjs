@@ -4,10 +4,19 @@
  * 戻り値: { ok: boolean, errors: string[], warnings: string[] }
  */
 
+// 単純文字列マッチ（前後の文脈に関係なく禁止）
 const BANNED_EXPRESSIONS = [
-  '確実に儲かる', '絶対に損しない', '元本保証', '必ず増える',
-  '誰でも稼げる', '絶対儲かる', '損しない', 'リスクなし',
+  '確実に儲かる', '絶対に損しない', '必ず増える',
+  '誰でも稼げる', '絶対儲かる', 'リスクなし',
 ];
+
+// 「〜はない/ありません」という否定文で使う場合は合法なので正規表現で除外する
+// 「元本保証」単体（肯定的に使われている）は禁止、「元本保証はない/なし/ありません」はOK
+const BANNED_PATTERNS = [
+  { pattern: /元本保証(?!はな|がな|はあり|がない)/, label: '元本保証（肯定的使用）' },
+  { pattern: /損しない(?!とは言えない|わけではない)/, label: '損しない（断定）' },
+];
+
 
 const FINANCIAL_KEYWORDS = ['FX', '投資', 'NISA', 'iDeCo', '証券', '株', '外国為替', 'レバレッジ'];
 
@@ -36,10 +45,17 @@ export function checkArticle(content, slug) {
     errors.push('frontmatterにupdatedDateがない');
   }
 
-  // 禁止表現チェック
+  // 禁止表現チェック（単純マッチ）
   for (const expr of BANNED_EXPRESSIONS) {
     if (content.includes(expr)) {
       errors.push(`禁止表現「${expr}」が含まれている`);
+    }
+  }
+
+  // 禁止パターンチェック（正規表現・文脈考慮）
+  for (const { pattern, label } of BANNED_PATTERNS) {
+    if (pattern.test(content)) {
+      errors.push(`禁止表現「${label}」が含まれている`);
     }
   }
 
