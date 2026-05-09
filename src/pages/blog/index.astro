@@ -36,11 +36,12 @@ const catColors: Record<string, { bg: string; text: string }> = {
           onmouseout="this.style.boxShadow='none';this.style.transform='translateY(0)'"
         >
           <img
-            src={ogSrc}
+            src={post.data.heroImage ?? ogSrc}
             alt=""
             aria-hidden="true"
             width="96"
             height="64"
+            loading="lazy"
             style="width:96px;height:64px;object-fit:cover;border-radius:6px;flex-shrink:0;background:#f1f5f9;"
           />
           <div style="min-width:0;flex:1;">

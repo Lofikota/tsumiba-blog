@@ -844,7 +844,17 @@ const catStyle: Record<string, CatStyle> = {
           return (
             <article class={`article-card reveal`} style={`animation-delay:${i * 0.08}s`}>
               <a href={`/blog/${post.id}/`} style="display:block;color:inherit;text-decoration:none;">
-                <div class="article-thumb" style={`background:${bg}`}>
+                <div class="article-thumb" style={post.data.heroImage ? '' : `background:${bg}`}>
+                  {post.data.heroImage ? (
+                    <img
+                      src={post.data.heroImage}
+                      alt={post.data.title}
+                      width="640"
+                      height="400"
+                      loading="lazy"
+                      style="width:100%;height:100%;object-fit:cover;display:block;"
+                    />
+                  ) : (
                   <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
                     {post.data.category === 'NISA・投資' && (
                       <>
@@ -895,6 +905,7 @@ const catStyle: Record<string, CatStyle> = {
                       </>
                     )}
                   </svg>
+                  )}
                 </div>
                 <div class="article-body">
                   <span class={`article-cat ${cls}`}>{post.data.category}</span>
