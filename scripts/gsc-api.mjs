@@ -5,17 +5,34 @@
  *           GSC_SITE_URL (例: https://ren-money.com/)
  */
 import { google } from 'googleapis';
+import { readFileSync, existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+// ローカル開発用: .env ファイルを手動ロード（dotenv不要）
+const __dir = dirname(fileURLToPath(import.meta.url));
+const envPath = join(__dir, '..', '.env');
+if (existsSync(envPath)) {
+  for (const line of readFileSync(envPath, 'utf-8').split('\n')) {
+    const m = line.match(/^([^=]+)=(.*)$/);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim();
+  }
+}
 
 const SITE_URL = process.env.GSC_SITE_URL || 'https://ren-money.com/';
 
 function getAuth() {
+  const scopes = ['https://www.googleapis.com/auth/webmasters.readonly'];
+
+  // GitHub Actions: サービスアカウントJSONをbase64で渡す
   const encoded = process.env.GSC_SERVICE_ACCOUNT_JSON;
-  if (!encoded) throw new Error('GSC_SERVICE_ACCOUNT_JSON が設定されていません');
-  const json = JSON.parse(Buffer.from(encoded, 'base64').toString('utf-8'));
-  return new google.auth.GoogleAuth({
-    credentials: json,
-    scopes: ['https://www.googleapis.com/auth/webmasters.readonly'],
-  });
+  if (encoded) {
+    const json = JSON.parse(Buffer.from(encoded, 'base64').toString('utf-8'));
+    return new google.auth.GoogleAuth({ credentials: json, scopes });
+  }
+
+  // ローカル開発: gcloud application-default credentials を自動検出
+  return new google.auth.GoogleAuth({ scopes });
 }
 
 /**
