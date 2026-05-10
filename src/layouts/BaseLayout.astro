@@ -17,6 +17,7 @@ const siteName = '田中蓮のマネーブログ';
 const pageTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 const absoluteImageUrl = new URL(image, siteUrl);
 const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';
+const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_SEND_TO ?? '';
 ---
 
 <!doctype html>
@@ -63,11 +64,27 @@ const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBL
   {googleTagId && (
     <>
       <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}></script>
-      <script define:vars={{ googleTagId }}>
+      <script define:vars={{ googleTagId, googleAdsConversionSendTo }}>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
+        window.gtag = window.gtag || gtag;
         gtag('js', new Date());
         gtag('config', googleTagId);
+
+        document.addEventListener('click', (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          const anchor = target.closest('a[data-google-event]');
+          if (!anchor) return;
+          const eventName = anchor.getAttribute('data-google-event') || 'click';
+          const label = anchor.getAttribute('data-google-label') || anchor.textContent?.trim().replace(/\s+/g, ' ').slice(0, 80) || '';
+          window.gtag('event', eventName, {
+            event_category: anchor.getAttribute('data-google-category') || 'engagement',
+            event_label: label,
+            link_url: anchor.getAttribute('href') || '',
+            page_path: window.location.pathname,
+          });
+        }, true);
       </script>
     </>
   )}

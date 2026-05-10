@@ -27,6 +27,9 @@ const bg = colorMap[color] ?? colorMap.blue;
   {badge && <div class="acta-badge">{badge}</div>}
   {note && <p class="acta-note">{note}</p>}
   <a href={ctaHref} target="_blank" rel="noopener noreferrer sponsored nofollow"
+     data-google-event="affiliate_click"
+     data-google-category="affiliate"
+     data-google-label={product ?? href ?? text}
      class="acta-btn" style={bg}>
     <span class="acta-arrow">→</span>
     {text}

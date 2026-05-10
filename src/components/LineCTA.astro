@@ -1,0 +1,104 @@
+---
+import { getLineAddUrl, getLineRef } from '../data/lineLinks';
+
+interface Props {
+  ref?: string;
+  headline?: string;
+  description?: string;
+}
+
+const {
+  ref: refKey = 'blog-main',
+  headline: headlineProp,
+  description: descriptionProp,
+} = Astro.props;
+
+const lineRef = getLineRef(refKey);
+const addUrl = getLineAddUrl(refKey);
+const headline = headlineProp ?? lineRef?.headline ?? 'LINEで続きを受け取る';
+const description = descriptionProp ?? lineRef?.description ?? '';
+---
+
+<div class="lcta-wrap">
+  <div class="lcta-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#06c755">
+      <path d="M12 2C6.48 2 2 6.03 2 11c0 2.7 1.3 5.12 3.36 6.83L4.5 21l3.36-1.76A10.9 10.9 0 0 0 12 20c5.52 0 10-4.03 10-9S17.52 2 12 2z"/>
+    </svg>
+  </div>
+  <div class="lcta-body">
+    <p class="lcta-headline">{headline}</p>
+    {description && <p class="lcta-desc">{description}</p>}
+  </div>
+  <a href={addUrl} class="lcta-btn" target="_blank" rel="noopener noreferrer"
+     data-google-event="line_click"
+     data-google-category="lead"
+     data-google-label={refKey}>
+    LINEで受け取る
+  </a>
+  <p class="lcta-note">登録無料・不要なら解除できます</p>
+</div>
+
+<style>
+.lcta-wrap {
+  margin: 2rem 0;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 14px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+.lcta-icon {
+  background: #dcfce7;
+  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lcta-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lcta-headline {
+  font-size: 17px;
+  font-weight: 800;
+  color: #14532d;
+  line-height: 1.4;
+  margin: 0;
+}
+.lcta-desc {
+  font-size: 13px;
+  color: #166534;
+  line-height: 1.7;
+  margin: 0;
+}
+.lcta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #06c755;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 13px 28px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(6,199,85,.3);
+  transition: filter .15s, transform .1s;
+}
+.lcta-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+}
+.lcta-note {
+  font-size: 11px;
+  color: #6b7280;
+  margin: 0;
+}
+</style>
