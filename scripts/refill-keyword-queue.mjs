@@ -62,14 +62,34 @@ if (missingGSC.length > 0) {
     process.exit(1);
   }
 
-  console.log('GSCなしモード: デフォルトキーワードを5件追加します。');
+  console.log('GSCなしモード: FX SEO/X オーガニック用デフォルトキーワードを5件追加します。');
 
   const defaults = [
-    { keyword: 'SBI FX α スプレッド 比較', category: 'FX・外貨', notes: 'SBI FX αの特徴とスプレッドを他社と比較' },
-    { keyword: '楽天証券 NISA 2024 新制度', category: '投資・資産運用', notes: '楽天証券での新NISA設定手順' },
-    { keyword: 'ふるさと納税 おすすめ サイト 比較', category: '家計・節約', notes: 'ふるさと納税サイトをポイント還元率で比較' },
-    { keyword: 'au PAY カード ポイント 還元率', category: 'クレジットカード', notes: 'au PAYカードのメリット・デメリット' },
-    { keyword: '副業 バレない 方法 住民税', category: '副業・節税', notes: '副業が会社にバレないための住民税対策' },
+    {
+      keyword: 'FX 初心者 やめとけ 理由',
+      category: 'FX・外貨',
+      notes: 'FX SEO/Xオーガニック優先。失敗回避、元本割れ、レバレッジ、ロスカットを先に説明',
+    },
+    {
+      keyword: 'FX 少額 始め方 初心者',
+      category: 'FX・外貨',
+      notes: 'FX SEO/Xオーガニック優先。余剰資金、取引単位、必要証拠金、練習口座の考え方',
+    },
+    {
+      keyword: 'FX レバレッジ 何倍 初心者',
+      category: 'FX・外貨',
+      notes: 'FX SEO/Xオーガニック優先。レバレッジとロスカットの仕組みを安全確認目的で解説',
+    },
+    {
+      keyword: 'FX 副業 会社にバレる',
+      category: 'FX・外貨',
+      notes: 'FX SEO/Xオーガニック優先。会社員の副業規程、確定申告、住民税の注意点',
+    },
+    {
+      keyword: 'FX 確定申告 やり方 会社員',
+      category: 'FX・外貨',
+      notes: 'FX SEO/Xオーガニック優先。申告分離課税、必要書類、損益通算、繰越控除を公式確認前提で整理',
+    },
   ];
 
   let added = 0;
@@ -87,6 +107,7 @@ if (missingGSC.length > 0) {
         notes: item.notes,
         status: 'pending',
         addedBy: 'refill-default',
+        channel: 'seo_x_organic',
       });
       added++;
       console.log(`+ ${item.keyword}`);

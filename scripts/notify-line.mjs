@@ -7,6 +7,7 @@
  *   node scripts/notify-line.mjs --type publish --slug matsui-fx-review
  *   node scripts/notify-line.mjs --type error --message "品質チェック失敗: ..."
  *   node scripts/notify-line.mjs --type seo --slug ideco-guide --report "順位改善..."
+ *   node scripts/notify-line.mjs --type asp --approved "A8.net × 松井証券 (2026-05-12)" --rejected "アクセストレード × ren-money.com (2026-05-12)"
  */
 
 const LINE_API = 'https://api.line.me/v2/bot/message/push';
@@ -51,6 +52,8 @@ const slug = getArg('slug');
 const message = getArg('message');
 const report = getArg('report');
 const charCount = getArg('chars');
+const approved = getArg('approved');  // ASP承認リスト（改行区切り）
+const rejected = getArg('rejected');  // ASP否認リスト（改行区切り）
 
 let lineMessages;
 const now = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
@@ -75,6 +78,27 @@ if (type === 'publish') {
   lineMessages = [{
     type: 'text',
     text: `🐦 Xスレッドを投稿しました\n\n📄 ${slug}\n🕐 ${now}`,
+  }];
+} else if (type === 'asp') {
+  // カンマ区切りまたは改行区切りの両方に対応
+  const splitList = (s) => s ? s.split(/[,\n]/).map(l => l.trim()).filter(Boolean) : [];
+  const approvedLines = splitList(approved).map(l => `  ✅ ${l}`).join('\n') || null;
+  const rejectedLines = splitList(rejected).map(l => `  ❌ ${l}`).join('\n') || null;
+
+  const sections = [];
+  if (approvedLines) {
+    sections.push(`【承認】\n${approvedLines}\n\n→ keyword-queue に自動追加 → 翌朝10:00に記事生成`);
+  }
+  if (rejectedLines) {
+    sections.push(`【否認】\n${rejectedLines}\n\n→ 記事を充実させてから再申請してください`);
+  }
+  if (message) {
+    sections.push(message);
+  }
+
+  lineMessages = [{
+    type: 'text',
+    text: `🔔 ASPステータス更新\n🕐 ${now}\n\n${sections.join('\n\n──────────────\n\n')}`,
   }];
 } else {
   lineMessages = [{
