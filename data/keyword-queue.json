@@ -14,9 +14,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "FX SEO/Xオーガニック優先。FX利益の確定申告手順、申告分離課税20.315%、会社員の副業・住民税注意点を公式確認前提で解説。fx-kouza-hikaku と LINE interest_fx へ内部導線を置く",
-    "status": "pending",
+    "status": "published",
     "priority": 1,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-05-10T06:42:27.883Z"
   },
   {
     "slug": "fx-yametoke-reason",
