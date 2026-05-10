@@ -16,7 +16,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
 const siteName = '田中蓮のマネーブログ';
 const pageTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 const absoluteImageUrl = new URL(image, siteUrl);
-const gaId = import.meta.env.PUBLIC_GA_ID;
+const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';
 ---
 
 <!doctype html>
@@ -60,14 +60,14 @@ const gaId = import.meta.env.PUBLIC_GA_ID;
 
   <link rel="sitemap" href="/sitemap-index.xml" />
 
-  {gaId && (
+  {googleTagId && (
     <>
-      <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
-      <script define:vars={{ gaId }}>
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}></script>
+      <script define:vars={{ googleTagId }}>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', gaId);
+        gtag('config', googleTagId);
       </script>
     </>
   )}
