@@ -12,15 +12,47 @@ interface Props {
   category: string;
   affiliate?: boolean;
   headings?: { depth: number; slug: string; text: string }[];
+  articleType?: 'review' | 'guide' | 'comparison' | 'news';
+  rating?: number;
 }
 
-const { title, description, pubDate, updatedDate, heroImage, category, affiliate = true, headings = [] } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, category, affiliate = true, headings = [], articleType, rating } = Astro.props;
 const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 const ogImage = heroImage ?? `/og/${slug}.svg`;
 const lineRef = getLineRef(getLineRefForArticle(slug, category));
 const adSourceRef = Astro.url.searchParams.get('ref')?.trim();
 const resolvedLineRef = lineRef ? lineRef.ref : 'blog-main';
 const lineAddUrl = getLineAddUrl(adSourceRef ? `${resolvedLineRef}__${adSourceRef}` : resolvedLineRef);
+const SITE_URL = 'https://ren-money.com';
+const AUTHOR = { '@type': 'Person', name: '田中蓮', url: `${SITE_URL}/about/` };
+
+// Article スキーマ（全記事共通）
+const articleJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': articleType === 'review' ? 'Review' : 'Article',
+  headline: title,
+  description,
+  image: heroImage ? [heroImage] : [`${SITE_URL}/og/${slug}.svg`],
+  datePublished: pubDate.toISOString(),
+  dateModified: (updatedDate ?? pubDate).toISOString(),
+  author: AUTHOR,
+  publisher: {
+    '@type': 'Organization',
+    name: 'ren-money.com',
+    logo: { '@type': 'ImageObject', url: `${SITE_URL}/favicon.svg` },
+  },
+  url: `${SITE_URL}/blog/${slug}/`,
+  ...(articleType === 'review' && rating ? {
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: rating,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    itemReviewed: { '@type': 'FinancialProduct', name: title.replace(/のレビュー|評判.*$/, '').trim() },
+  } : {}),
+});
+
 const faqItems = getArticleFaqs(slug);
 const faqJsonLd = faqItems.length > 0 ? JSON.stringify({
   '@context': 'https://schema.org',
@@ -94,7 +126,8 @@ const tocHeadings = headings.filter(h => h.depth === 2);
       </section>
     )}
 
-    {faqJsonLd && <script type="application/ld+json" set:html={faqJsonLd} />}
+    <script is:inline type="application/ld+json" set:html={articleJsonLd} />
+    {faqJsonLd && <script is:inline type="application/ld+json" set:html={faqJsonLd} />}
 
     <section class="line-cta">
       <h2>{lineRef ? lineRef.headline : '気になった内容をLINEで整理する'}</h2>

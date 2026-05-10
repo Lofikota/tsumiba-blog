@@ -135,3 +135,17 @@ if (errors.length > 0) {
 }
 
 console.log('keyword-queue 検証OK');
+
+// pending 残数 2件以下で LINE アラート（LINE Secret が設定されている環境のみ）
+if (pendingItems.length <= 2 && process.env.LINE_CHANNEL_ACCESS_TOKEN && process.env.LINE_USER_ID) {
+  const { execFileSync } = await import('child_process');
+  const nextKeyword = next?.keyword ?? '不明';
+  const msg = pendingItems.length === 0
+    ? 'キューが空になりました。新しいキーワードを追加してください。'
+    : `キューの残りが${pendingItems.length}件です。補充を検討してください（次: ${nextKeyword}）`;
+  try {
+    execFileSync('node', ['scripts/notify-line.mjs', '--type', 'error', '--message', msg], { stdio: 'inherit' });
+  } catch {
+    console.warn('LINE通知失敗（キュー残数アラート）');
+  }
+}
