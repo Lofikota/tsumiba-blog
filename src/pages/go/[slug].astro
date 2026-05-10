@@ -14,6 +14,8 @@ interface Props {
 
 const { link } = Astro.props;
 const destinationJson = JSON.stringify(link.destinationUrl);
+const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';
+const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_SEND_TO ?? '';
 ---
 
 <!doctype html>
@@ -25,12 +27,40 @@ const destinationJson = JSON.stringify(link.destinationUrl);
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <title>{link.name} 公式サイトへ移動します</title>
     <meta name="description" content={`${link.name} の公式サイトへ移動します。`} />
-    <script is:inline define:vars={{ destinationJson }}>
-      const destination = JSON.parse(destinationJson);
-      window.setTimeout(() => {
-        window.location.replace(destination);
-      }, 900);
-    </script>
+    {googleTagId && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}></script>
+        <script is:inline define:vars={{ destinationJson, googleTagId, googleAdsConversionSendTo }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          window.gtag = window.gtag || gtag;
+          gtag('js', new Date());
+          gtag('config', googleTagId);
+
+          const destination = JSON.parse(destinationJson);
+          const finish = () => window.location.replace(destination);
+
+          if (googleAdsConversionSendTo) {
+            let finished = false;
+            const done = () => {
+              if (finished) return;
+              finished = true;
+              finish();
+            };
+            gtag('event', 'conversion', {
+              send_to: googleAdsConversionSendTo,
+              value: 1.0,
+              currency: 'JPY',
+              event_callback: done,
+              event_timeout: 1200,
+            });
+            window.setTimeout(done, 1200);
+          } else {
+            window.setTimeout(finish, 900);
+          }
+        </script>
+      </>
+    )}
   </head>
   <body>
     <main class="go-page">
@@ -39,7 +69,10 @@ const destinationJson = JSON.stringify(link.destinationUrl);
         <h1>{link.name} 公式サイトへ移動します</h1>
         <p>{link.disclosure}</p>
         <p class="go-small">掲載情報やキャンペーン条件は変更される場合があります。申込前に公式サイトで最新情報をご確認ください。</p>
-        <a class="go-button" href={link.destinationUrl} rel="sponsored nofollow noopener noreferrer">公式サイトを開く</a>
+        <a class="go-button" href={link.destinationUrl} rel="sponsored nofollow noopener noreferrer"
+           data-google-event="affiliate_click"
+           data-google-category="affiliate"
+           data-google-label={link.slug}>公式サイトを開く</a>
       </section>
     </main>
     <style>
