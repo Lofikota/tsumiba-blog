@@ -5,9 +5,14 @@ on:
     - cron: '0 2 * * 1'   # 毎週月曜 11:00 JST
   workflow_dispatch:
 
+concurrency:
+  group: ren-blog-automation-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   seo-rewrite:
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     permissions:
       contents: write
 
@@ -24,7 +29,11 @@ jobs:
       - name: 依存関係インストール
         run: npm ci
 
+      - name: キュー事前検証
+        run: npm run queue:check
+
       - name: SEO分析＆リライト実行
+        id: seo
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
@@ -32,25 +41,50 @@ jobs:
         run: node scripts/seo-analyzer.mjs
 
       - name: Astroビルド（品質確認）
+        if: steps.seo.outputs.rewritten_count != '0'
         run: npm run build
 
       - name: キーワードキュー自動補充
+        id: refill
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
         run: node scripts/refill-keyword-queue.mjs
 
+      - name: キュー補充後検証
+        run: npm run queue:check
+
       - name: 変更をコミット＆プッシュ
+        id: commit
         run: |
           git config user.name "ren-bot[bot]"
           git config user.email "bot@ren-money.com"
           git add src/content/blog/ KPI管理/ data/keyword-queue.json
-          git diff --staged --quiet || git commit -m "feat(seo): 週次自動リライト＋キュー補充"
-          git push
+          if git diff --staged --quiet; then
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "feat(seo): 週次自動リライト＋キュー補充"
+            git push
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: LINE通知（SEO完了）
+        if: success()
         env:
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-        run: node scripts/notify-line.mjs --type seo --message "週次SEO改善完了"
+          REWRITTEN_COUNT: ${{ steps.seo.outputs.rewritten_count }}
+          ADDED_COUNT: ${{ steps.refill.outputs.added_count }}
+          COMMITTED: ${{ steps.commit.outputs.committed }}
+        run: |
+          node scripts/notify-line.mjs --type seo --message "週次SEO改善完了: リライト${REWRITTEN_COUNT:-0}件 / キュー補充${ADDED_COUNT:-0}件 / commit=${COMMITTED:-false}"
+
+      - name: LINE通知（SEO失敗）
+        if: failure()
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          node scripts/notify-line.mjs --type error --message "週次SEO改善が失敗しました。GitHub Actions run_id=${RUN_ID} を確認してください。"

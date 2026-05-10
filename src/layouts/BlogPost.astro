@@ -18,7 +18,9 @@ const { title, description, pubDate, updatedDate, heroImage, category, affiliate
 const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 const ogImage = heroImage ?? `/og/${slug}.svg`;
 const lineRef = getLineRef(getLineRefForArticle(slug, category));
-const lineAddUrl = lineRef ? getLineAddUrl(lineRef.ref) : getLineAddUrl('blog-main');
+const adSourceRef = Astro.url.searchParams.get('ref')?.trim();
+const resolvedLineRef = lineRef ? lineRef.ref : 'blog-main';
+const lineAddUrl = getLineAddUrl(adSourceRef ? `${resolvedLineRef}__${adSourceRef}` : resolvedLineRef);
 const faqItems = getArticleFaqs(slug);
 const faqJsonLd = faqItems.length > 0 ? JSON.stringify({
   '@context': 'https://schema.org',

@@ -5,9 +5,14 @@ on:
     - cron: '0 1 * * *'   # 毎日 10:00 JST
   workflow_dispatch:        # 手動実行も可能
 
+concurrency:
+  group: ren-blog-automation-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   generate-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
 
@@ -24,46 +29,88 @@ jobs:
       - name: 依存関係インストール
         run: npm ci
 
+      - name: キュー検証
+        id: queue-check
+        run: npm run queue:check
+
       - name: 記事生成
+        id: article
+        if: steps.queue-check.outputs.has_pending == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node scripts/generate-article.mjs
 
-      - name: Astroビルド（品質確認）
-        run: npm run build
-
       - name: 内部リンク自動挿入
+        if: steps.article.outputs.status == 'published'
         run: node scripts/internal-links.mjs
 
-      - name: 変更をコミット＆プッシュ
+      - name: 生成記事の品質再確認
+        if: steps.article.outputs.status == 'published'
         env:
-          TODAY: ${{ github.run_id }}
+          ARTICLE_PATH: ${{ steps.article.outputs.article_path }}
+        run: node scripts/quality-gate.mjs "$ARTICLE_PATH"
+
+      - name: Astroビルド（品質確認）
+        if: steps.article.outputs.status == 'published'
+        run: npm run build
+
+      - name: 変更をコミット＆プッシュ
+        id: commit-content
+        if: steps.article.outputs.status == 'published'
+        env:
+          ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
         run: |
           git config user.name "ren-bot[bot]"
           git config user.email "bot@ren-money.com"
-          git add src/content/blog/ data/keyword-queue.json
-          git diff --staged --quiet || git commit -m "feat(auto): 記事自動生成"
-          git push
+          git add src/content/blog/ data/keyword-queue.json KPI管理/automation-runs/
+          if git diff --staged --quiet; then
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "feat(auto): 記事自動生成 ${ARTICLE_SLUG}"
+            git push
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Xスレッド投稿
+        if: steps.commit-content.outputs.committed == 'true'
         env:
+          ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
-        run: node scripts/auto-post-x.mjs
+        run: |
+          sleep 90
+          node scripts/auto-post-x.mjs --slug "$ARTICLE_SLUG"
+
+      - name: X投稿フラグを保存
+        if: steps.commit-content.outputs.committed == 'true'
+        env:
+          ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
+        run: |
+          git add data/keyword-queue.json
+          if git diff --staged --quiet; then
+            echo "X投稿フラグの変更なし"
+          else
+            git commit -m "chore(auto): record X post ${ARTICLE_SLUG}"
+            git push
+          fi
 
       - name: LINE通知（公開完了）
+        if: steps.commit-content.outputs.committed == 'true'
+        env:
+          ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
+          CHAR_COUNT: ${{ steps.article.outputs.char_count }}
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: node scripts/notify-line.mjs --type publish --slug "$ARTICLE_SLUG" --chars "$CHAR_COUNT"
+
+      - name: LINE通知（記事生成失敗）
+        if: failure()
         env:
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          RUN_ID: ${{ github.run_id }}
         run: |
-          SLUG=$(node -e "
-            const q=JSON.parse(require('fs').readFileSync('data/keyword-queue.json','utf-8'));
-            const latest=[...q].reverse().find(k=>k.status==='published');
-            console.log(latest ? latest.slug : '');
-          ")
-          if [ -n "$SLUG" ]; then
-            node scripts/notify-line.mjs --type publish --slug "$SLUG"
-          fi
+          node scripts/notify-line.mjs --type error --message "毎日記事自動生成が失敗しました。GitHub Actions run_id=${RUN_ID} を確認してください。"

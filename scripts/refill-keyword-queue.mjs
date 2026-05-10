@@ -15,6 +15,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const QUEUE_PATH = path.join(ROOT, 'data/keyword-queue.json');
 
+function setOutput(key, value) {
+  if (!process.env.GITHUB_OUTPUT) return;
+  fs.appendFileSync(process.env.GITHUB_OUTPUT, `${key}=${String(value)}\n`);
+}
+
 // 日本語キーワード → ASCII スラッグ変換（Claudeに依頼）
 async function generateSlug(client, keyword) {
   const res = await client.messages.create({
@@ -51,6 +56,12 @@ const gscRequired = ['GSC_SERVICE_ACCOUNT_JSON', 'GSC_SITE_URL'];
 const missingGSC = gscRequired.filter(k => !process.env[k]);
 if (missingGSC.length > 0) {
   console.warn(`GSC環境変数未設定: ${missingGSC.join(', ')}`);
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    setOutput('added_count', 0);
+    console.error('GitHub ActionsではGSCなしのデフォルト補充を禁止します。Secretsを設定してください。');
+    process.exit(1);
+  }
+
   console.log('GSCなしモード: デフォルトキーワードを5件追加します。');
 
   const defaults = [
@@ -84,6 +95,7 @@ if (missingGSC.length > 0) {
 
   fs.writeFileSync(QUEUE_PATH, JSON.stringify(queue, null, 2), 'utf-8');
   console.log(`\n${added}件のキーワードを追加しました。`);
+  setOutput('added_count', added);
   process.exit(0);
 }
 
@@ -109,6 +121,7 @@ const top = candidates.slice(0, 10);
 
 if (top.length === 0) {
   console.log('追加候補のキーワードがありませんでした。');
+  setOutput('added_count', 0);
   process.exit(0);
 }
 
@@ -145,3 +158,4 @@ for (const { keyword, impressions, position } of top) {
 
 fs.writeFileSync(QUEUE_PATH, JSON.stringify(queue, null, 2), 'utf-8');
 console.log(`\n✅ ${added}件のキーワードをキューに追加しました。`);
+setOutput('added_count', added);

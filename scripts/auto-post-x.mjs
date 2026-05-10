@@ -13,12 +13,31 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 
-// 直近公開記事を取得
+const args = process.argv.slice(2);
+const getArg = (name) => {
+  const index = args.indexOf(`--${name}`);
+  return index >= 0 ? args[index + 1] : null;
+};
+
+const requestedSlug = getArg('slug') || process.env.ARTICLE_SLUG || '';
+
+// 投稿対象記事を取得。Actions では生成工程の slug を必ず渡し、過去記事の誤投稿を防ぐ。
 const queue = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/keyword-queue.json'), 'utf-8'));
-const latest = [...queue].reverse().find(k => k.status === 'published');
+const latest = requestedSlug
+  ? queue.find(k => k.slug === requestedSlug)
+  : [...queue].reverse().find(k => k.status === 'published');
 
 if (!latest) {
+  if (requestedSlug) {
+    console.error(`投稿対象の記事がキューにありません: ${requestedSlug}`);
+    process.exit(1);
+  }
   console.log('投稿対象の記事なし。終了します。');
+  process.exit(0);
+}
+
+if (latest.status !== 'published') {
+  console.log(`投稿対象が published ではありません: ${latest.slug} (${latest.status})`);
   process.exit(0);
 }
 

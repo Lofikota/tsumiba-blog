@@ -5,9 +5,14 @@ on:
     - cron: '0 3 * * 3'   # 毎週水曜 12:00 JST
   workflow_dispatch:
 
+concurrency:
+  group: ren-blog-automation-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   monitor:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     permissions:
       contents: write
 

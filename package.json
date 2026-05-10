@@ -12,6 +12,7 @@
     "article:links": "node scripts/internal-links.mjs",
     "seo:improve": "node scripts/seo-analyzer.mjs",
     "seo:fetch": "node scripts/gsc-api.mjs",
+    "queue:check": "node scripts/validate-keyword-queue.mjs",
     "queue:refill": "node scripts/refill-keyword-queue.mjs",
     "x:post": "node scripts/auto-post-x.mjs",
     "notify:line": "node scripts/notify-line.mjs",
