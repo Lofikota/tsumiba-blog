@@ -9,6 +9,76 @@
     "publishedAt": "2026-05-09T13:00:40.029Z"
   },
   {
+    "slug": "fx-kakuteishinkoku-guide",
+    "keyword": "FX 確定申告 やり方 会社員",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "FX SEO/Xオーガニック優先。FX利益の確定申告手順、申告分離課税20.315%、会社員の副業・住民税注意点を公式確認前提で解説。fx-kouza-hikaku と LINE interest_fx へ内部導線を置く",
+    "status": "pending",
+    "priority": 1,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-yametoke-reason",
+    "keyword": "FX 初心者 やめとけ 理由",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "FX SEO/Xオーガニック優先。不安・失敗回避の検索意図に答える。元本割れ、レバレッジ、ロスカット、余剰資金、少額練習を先に説明し、無理な口座開設へ誘導しない",
+    "status": "pending",
+    "priority": 2,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-small-start-guide",
+    "keyword": "FX 少額 始め方 初心者",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "FX SEO/Xオーガニック優先。少額で始めたい初心者向けに、必要証拠金、取引単位、失ってもよい余剰資金、練習口座の考え方を整理する",
+    "status": "pending",
+    "priority": 3,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-leverage-risk-guide",
+    "keyword": "FX レバレッジ 何倍 初心者",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "FX SEO/Xオーガニック優先。レバレッジ、必要証拠金、ロスカット、追加証拠金の考え方を初心者向けに解説。利益訴求ではなくリスク理解を主目的にする",
+    "status": "pending",
+    "priority": 4,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-company-barenai",
+    "keyword": "FX 副業 会社にバレる",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "FX SEO/Xオーガニック優先。会社員が気にする副業規程、住民税、確定申告、勤務先ルールを整理。法律・税務の個別助言にしない",
+    "status": "pending",
+    "priority": 5,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "hoken-minaoshi-fp-soudan",
+    "keyword": "保険 見直し FP 無料相談",
+    "type": "guide",
+    "category": "保険",
+    "notes": "Google Ads出稿対象。副業・NISA開始後に保険を見直すタイミングを田中蓮視点で解説。保険見直しラボ・保険チャンネルへのCTA。無料FP相談の流れ・注意点も含める。ASP申請完了後にaff URLへ差し替え。",
+    "status": "pending",
+    "priority": 1,
+    "channel": "google_ads"
+  },
+  {
+    "slug": "hoken-minaoshi-30dai-kaisha-in",
+    "keyword": "保険 見直し 30代 会社員 タイミング",
+    "type": "guide",
+    "category": "保険",
+    "notes": "Google Ads出稿対象。30代会社員が保険を見直すべきタイミング（副業開始・結婚・子育て・住宅購入）を整理。田中蓮の経験談として。保険見直しラボへのCTA。",
+    "status": "pending",
+    "priority": 2,
+    "channel": "google_ads"
+  },
+  {
     "slug": "ideco-shoshinsha-guide",
     "keyword": "iDeCo 始め方 会社員",
     "type": "guide",
@@ -33,14 +103,6 @@
     "status": "pending"
   },
   {
-    "slug": "fx-kakuteishinkoku-guide",
-    "keyword": "FX 確定申告 やり方 会社員",
-    "type": "guide",
-    "category": "FX・外貨",
-    "notes": "FX利益の確定申告手順。申告分離課税20.315%の計算方法。副業との合算も解説",
-    "status": "pending"
-  },
-  {
     "slug": "nisa-ideco-docchi",
     "keyword": "NISA iDeCo どっち 先 副業",
     "type": "comparison",
@@ -54,7 +116,8 @@
     "type": "review",
     "category": "クレジットカード",
     "notes": "楽天カードの正直レビュー。ポイント還元率・楽天経済圏との相性・田中蓮が実際に使っている感想",
-    "status": "pending"
+    "status": "published",
+    "publishedAt": "2026-05-10"
   },
   {
     "slug": "fukugyo-kakuteishinkoku-guide",

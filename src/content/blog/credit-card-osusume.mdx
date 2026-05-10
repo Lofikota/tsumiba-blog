@@ -11,7 +11,6 @@ affiliate: true
 
 import AffiliateCTA from '../../components/AffiliateCTA.astro';
 import ComparisonTable from '../../components/ComparisonTable.astro';
-import LineCTA from '../../components/LineCTA.astro';
 
 > アフィリエイト広告を含みます
 
@@ -22,6 +21,26 @@ import LineCTA from '../../components/LineCTA.astro';
 改めて整理してみると、**メインカード1枚の選び方でポイント還元が年間2〜5万円変わる**ことがわかった。何も考えずに使い続けることのコストは想像以上に大きかった。
 
 クレカ選びのポイントは「どれが一番すごいか」より「自分の使い方に合っているか」だ。この記事では、実際に使ってきた視点で主要カードを比較する。
+
+<div style="margin:1.5rem 0 2rem;padding:1.15rem 1.2rem;border:1px solid #dbeafe;border-radius:14px;background:linear-gradient(180deg,#eff6ff 0%,#ffffff 100%);">
+  <p style="margin:0 0 0.45rem;font-size:0.74rem;font-weight:800;color:#1d4ed8;letter-spacing:0.08em;text-transform:uppercase;">先に結論だけ見る</p>
+  <p style="margin:0 0 0.85rem;color:#334155;font-size:0.95rem;line-height:1.8;">広告から来た人が迷いやすいのは、「結局どれを見ればいいのか」が最初に見えないことだと思う。なので先に順番だけ置いておく。</p>
+  <p style="margin:0 0 1rem;color:#0f172a;font-size:0.94rem;line-height:1.7;"><strong>本命は楽天カード</strong>、積立や実質無料は三井住友カードゴールド（NL）、海外旅行や保険を足すならエポスカード。先にここだけ押さえれば十分だ。</p>
+
+  <AffiliateCTA
+    product="rakuten-card"
+    text="楽天カードを先に確認する"
+    note="年会費永年無料・1枚目として使いやすい基準を先に見たい人向け"
+    color="red"
+    compact
+  />
+
+  <p style="margin:0.8rem 0 0;font-size:0.9rem;line-height:1.7;color:#475569;">
+    迷うなら
+    <a href="/line/blog-card-roundup/" style="color:#1d4ed8;font-weight:700;text-decoration:underline;">LINEで3枚の違いを1分で整理する</a>
+    へ。
+  </p>
+</div>
 
 ## この記事でわかること
 
@@ -294,13 +313,19 @@ NISAとの連携については詳しくまとめた記事もある。
 
 → [新NISAの始め方・クレカ積立設定まで全手順](/blog/nisa-hajimekata/)
 
-<LineCTA ref="blog-card-roundup" />
+<AffiliateCTA
+  href="/blog/nisa-hajimekata/"
+  text="新NISAの始め方を見る"
+  note="クレカ積立の前提を先に確認する"
+  color="green"
+  external={false}
+/>
 
 <AffiliateCTA
-  product="epos-card"
-  text="エポスカードに申し込む（年会費永久無料）"
-  note="海外旅行保険が自動付帯・マルイ・ゾゾでポイントアップ"
-  color="blue"
+  product="rakuten-card"
+  text="楽天カードに申し込む（年会費永年無料）"
+  note="楽天市場で還元率3%・汎用性が高い1枚目に最適"
+  color="red"
 />
 
 <AffiliateCTA
@@ -311,15 +336,22 @@ NISAとの連携については詳しくまとめた記事もある。
 />
 
 <AffiliateCTA
-  product="rakuten-card"
-  text="楽天カードに申し込む（年会費永年無料）"
-  note="楽天市場で還元率3%・汎用性が高い1枚目に最適"
-  color="red"
+  product="jcb-card-w"
+  text="JCBカードWに申し込む（39歳以下・年会費永年無料）"
+  note="Amazon・スタバでポイント高還元・基本還元率1%"
+  color="blue"
+/>
+
+<AffiliateCTA
+  product="epos-card"
+  text="エポスカードに申し込む（年会費永久無料）"
+  note="海外旅行保険が自動付帯・マルイ・ゾゾでポイントアップ"
+  color="blue"
 />
 
 ## 関連記事
 
+- [エポスカードのメリット・デメリット完全解説](/blog/epos-card-review/)
 - [新NISAの始め方｜SBI証券でのクレカ積立設定](/blog/nisa-hajimekata/)
 - [SBI証券vs楽天証券、どちらで開設すべきか？](/blog/sbi-rakuten-hikaku/)
 - [副業の税金と節税｜確定申告が必要なケースまとめ](/blog/fukugyo-zeikin/)
-- [FX口座おすすめ比較｜初心者が最初に選ぶべき口座](/blog/fx-kouza-hikaku/)

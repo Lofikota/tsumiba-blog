@@ -84,16 +84,24 @@ jobs:
           sleep 90
           node scripts/auto-post-x.mjs --slug "$ARTICLE_SLUG"
 
-      - name: X投稿フラグを保存
+      - name: X投稿ストック生成
+        id: x-stock
+        if: steps.commit-content.outputs.committed == 'true'
+        env:
+          ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/generate-x-stock.mjs --slug "$ARTICLE_SLUG"
+
+      - name: X投稿フラグ＆ストックを保存
         if: steps.commit-content.outputs.committed == 'true'
         env:
           ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
         run: |
-          git add data/keyword-queue.json
+          git add data/keyword-queue.json data/x-stock/
           if git diff --staged --quiet; then
-            echo "X投稿フラグの変更なし"
+            echo "変更なし"
           else
-            git commit -m "chore(auto): record X post ${ARTICLE_SLUG}"
+            git commit -m "chore(auto): record X post & stock ${ARTICLE_SLUG}"
             git push
           fi
 

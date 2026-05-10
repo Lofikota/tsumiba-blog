@@ -5,12 +5,14 @@ interface Props {
   ref?: string;
   headline?: string;
   description?: string;
+  compact?: boolean;
 }
 
 const {
   ref: refKey = 'blog-main',
   headline: headlineProp,
   description: descriptionProp,
+  compact = false,
 } = Astro.props;
 
 const lineRef = getLineRef(refKey);
@@ -19,23 +21,23 @@ const headline = headlineProp ?? lineRef?.headline ?? 'LINEで続きを受け取
 const description = descriptionProp ?? lineRef?.description ?? '';
 ---
 
-<div class="lcta-wrap">
-  <div class="lcta-icon">
+<div class={`lcta-wrap${compact ? ' lcta-wrap-compact' : ''}`}>
+  <div class={`lcta-icon${compact ? ' lcta-icon-compact' : ''}`}>
     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#06c755">
       <path d="M12 2C6.48 2 2 6.03 2 11c0 2.7 1.3 5.12 3.36 6.83L4.5 21l3.36-1.76A10.9 10.9 0 0 0 12 20c5.52 0 10-4.03 10-9S17.52 2 12 2z"/>
     </svg>
   </div>
   <div class="lcta-body">
-    <p class="lcta-headline">{headline}</p>
-    {description && <p class="lcta-desc">{description}</p>}
+    <p class={`lcta-headline${compact ? ' lcta-headline-compact' : ''}`}>{headline}</p>
+    {description && <p class={`lcta-desc${compact ? ' lcta-desc-compact' : ''}`}>{description}</p>}
   </div>
-  <a href={addUrl} class="lcta-btn" target="_blank" rel="noopener noreferrer"
+  <a href={addUrl} class={`lcta-btn${compact ? ' lcta-btn-compact' : ''}`} target="_blank" rel="noopener noreferrer"
      data-google-event="line_click"
      data-google-category="lead"
      data-google-label={refKey}>
     LINEで受け取る
   </a>
-  <p class="lcta-note">登録無料・不要なら解除できます</p>
+  <p class={`lcta-note${compact ? ' lcta-note-compact' : ''}`}>登録無料・不要なら解除できます</p>
 </div>
 
 <style>
@@ -51,6 +53,11 @@ const description = descriptionProp ?? lineRef?.description ?? '';
   text-align: center;
   gap: 10px;
 }
+.lcta-wrap-compact {
+  margin: 1rem 0;
+  padding: 16px 18px;
+  gap: 8px;
+}
 .lcta-icon {
   background: #dcfce7;
   border-radius: 50%;
@@ -59,6 +66,10 @@ const description = descriptionProp ?? lineRef?.description ?? '';
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.lcta-icon-compact {
+  width: 44px;
+  height: 44px;
 }
 .lcta-body {
   display: flex;
@@ -72,11 +83,18 @@ const description = descriptionProp ?? lineRef?.description ?? '';
   line-height: 1.4;
   margin: 0;
 }
+.lcta-headline-compact {
+  font-size: 15px;
+}
 .lcta-desc {
   font-size: 13px;
   color: #166534;
   line-height: 1.7;
   margin: 0;
+}
+.lcta-desc-compact {
+  font-size: 12px;
+  line-height: 1.6;
 }
 .lcta-btn {
   display: inline-flex;
@@ -92,6 +110,10 @@ const description = descriptionProp ?? lineRef?.description ?? '';
   box-shadow: 0 4px 14px rgba(6,199,85,.3);
   transition: filter .15s, transform .1s;
 }
+.lcta-btn-compact {
+  font-size: 15px;
+  padding: 11px 22px;
+}
 .lcta-btn:hover {
   filter: brightness(1.08);
   transform: translateY(-2px);
@@ -100,5 +122,8 @@ const description = descriptionProp ?? lineRef?.description ?? '';
   font-size: 11px;
   color: #6b7280;
   margin: 0;
+}
+.lcta-note-compact {
+  font-size: 10px;
 }
 </style>

@@ -16,7 +16,19 @@
     "queue:refill": "node scripts/refill-keyword-queue.mjs",
     "x:post": "node scripts/auto-post-x.mjs",
     "notify:line": "node scripts/notify-line.mjs",
-    "monitor:competitor": "node scripts/competitor-monitor.mjs"
+    "monitor:competitor": "node scripts/competitor-monitor.mjs",
+    "kpi:collect": "node scripts/kpi-collector.mjs",
+    "asp:check": "node scripts/asp-status-checker.mjs",
+    "asp:check:dry": "node scripts/asp-status-checker.mjs --dry-run",
+    "asp:setup": "node scripts/gmail-oauth-setup.mjs",
+    "add": "node scripts/add-to-queue.mjs",
+    "run": "node scripts/run-local.mjs",
+    "run:dry": "node scripts/run-local.mjs --dry-run",
+    "run:no-push": "node scripts/run-local.mjs --no-push",
+    "go": "op run --env-file .env.1password -- node scripts/run-local.mjs",
+    "go:dry": "op run --env-file .env.1password -- node scripts/run-local.mjs --dry-run",
+    "go:no-push": "op run --env-file .env.1password -- node scripts/run-local.mjs --no-push",
+    "go:add": "op run --env-file .env.1password -- node scripts/add-to-queue.mjs"
   },
   "license": "ISC",
   "dependencies": {

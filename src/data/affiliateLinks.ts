@@ -1,10 +1,10 @@
-export type AffiliateRisk = 'standard' | 'investment' | 'tax' | 'fx' | 'credit';
+export type AffiliateRisk = 'standard' | 'investment' | 'tax' | 'fx' | 'credit' | 'insurance';
 
 export interface AffiliateLink {
   slug: string;
   name: string;
   provider: string;
-  category: '証券' | 'クレカ' | 'FX' | '会計';
+  category: '証券' | 'クレカ' | 'FX' | '会計' | '保険';
   destinationUrl: string;
   status: 'official' | 'affiliate' | 'pending';
   risk: AffiliateRisk;
@@ -191,6 +191,52 @@ export const affiliateLinks: AffiliateLink[] = [
     status: 'pending',
     risk: 'credit',
     disclosure: 'クレジットカードの審査があります。年会費や特典条件は公式情報をご確認ください。',
+  },
+  // 保険相談（Google Ads出稿可・高単価）
+  // 単価比較（2026-05-10 A8.net実測）:
+  //   FPに相談 13,000円 EPC411 確定率42% ← 最優先申請
+  //   保険ガーデン 10,250円 EPC157 確定率25%
+  //   保険見直しラボ 10,000円 EPC29 確定率58%
+  //   保険見直し本舗 15,384円 EPC66 確定率不明
+  {
+    slug: 'fp-soudan',
+    name: 'ファイナンシャルプランナーに相談',
+    provider: 'ファインドイット株式会社',
+    category: '保険',
+    destinationUrl: 'https://www.fp-sodan.com/',
+    status: 'pending', // A8.net s00000026218001 に申請が必要
+    risk: 'insurance',
+    disclosure: 'FP相談は無料です。提案内容はFPにより異なります。加入を強制するものではありません。',
+  },
+  {
+    slug: 'hoken-garden',
+    name: '保険の無料相談サイト「ガーデン」',
+    provider: '株式会社Global8',
+    category: '保険',
+    destinationUrl: 'https://www.hokengarden.com/',
+    status: 'pending', // A8.net s00000020819004 に申請が必要
+    risk: 'insurance',
+    disclosure: '保険相談は無料です。相談内容や結果はFPにより異なります。',
+  },
+  {
+    slug: 'hoken-minaoshi-labo',
+    name: '保険見直しラボ',
+    provider: '保険見直しラボ',
+    category: '保険',
+    destinationUrl: 'https://www.hoken-minaoshi-lab.jp/',
+    status: 'pending', // A8.net s00000017791001 に申請が必要
+    risk: 'insurance',
+    disclosure: '保険相談は無料です。相談内容や結果はFPにより異なります。',
+  },
+  {
+    slug: 'hoken-minaoshi-honpo',
+    name: '保険見直し本舗',
+    provider: '株式会社保険見直し本舗',
+    category: '保険',
+    destinationUrl: 'https://www.hoken-minaoshi.jp/',
+    status: 'pending', // A8.net s00000027364001 に申請が必要
+    risk: 'insurance',
+    disclosure: '保険相談は無料です。相談内容や結果はFPにより異なります。',
   },
 ];
 

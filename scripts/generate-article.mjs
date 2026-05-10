@@ -89,9 +89,53 @@ if (fs.existsSync(outputPath)) {
   process.exit(0);
 }
 
-// スタイル参考記事（最初の2,500字）
-const examplePath = path.join(ROOT, 'src/content/blog/fx-kouza-hikaku.mdx');
-const exampleContent = fs.readFileSync(examplePath, 'utf-8').slice(0, 2500);
+// ─────────────────────────────────────────
+// 田中蓮の文体サンプル（複数記事から抽出）
+// 各記事の冒頭1,200字 × 2本 + 声のパターン集
+// ─────────────────────────────────────────
+const STYLE_FILES = [
+  'fx-kouza-hikaku.mdx',
+  'credit-card-osusume.mdx',
+];
+
+const styleExamples = STYLE_FILES
+  .map(file => {
+    const p = path.join(ROOT, 'src/content/blog', file);
+    if (!fs.existsSync(p)) return null;
+    const raw = fs.readFileSync(p, 'utf-8');
+    // frontmatter を除いた本文の冒頭1,200字
+    const body = raw.replace(/^---[\s\S]*?---\n/, '').replace(/^import.*\n/gm, '');
+    return `【サンプル: ${file}】\n${body.slice(0, 1200)}`;
+  })
+  .filter(Boolean)
+  .join('\n\n');
+
+const VOICE_PATTERNS = `
+【田中蓮の"声"パターン集（これを参考に自然な語り口を作ること）】
+
+◆ 冒頭フック（読者の悩みを代弁する形で入る）
+  NG: 「クレジットカードには様々な種類があります」
+  OK: 「クレカって種類が多すぎて、どれを選べばいいかわからない」→これ、2年前の僕がそのままだった。
+
+◆ 失敗談を先に出す
+  NG: 「口座を選ぶ際は複数の観点から検討しましょう」
+  OK: 「調べれば調べるほど『どの口座もおすすめ』と書いてある記事ばかりで、結局何が違うのか分からなくなる」
+
+◆ 結論を先に言う
+  OK: 「最初に結論を言う。迷っている時間がもったいないので。」
+
+◆ 数字で具体化する
+  NG: 「ポイント還元率が高いカードはお得です」
+  OK: 「月の支出が20万円の場合、還元率0.5%と1.0%では年間のポイント差が12,000ポイント（約12,000円相当）になる」
+
+◆ 「です/ます」と「だ/である」の自然な混在
+  OK: 「これが正直な感想です。FXは甘くない。ただ、やり方を間違えなければ損は最小化できる。」
+
+◆ 専門用語は必ずその場で解説
+  OK: 「スプレッドとは、売値と買値の差のこと。これが実質的な取引コストになる。」
+`;
+
+const exampleContent = styleExamples + VOICE_PATTERNS;
 
 const today = new Date().toISOString().split('T')[0];
 

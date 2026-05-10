@@ -9,9 +9,11 @@ interface Props {
   color?: 'blue' | 'green' | 'orange' | 'red';
   note?: string;
   badge?: string;
+  compact?: boolean;
+  external?: boolean;
 }
 
-const { href, product, text = '公式サイトで確認する', label = 'PR', color = 'blue', note, badge } = Astro.props;
+const { href, product, text = '公式サイトで確認する', label = 'PR', color = 'blue', note, badge, compact = false, external = true } = Astro.props;
 const ctaHref = product ? getAffiliatePath(product) : href ?? '#';
 
 const colorMap: Record<string, string> = {
@@ -23,18 +25,18 @@ const colorMap: Record<string, string> = {
 const bg = colorMap[color] ?? colorMap.blue;
 ---
 
-<div class="acta-wrap">
-  {badge && <div class="acta-badge">{badge}</div>}
-  {note && <p class="acta-note">{note}</p>}
-  <a href={ctaHref} target="_blank" rel="noopener noreferrer sponsored nofollow"
+<div class={`acta-wrap${compact ? ' acta-wrap-compact' : ''}`}>
+  {badge && <div class={`acta-badge${compact ? ' acta-badge-compact' : ''}`}>{badge}</div>}
+  {note && <p class={`acta-note${compact ? ' acta-note-compact' : ''}`}>{note}</p>}
+  <a href={ctaHref} {...(external ? { target: '_blank', rel: 'noopener noreferrer sponsored nofollow' } : {})}
      data-google-event="affiliate_click"
      data-google-category="affiliate"
      data-google-label={product ?? href ?? text}
-     class="acta-btn" style={bg}>
+     class={`acta-btn${compact ? ' acta-btn-compact' : ''}`} style={bg}>
     <span class="acta-arrow">→</span>
     {text}
   </a>
-  <p class="acta-sub"><span class="acta-pr">{label}</span> 公式サイトへ移動します</p>
+  <p class={`acta-sub${compact ? ' acta-sub-compact' : ''}`}><span class={`acta-pr${compact ? ' acta-pr-compact' : ''}`}>{label}</span> 公式サイトへ移動します</p>
 </div>
 
 <style>
@@ -46,6 +48,10 @@ const bg = colorMap[color] ?? colorMap.blue;
   border-radius: 14px;
   padding: 20px 24px 16px;
 }
+.acta-wrap-compact {
+  margin: 1rem 0;
+  padding: 16px 18px 14px;
+}
 .acta-badge {
   display: inline-block;
   background: #FBBF24; color: #7A4A00;
@@ -53,9 +59,16 @@ const bg = colorMap[color] ?? colorMap.blue;
   padding: 3px 12px; border-radius: 999px;
   margin-bottom: 10px; letter-spacing: .05em;
 }
+.acta-badge-compact {
+  margin-bottom: 8px;
+}
 .acta-note {
   font-size: 13px; color: #374151;
   margin-bottom: 14px; line-height: 1.7;
+}
+.acta-note-compact {
+  font-size: 12px;
+  margin-bottom: 10px;
 }
 .acta-btn {
   display: inline-flex; align-items: center; gap: 10px;
@@ -65,16 +78,27 @@ const bg = colorMap[color] ?? colorMap.blue;
   transition: filter .15s, transform .1s;
   box-shadow: 0 4px 14px rgba(0,0,0,.18);
 }
+.acta-btn-compact {
+  font-size: 15px;
+  padding: 12px 22px;
+}
 .acta-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
 .acta-arrow { font-size: 20px; }
+.acta-btn-compact .acta-arrow { font-size: 18px; }
 .acta-sub {
   font-size: 11px; color: #6B7280;
   margin-top: 10px;
+}
+.acta-sub-compact {
+  margin-top: 8px;
 }
 .acta-pr {
   background: #E5E7EB; color: #374151;
   font-size: 10px; font-weight: 700;
   padding: 1px 6px; border-radius: 3px;
   margin-right: 4px;
+}
+.acta-pr-compact {
+  font-size: 9px;
 }
 </style>

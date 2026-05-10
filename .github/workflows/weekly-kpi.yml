@@ -1,0 +1,146 @@
+name: 週次KPI自動集計
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'   # 毎週月曜 09:00 JST（UTC 00:00）
+  workflow_dispatch:        # 手動実行（テスト・再取得用）
+
+# 他の自動化ジョブと同一 concurrency group で衝突防止
+concurrency:
+  group: ren-blog-automation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  collect-kpi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 依存関係インストール
+        run: npm ci
+
+      # ──────────────────────────────────────
+      # KPI集計（X / GSC / LINE）
+      # ──────────────────────────────────────
+      - name: 週次KPI集計
+        id: kpi
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: node scripts/kpi-collector.mjs
+
+      # ──────────────────────────────────────
+      # ASPステータス自動チェック
+      # ──────────────────────────────────────
+      - name: ASPステータス自動チェック
+        id: asp
+        continue-on-error: true
+        env:
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+        run: node scripts/asp-status-checker.mjs
+
+      # ──────────────────────────────────────
+      # 集計結果をリポジトリにコミット
+      # ──────────────────────────────────────
+      - name: 変更をコミット＆プッシュ
+        id: commit
+        env:
+          WEEK_KEY: ${{ steps.kpi.outputs.week_key }}
+          X_FOLLOWERS: ${{ steps.kpi.outputs.x_followers }}
+          GSC_CLICKS: ${{ steps.kpi.outputs.gsc_clicks }}
+        run: |
+          git config user.name "ren-bot[bot]"
+          git config user.email "bot@ren-money.com"
+          git add \
+            data/kpi-snapshots.json \
+            KPI管理/kpi-dashboard.md \
+            KPI管理/weekly/ \
+            KPI管理/Phase1_KPI.md
+
+          if git diff --staged --quiet; then
+            echo "変更なし — コミットをスキップ"
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "chore(kpi): 週次KPI集計 ${WEEK_KEY} — Xフォロワー${X_FOLLOWERS}人 / GSC${GSC_CLICKS}クリック"
+            git push
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ──────────────────────────────────────
+      # LINE通知（完了 / 変更なし / 失敗）
+      # ──────────────────────────────────────
+      - name: LINE通知（集計完了）
+        if: success() && steps.commit.outputs.committed == 'true'
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          WEEK_KEY: ${{ steps.kpi.outputs.week_key }}
+          X_FOLLOWERS: ${{ steps.kpi.outputs.x_followers }}
+          FOLLOWER_INCREASE: ${{ steps.kpi.outputs.follower_increase }}
+          GSC_CLICKS: ${{ steps.kpi.outputs.gsc_clicks }}
+          LINE_FOLLOWERS: ${{ steps.kpi.outputs.line_followers }}
+          ASP_OUTCOME: ${{ steps.asp.outcome }}
+          ASP_APPROVED: ${{ steps.asp.outputs.asp_approved_count }}
+          ASP_REJECTED: ${{ steps.asp.outputs.asp_rejected_count }}
+          ASP_APPROVED_LIST: ${{ steps.asp.outputs.asp_approved_list }}
+          ASP_REJECTED_LIST: ${{ steps.asp.outputs.asp_rejected_list }}
+        run: |
+          MSG="✅ 週次KPI集計完了 [${WEEK_KEY}]"$'\n'
+          MSG+="Xフォロワー: ${X_FOLLOWERS}人（前週比+${FOLLOWER_INCREASE}人）"$'\n'
+          MSG+="GSCクリック: ${GSC_CLICKS}回 / LINE: ${LINE_FOLLOWERS}人"
+          if [ "${ASP_OUTCOME}" = "success" ]; then
+            MSG+=$'\n'"📋 ASP今週: 承認${ASP_APPROVED}件 / 否認${ASP_REJECTED}件"
+            [ "${ASP_APPROVED_LIST}" != "なし" ] && MSG+=$'\n'"  ✅ ${ASP_APPROVED_LIST}"
+            [ "${ASP_REJECTED_LIST}" != "なし" ] && MSG+=$'\n'"  ❌ ${ASP_REJECTED_LIST}"
+          fi
+          node scripts/notify-line.mjs --type info --message "${MSG}"
+
+      - name: LINE通知（変更なし）
+        if: success() && steps.commit.outputs.committed != 'true'
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          WEEK_KEY: ${{ steps.kpi.outputs.week_key }}
+          ASP_OUTCOME: ${{ steps.asp.outcome }}
+          ASP_APPROVED: ${{ steps.asp.outputs.asp_approved_count }}
+          ASP_REJECTED: ${{ steps.asp.outputs.asp_rejected_count }}
+          ASP_APPROVED_LIST: ${{ steps.asp.outputs.asp_approved_list }}
+          ASP_REJECTED_LIST: ${{ steps.asp.outputs.asp_rejected_list }}
+        run: |
+          MSG="ℹ️ 週次KPI集計: 前回から変更なし [${WEEK_KEY}]"
+          if [ "${ASP_OUTCOME}" = "success" ]; then
+            MSG+=$'\n'"📋 ASP今週: 承認${ASP_APPROVED}件 / 否認${ASP_REJECTED}件"
+            [ "${ASP_APPROVED_LIST}" != "なし" ] && MSG+=$'\n'"  ✅ ${ASP_APPROVED_LIST}"
+            [ "${ASP_REJECTED_LIST}" != "なし" ] && MSG+=$'\n'"  ❌ ${ASP_REJECTED_LIST}"
+          fi
+          node scripts/notify-line.mjs --type info --message "${MSG}"
+
+      - name: LINE通知（失敗）
+        if: failure()
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          node scripts/notify-line.mjs \
+            --type error \
+            --message "週次KPI集計が失敗しました。Actions run_id=${RUN_ID} を確認してください。"

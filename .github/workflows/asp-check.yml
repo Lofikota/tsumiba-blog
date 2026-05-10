@@ -1,0 +1,126 @@
+name: ASP承認チェック → キュー自動追加
+
+on:
+  schedule:
+    - cron: '0 2,8,14,20 * * *'  # 11:00 / 17:00 / 23:00 / 05:00 JST（1日4回）
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Gmailを遡る日数'
+        default: '7'
+        required: false
+
+concurrency:
+  group: asp-check
+  cancel-in-progress: false
+
+jobs:
+  check-and-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 依存関係インストール
+        run: npm ci
+
+      # ── Step1: GmailでASP承認メールを検索 ──────────────
+      - name: ASPメールチェック（Gmail）
+        id: asp-check
+        env:
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          SCAN_DAYS: ${{ github.event.inputs.days || '7' }}
+        run: node scripts/asp-status-checker.mjs --days=$SCAN_DAYS
+
+      # ── Step2: 承認があればキューに追加 ──────────────────
+      - name: keyword-queue.json に追加
+        id: add-queue
+        if: steps.asp-check.outputs.asp_approved_count != '0'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ASP_APPROVED_LIST: ${{ steps.asp-check.outputs.asp_approved_list }}
+        run: node scripts/asp-approval-to-queue.mjs
+
+      # ── Step3: 変更があればコミット＆プッシュ ────────────
+      - name: 変更をコミット＆プッシュ
+        id: commit
+        if: steps.add-queue.outputs.queue_added_count != '0'
+        env:
+          QUEUE_ADDED_SLUGS: ${{ steps.add-queue.outputs.queue_added_slugs }}
+        run: |
+          git config user.name "ren-bot[bot]"
+          git config user.email "bot@ren-money.com"
+          git add data/keyword-queue.json
+          if git diff --staged --quiet; then
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "feat(queue): ASP承認によりキューに追加 [${QUEUE_ADDED_SLUGS}]"
+            git push
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── Step4: LINE通知（承認あり・キュー追加あり）────────
+      - name: LINE通知（ASP承認 + キュー追加）
+        if: steps.commit.outputs.committed == 'true'
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          ASP_APPROVED_LIST: ${{ steps.asp-check.outputs.asp_approved_list }}
+          QUEUE_ADDED_SLUGS: ${{ steps.add-queue.outputs.queue_added_slugs }}
+          QUEUE_ADDED_COUNT: ${{ steps.add-queue.outputs.queue_added_count }}
+        run: |
+          node scripts/notify-line.mjs \
+            --type asp \
+            --approved "$ASP_APPROVED_LIST" \
+            --message "📋 keyword-queue に ${QUEUE_ADDED_COUNT} 件を追加しました。翌朝10:00の自動生成を待ちます。追加: ${QUEUE_ADDED_SLUGS}"
+
+      # ── Step5: LINE通知（承認あり・キュー追加なし）─────────
+      - name: LINE通知（承認あり・既にキュー登録済み）
+        if: |
+          steps.asp-check.outputs.asp_approved_count != '0' &&
+          steps.add-queue.outputs.queue_added_count == '0'
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          ASP_APPROVED_LIST: ${{ steps.asp-check.outputs.asp_approved_list }}
+        run: |
+          node scripts/notify-line.mjs \
+            --type asp \
+            --approved "$ASP_APPROVED_LIST" \
+            --message "(slug重複のためキュー追加なし)"
+
+      # ── Step6: LINE通知（否認あり）───────────────────────
+      - name: LINE通知（ASP否認）
+        if: steps.asp-check.outputs.asp_rejected_count != '0'
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          ASP_REJECTED_LIST: ${{ steps.asp-check.outputs.asp_rejected_list }}
+        run: |
+          node scripts/notify-line.mjs \
+            --type asp \
+            --rejected "$ASP_REJECTED_LIST"
+
+      # ── Step7: エラー通知 ────────────────────────────────
+      - name: LINE通知（エラー）
+        if: failure()
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          node scripts/notify-line.mjs \
+            --type error \
+            --message "ASP承認チェックが失敗しました。GitHub Actions run_id=${RUN_ID} を確認してください。"
