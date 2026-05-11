@@ -10,10 +10,11 @@ const BANNED_EXPRESSIONS = [
   '誰でも稼げる', '絶対儲かる', 'リスクなし',
 ];
 
-// 文脈考慮チェック：肯定形でのみ禁止（否定・リスク説明は合法）
-// 「元本が保証されています」「元本保証サービス」等は禁止、リスク説明の「元本保証なし」はOK
+// 文脈考慮チェック：肯定形でのみ禁止
+// 「元本保証されています」「元本保証あります」等は禁止
+// 「元本保証はありません」「元本保証がない」等の否定形はOK
 const BANNED_PATTERNS = [
-  { pattern: /元本(が|は|を)?保証(され|しま|です|あり|する(?!がな|はな|がない|はない|なし))/, label: '元本保証の肯定表現' },
+  { pattern: /元本(が|は|を)?保証(されています|されており|されます|します|あり(?!ません|がない|はない|はしない|が))/, label: '元本保証の肯定表現' },
 ];
 
 
@@ -30,8 +31,8 @@ export function checkArticle(content, slug) {
     .replace(/<[^>]+>/g, '')
     .replace(/[#*`>|]/g, '');
   const charCount = bodyOnly.trim().length;
-  if (charCount < 3000) {
-    errors.push(`本文が${charCount}字しかない（3,000字以上必須）`);
+  if (charCount < 4500) {
+    errors.push(`本文が${charCount}字しかない（4,500字以上必須）`);
   }
 
   // PR表記チェック
