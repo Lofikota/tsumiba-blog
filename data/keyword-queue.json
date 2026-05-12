@@ -25,9 +25,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "FX SEO/Xオーガニック優先。不安・失敗回避の検索意図に答える。元本割れ、レバレッジ、ロスカット、余剰資金、少額練習を先に説明し、無理な口座開設へ誘導しない",
-    "status": "pending",
+    "status": "published",
     "priority": 2,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-05-12T04:31:56.431Z"
   },
   {
     "slug": "fx-small-start-guide",
