@@ -28,8 +28,7 @@
     "status": "published",
     "priority": 2,
     "channel": "seo_x_organic",
-    "publishedAt": "2026-05-12T04:31:56.431Z",
-    "xPostedAt": "2026-05-12T04:33:45.477Z"
+    "publishedAt": "2026-05-10T07:01:21.856Z"
   },
   {
     "slug": "fx-small-start-guide",
@@ -40,8 +39,7 @@
     "status": "published",
     "priority": 3,
     "channel": "seo_x_organic",
-    "publishedAt": "2026-05-13T04:38:57.796Z",
-    "xPostedAt": "2026-05-13T04:40:46.679Z"
+    "publishedAt": "2026-05-10T07:03:11.537Z"
   },
   {
     "slug": "fx-leverage-risk-guide",
@@ -49,9 +47,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "FX SEO/Xオーガニック優先。レバレッジ、必要証拠金、ロスカット、追加証拠金の考え方を初心者向けに解説。利益訴求ではなくリスク理解を主目的にする",
-    "status": "pending",
+    "status": "published",
     "priority": 4,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-05-10T07:04:57.395Z"
   },
   {
     "slug": "fx-company-barenai",
@@ -59,9 +58,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "FX SEO/Xオーガニック優先。会社員が気にする副業規程、住民税、確定申告、勤務先ルールを整理。法律・税務の個別助言にしない",
-    "status": "pending",
+    "status": "published",
     "priority": 5,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-05-10T07:06:38.960Z"
   },
   {
     "slug": "hoken-minaoshi-fp-soudan",
@@ -69,9 +69,10 @@
     "type": "guide",
     "category": "保険",
     "notes": "Google Ads出稿対象。副業・NISA開始後に保険を見直すタイミングを田中蓮視点で解説。保険見直しラボ・保険チャンネルへのCTA。無料FP相談の流れ・注意点も含める。ASP申請完了後にaff URLへ差し替え。",
-    "status": "pending",
+    "status": "published",
     "priority": 1,
-    "channel": "google_ads"
+    "channel": "google_ads",
+    "publishedAt": "2026-05-10T07:08:27.191Z"
   },
   {
     "slug": "hoken-minaoshi-30dai-kaisha-in",
@@ -79,9 +80,10 @@
     "type": "guide",
     "category": "保険",
     "notes": "Google Ads出稿対象。30代会社員が保険を見直すべきタイミング（副業開始・結婚・子育て・住宅購入）を整理。田中蓮の経験談として。保険見直しラボへのCTA。",
-    "status": "pending",
+    "status": "published",
     "priority": 2,
-    "channel": "google_ads"
+    "channel": "google_ads",
+    "publishedAt": "2026-05-10T07:10:14.436Z"
   },
   {
     "slug": "ideco-shoshinsha-guide",
@@ -89,7 +91,8 @@
     "type": "guide",
     "category": "投資・資産運用",
     "notes": "副業会社員がiDeCoを始める手順。節税効果の計算例を具体的に。SBI証券とマネックス証券を比較",
-    "status": "pending"
+    "status": "published",
+    "publishedAt": "2026-05-10T07:12:21.207Z"
   },
   {
     "slug": "sarakin-kaishaku-kaihi",
@@ -97,7 +100,8 @@
     "type": "guide",
     "category": "クレジットカード",
     "notes": "リボ払いの罠と解除方法。田中蓮の借金体験（200万）からの導入で強い共感を狙う",
-    "status": "pending"
+    "status": "published",
+    "publishedAt": "2026-05-10T07:13:54.001Z"
   },
   {
     "slug": "moneyforward-me-review",
@@ -105,7 +109,8 @@
     "type": "review",
     "category": "家計・節約",
     "notes": "副業収入の管理にマネーフォワードMEを使う方法。確定申告との連携も解説",
-    "status": "pending"
+    "status": "published",
+    "publishedAt": "2026-05-10T07:15:39.887Z"
   },
   {
     "slug": "nisa-ideco-docchi",
@@ -130,7 +135,8 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "副業収入20万円以下でも確定申告が必要なケース。住民税の注意点も含める",
-    "status": "pending"
+    "status": "published",
+    "publishedAt": "2026-05-10T07:19:15.783Z"
   },
   {
     "slug": "sumitomo-goldnl-review",
@@ -138,7 +144,8 @@
     "type": "review",
     "category": "クレジットカード",
     "notes": "三井住友ゴールドNLの年会費無料条件（100万修行）を実体験ベースで解説",
-    "status": "pending"
+    "status": "published",
+    "publishedAt": "2026-05-10T07:20:58.541Z"
   },
   {
     "slug": "sbi-shoken-tsumitate-nisa",
@@ -146,6 +153,27 @@
     "type": "guide",
     "category": "投資・資産運用",
     "notes": "SBI証券でつみたてNISAを設定する手順。銘柄選びの考え方も田中蓮の判断基準で",
-    "status": "pending"
+    "status": "published",
+    "publishedAt": "2026-05-10T07:22:56.116Z"
+  },
+  {
+    "slug": "epos-rakuten-card-hikaku",
+    "keyword": "エポスカード 楽天カード 比較",
+    "type": "comparison",
+    "category": "クレジットカード",
+    "notes": "エポスカード（affiliate承認済み）vs 楽天カード。年会費・ポイント還元率・海外旅行保険・使いやすさを比較。エポスカードへのアフィリリンクへ誘導。Google Ads着地先候補。",
+    "status": "pending",
+    "priority": 1,
+    "channel": "google_ads"
+  },
+  {
+    "slug": "epos-card-merit-demerit",
+    "keyword": "エポスカード メリット デメリット",
+    "type": "review",
+    "category": "クレジットカード",
+    "notes": "エポスカード（affiliate承認済み）の詳細レビュー。年会費永年無料・マルイ優待・海外旅行保険無料付帯が強み。田中蓮視点で実用性を語る。CVR最大化のCTA設計。",
+    "status": "pending",
+    "priority": 2,
+    "channel": "google_ads"
   }
 ]

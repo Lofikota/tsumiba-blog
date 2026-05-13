@@ -76,7 +76,7 @@ export const lineRefs: LineRef[] = [
     source: 'blog',
     intent: 'card',
     headline: 'クレカ・ポイントの条件をLINEで整理する',
-    description: '年会費、還元率、キャンペーン条件を見返しやすくまとめて届けます。',
+    description: '年会費、還元率、キャンペーン条件を見返しやすくまとめて届けます。最初の送客先は三井住友カードゴールド（NL）を優先します。',
   },
   {
     ref: 'blog-fx-roundup',
@@ -117,6 +117,14 @@ export const lineRefs: LineRef[] = [
     intent: 'campaign',
     headline: 'FXTFの迷いを先に潰すLINE',
     description: 'スプレッド、約定、ツール面を見てから判断したい人向けです。',
+  },
+  {
+    ref: 'campaign-smbc-gold-nl',
+    label: '案件 三井住友カードゴールド（NL）',
+    source: 'campaign',
+    intent: 'card',
+    headline: '三井住友カードゴールド（NL）の条件を整理するLINE',
+    description: '年会費実質無料の条件、NISA積立との相性、申し込む前に見るポイントを先に整理します。',
   },
   {
     ref: 'campaign-epos-card',
