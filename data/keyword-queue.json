@@ -37,9 +37,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "FX SEO/Xオーガニック優先。少額で始めたい初心者向けに、必要証拠金、取引単位、失ってもよい余剰資金、練習口座の考え方を整理する",
-    "status": "pending",
+    "status": "published",
     "priority": 3,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-05-13T04:38:57.796Z"
   },
   {
     "slug": "fx-leverage-risk-guide",
