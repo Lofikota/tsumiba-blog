@@ -5,3 +5,6 @@ node_modules/
 !.env.example
 !.env.1password.example
 .wrangler/
+
+# GitHub Actions が生成するローカルキャッシュ（CI上では不要）
+KPI管理/automation-runs/

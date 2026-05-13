@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# 記事ファイル (src/content/blog/*.mdx) のローカルコミットをブロックする。
+# GitHub Actions が生成・コミットする役割を担うため、ローカルからの直接追加は禁止。
+# 手動で書いた記事を意図的にコミットする場合は:
+#   ALLOW_ARTICLE_COMMIT=1 git commit ...
+
+if [ "${ALLOW_ARTICLE_COMMIT:-0}" = "1" ]; then
+  exit 0
+fi
+
+staged_articles=$(git diff --cached --name-only --diff-filter=A | grep '^src/content/blog/.*\.mdx$')
+
+if [ -n "$staged_articles" ]; then
+  echo ""
+  echo "❌ [pre-commit] 記事ファイルのローカルコミットはブロックされています。"
+  echo ""
+  echo "   記事生成は GitHub Actions に任せてください。"
+  echo "   ローカルで触るのは config / data / src/data / scripts のみにしてください。"
+  echo ""
+  echo "   対象ファイル:"
+  echo "$staged_articles" | sed 's/^/     /'
+  echo ""
+  echo "   意図的にコミットする場合（手書き記事など）:"
+  echo "     ALLOW_ARTICLE_COMMIT=1 git commit ..."
+  echo ""
+  exit 1
+fi
