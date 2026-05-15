@@ -1,0 +1,83 @@
+name: 下書き手動公開
+
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: '公開する下書きslug'
+        required: true
+        type: string
+
+concurrency:
+  group: ren-blog-automation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 依存関係インストール
+        run: npm ci
+
+      - name: 下書きを公開記事へ昇格
+        env:
+          ARTICLE_SLUG: ${{ inputs.slug }}
+        run: npm run draft:publish -- "$ARTICLE_SLUG"
+
+      - name: 内部リンク自動挿入
+        run: node scripts/internal-links.mjs
+
+      - name: 公開記事の品質再確認
+        env:
+          ARTICLE_SLUG: ${{ inputs.slug }}
+        run: npm run article:check "src/content/blog/${ARTICLE_SLUG}.mdx"
+
+      - name: Astroビルド
+        run: npm run build
+
+      - name: 変更をコミット＆プッシュ
+        id: commit-content
+        env:
+          ARTICLE_SLUG: ${{ inputs.slug }}
+        run: |
+          git config user.name "ren-bot[bot]"
+          git config user.email "bot@ren-money.com"
+          git add src/content/blog/ data/article-drafts/ data/keyword-queue.json
+          if git diff --staged --quiet; then
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "feat(manual): publish draft ${ARTICLE_SLUG}"
+            git push
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: LINE通知（公開完了）
+        if: steps.commit-content.outputs.committed == 'true'
+        env:
+          ARTICLE_SLUG: ${{ inputs.slug }}
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: node scripts/notify-line.mjs --type publish --slug "$ARTICLE_SLUG"
+
+      - name: LINE通知（公開失敗）
+        if: failure()
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          ARTICLE_SLUG: ${{ inputs.slug }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          node scripts/notify-line.mjs --type error --message "下書き公開が失敗しました。slug=${ARTICLE_SLUG} run_id=${RUN_ID}"
