@@ -157,23 +157,43 @@
     "publishedAt": "2026-05-10T07:22:56.116Z"
   },
   {
-    "slug": "epos-rakuten-card-hikaku",
-    "keyword": "エポスカード 楽天カード 比較",
-    "type": "comparison",
-    "category": "クレジットカード",
-    "notes": "エポスカード（affiliate承認済み）vs 楽天カード。年会費・ポイント還元率・海外旅行保険・使いやすさを比較。エポスカードへのアフィリリンクへ誘導。Google Ads着地先候補。",
+    "slug": "hoken-minaoshi-30dai-hitori",
+    "keyword": "保険 見直し 30代 独身",
+    "type": "guide",
+    "category": "保険相談",
+    "notes": "30代独身向け保険見直し。保険見直し本舗・FPに相談へ誘導。LINE登録CTAを末尾に設置。",
     "status": "pending",
     "priority": 1,
-    "channel": "google_ads"
+    "channel": "seo_x_organic"
   },
   {
-    "slug": "epos-card-merit-demerit",
-    "keyword": "エポスカード メリット デメリット",
-    "type": "review",
-    "category": "クレジットカード",
-    "notes": "エポスカード（affiliate承認済み）の詳細レビュー。年会費永年無料・マルイ優待・海外旅行保険無料付帯が強み。田中蓮視点で実用性を語る。CVR最大化のCTA設計。",
+    "slug": "hoken-minaoshi-40dai-family",
+    "keyword": "保険 見直し 40代 家族",
+    "type": "guide",
+    "category": "保険相談",
+    "notes": "40代家族向け保険見直し。子育て・住宅ローンとの掛け合わせ。保険見直しラボ・保険ガーデンへ誘導。",
     "status": "pending",
     "priority": 2,
-    "channel": "google_ads"
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-tokudan-jouken",
+    "keyword": "FX アフィリエイト 特単 条件",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "内部用記事ではなく、FX口座開設比較として田中蓮視点で書く。DMM/JFX/FXTFの比較で特単狙いCV誘導。",
+    "status": "pending",
+    "priority": 1,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "hoken-fp-soudan-muryou",
+    "keyword": "FP 無料相談 保険 おすすめ",
+    "type": "guide",
+    "category": "保険相談",
+    "notes": "FP無料相談の流れ・選び方。FPに相談（13,000円）・保険ガーデン（10,250円）へ誘導。LINE登録CTA必須。",
+    "status": "pending",
+    "priority": 1,
+    "channel": "seo_x_organic"
   }
 ]
