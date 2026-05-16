@@ -1,0 +1,728 @@
+---
+import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { affiliateLinks } from '../../data/affiliateLinks';
+import keywordQueue from '../../../data/keyword-queue.json';
+import draftIndex from '../../../data/article-drafts/index.json';
+
+type DraftEntry = {
+  slug: string;
+  keyword: string;
+  type: string;
+  category: string;
+  channel: string;
+  priority: number | null;
+  charCount: number;
+  status: 'draft' | 'published';
+  draftedAt: string;
+  draftPath: string;
+  reportPath: string;
+  warnings?: string[];
+};
+
+type QueueItem = {
+  slug: string;
+  keyword: string;
+  type: string;
+  category: string;
+  status: string;
+  priority?: number;
+  channel?: string;
+};
+
+const pageDir = dirname(fileURLToPath(import.meta.url));
+const root = resolve(pageDir, '../../..');
+const drafts = draftIndex as DraftEntry[];
+const activeDrafts = drafts.filter((draft) => draft.status === 'draft');
+const queueItems = keywordQueue as QueueItem[];
+const pendingQueue = queueItems.filter((item) => item.status === 'pending');
+const draftQueue = queueItems.filter((item) => item.status === 'draft');
+const posts = await getCollection('blog');
+const affiliateReady = affiliateLinks.filter((link) => link.status === 'affiliate').length;
+const affiliatePending = affiliateLinks.filter((link) => link.status === 'pending').length;
+const affiliateByCategory = affiliateLinks.reduce<Record<string, typeof affiliateLinks>>((acc, link) => {
+  acc[link.category] = acc[link.category] ?? [];
+  acc[link.category].push(link);
+  return acc;
+}, {});
+
+async function readExcerpt(draft: DraftEntry): Promise<string> {
+  const filePath = join(root, draft.draftPath);
+  if (!existsSync(filePath)) return '下書きファイルが見つかりません。';
+  const raw = await readFile(filePath, 'utf-8');
+  return raw
+    .replace(/^---[\s\S]*?---\n/, '')
+    .replace(/^import .+$/gm, '')
+    .replace(/[#*>`]/g, '')
+    .trim()
+    .slice(0, 260);
+}
+
+const draftRows = await Promise.all(activeDrafts.map(async (draft) => ({
+  ...draft,
+  excerpt: await readExcerpt(draft),
+})));
+
+function dateLabel(value: string | undefined): string {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.valueOf())) return '-';
+  return date.toLocaleString('ja-JP', {
+    timeZone: 'Asia/Tokyo',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+---
+
+<BaseLayout
+  title="ブログ管理"
+  description="収益化記事の下書き、公開待ち、ASPリンク、次の制作キューを確認する管理画面です。"
+  robots="noindex,nofollow"
+  wide
+>
+  <section class="admin-hero">
+    <div>
+      <p class="admin-kicker">MANUAL PUBLISH CONTROL</p>
+      <h1>ブログ管理</h1>
+      <p>毎日生成された記事をここで確認し、稼げる導線だけを手動で公開します。</p>
+    </div>
+    <div class="admin-command">
+      <span>管理アクション</span>
+      <button class="admin-action-button" data-admin-action="generate-draft" type="button">下書きを今すぐ生成</button>
+      <small>初回だけ下の管理トークンを入力</small>
+    </div>
+  </section>
+
+  <section class="admin-auth">
+    <label for="admin-token">管理トークン</label>
+    <input id="admin-token" type="password" placeholder="CloudflareのADMIN_ACTION_TOKEN" autocomplete="off" />
+    <button id="save-admin-token" type="button">保存</button>
+    <p id="admin-action-status" role="status">ボタン操作はGitHub Actionsを起動します。秘密情報はこのブラウザ内だけに保存します。</p>
+  </section>
+
+  <section class="admin-stats" aria-label="運営状況">
+    <article>
+      <span>下書き</span>
+      <strong>{activeDrafts.length}</strong>
+      <small>手動公開待ち</small>
+    </article>
+    <article>
+      <span>公開記事</span>
+      <strong>{posts.length}</strong>
+      <small>ブログ掲載中</small>
+    </article>
+    <article>
+      <span>ASP承認済み</span>
+      <strong>{affiliateReady}</strong>
+      <small>送客可能</small>
+    </article>
+    <article>
+      <span>ASP承認待ち</span>
+      <strong>{affiliatePending}</strong>
+      <small>差替待ち</small>
+    </article>
+  </section>
+
+  <section class="admin-section">
+    <div class="section-head">
+      <div>
+        <p>DRAFT INBOX</p>
+        <h2>公開待ち下書き</h2>
+      </div>
+      <span>{activeDrafts.length}件</span>
+    </div>
+
+    {draftRows.length > 0 ? (
+      <div class="draft-list">
+        {draftRows.map((draft) => (
+          <article class="draft-card">
+            <div class="draft-main">
+              <div class="draft-topline">
+                <span>{draft.category}</span>
+                <span>{draft.channel}</span>
+                <span>{dateLabel(draft.draftedAt)}</span>
+              </div>
+              <h3>{draft.keyword}</h3>
+              <p>{draft.excerpt}</p>
+              {draft.warnings && draft.warnings.length > 0 && (
+                <div class="draft-warning">
+                  {draft.warnings.map((warning) => <span>{warning}</span>)}
+                </div>
+              )}
+            </div>
+            <div class="draft-side">
+              <strong>{draft.charCount.toLocaleString()}字</strong>
+              <a href={`/admin/drafts/${draft.slug}/`}>下書きを読む</a>
+              <button class="admin-action-button publish" data-admin-action="publish-draft" data-slug={draft.slug} type="button">この下書きを公開</button>
+              <code>npm run draft:publish -- {draft.slug}</code>
+            </div>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <div class="empty-state">
+        <h3>まだ下書きはありません</h3>
+        <p>次の pending キューから下書きを作るには、ローカルまたはGitHub Actionsで下書き生成を実行します。</p>
+        <code>cd /Users/kudokota/Affiliate/ren-blog- && npm run draft:generate</code>
+      </div>
+    )}
+  </section>
+
+  <section class="admin-grid">
+    <div class="admin-panel">
+      <div class="section-head compact">
+        <div>
+          <p>NEXT QUEUE</p>
+          <h2>次に作る記事</h2>
+        </div>
+        <span>{pendingQueue.length}件</span>
+      </div>
+      <div class="queue-list">
+        {pendingQueue.map((item) => (
+          <article>
+            <strong>{item.keyword}</strong>
+            <span>{item.slug}</span>
+            <small>{item.category} / {item.channel ?? 'manual'} / priority {item.priority ?? '-'}</small>
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <div class="admin-panel">
+      <div class="section-head compact">
+        <div>
+          <p>WHY THIS EXISTS</p>
+          <h2>この画面の目的</h2>
+        </div>
+      </div>
+      <ul class="purpose-list">
+        <li>自動生成は公開ではなく、下書き保存で止める。</li>
+        <li>人間がASP導線、リスク表記、読者の悩みを確認してから公開する。</li>
+        <li>公開判断はPVではなく、LINE登録とASPクリックに近い記事を優先する。</li>
+        <li>承認済み案件へ送れる記事を先に公開し、pending案件は差替待ちにする。</li>
+      </ul>
+    </div>
+  </section>
+
+  {draftQueue.length > 0 && (
+    <section class="admin-section">
+      <div class="section-head">
+        <div>
+          <p>QUEUE STATUS</p>
+          <h2>キュー上の下書き</h2>
+        </div>
+      </div>
+      <div class="queue-list wide">
+        {draftQueue.map((item) => (
+          <article>
+            <strong>{item.keyword}</strong>
+            <span>{item.slug}</span>
+            <small>{item.category} / draft</small>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="admin-section">
+    <div class="section-head">
+      <div>
+        <p>AFFILIATE LINKS</p>
+        <h2>ASPリンク台帳</h2>
+      </div>
+      <span>{affiliateLinks.length}件</span>
+    </div>
+
+    <div class="affiliate-groups">
+      {Object.entries(affiliateByCategory).map(([category, links]) => (
+        <div class="affiliate-group">
+          <h3>{category}</h3>
+          <div class="affiliate-list">
+            {links.map((link) => (
+              <a href={`/go/${link.slug}/`} class={`affiliate-item ${link.status}`}>
+                <div>
+                  <strong>{link.name}</strong>
+                  <span>{link.provider}</span>
+                </div>
+                <em>{link.status}</em>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <p class="admin-footnote">
+    旧一覧画面: <a href="/admin/blog/">記事・ASPリンク一覧</a>
+  </p>
+
+  <style>
+    .admin-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 1rem;
+      align-items: stretch;
+      background: #111827;
+      color: #f9fafb;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .admin-kicker {
+      color: #f59e0b;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.35rem;
+    }
+    .admin-hero h1 {
+      font-size: 2rem;
+      line-height: 1.2;
+      margin: 0 0 0.45rem;
+      letter-spacing: 0;
+    }
+    .admin-hero p {
+      color: #cbd5e1;
+      margin: 0;
+    }
+    .admin-command {
+      display: grid;
+      align-content: center;
+      gap: 0.5rem;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      padding: 1rem;
+      background: rgba(255,255,255,.06);
+    }
+    .admin-command span {
+      color: #cbd5e1;
+      font-size: 0.8rem;
+    }
+    .admin-command small {
+      color: #94a3b8;
+      font-size: 0.72rem;
+    }
+    .admin-action-button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      border: 0;
+      border-radius: 6px;
+      background: #2563eb;
+      color: #fff;
+      padding: 0.65rem 0.85rem;
+      font: inherit;
+      font-size: 0.86rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .admin-action-button:hover {
+      background: #1d4ed8;
+    }
+    .admin-action-button.publish {
+      background: #16a34a;
+    }
+    .admin-action-button.publish:hover {
+      background: #15803d;
+    }
+    .admin-action-button:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+    .admin-auth {
+      display: grid;
+      grid-template-columns: auto minmax(180px, 1fr) auto;
+      gap: 0.6rem;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #d8dee9;
+      border-radius: 8px;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 2px rgba(15,23,42,.05);
+    }
+    .admin-auth label {
+      color: #334155;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .admin-auth input {
+      min-width: 0;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 0.55rem 0.65rem;
+      font: inherit;
+      font-size: 0.86rem;
+    }
+    .admin-auth button {
+      border: 0;
+      border-radius: 6px;
+      background: #0f172a;
+      color: #fff;
+      padding: 0.55rem 0.8rem;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .admin-auth p {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: #64748b;
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+    code {
+      display: block;
+      width: fit-content;
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      background: #0f172a;
+      color: #f8fafc;
+      border-radius: 6px;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .admin-stats article,
+    .admin-section,
+    .admin-panel {
+      background: #fff;
+      border: 1px solid #d8dee9;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(15,23,42,.05);
+    }
+    .admin-stats article {
+      padding: 1rem;
+    }
+    .admin-stats span,
+    .admin-stats small {
+      display: block;
+      color: #64748b;
+      font-size: 0.78rem;
+    }
+    .admin-stats strong {
+      display: block;
+      color: #0f172a;
+      font-size: 1.8rem;
+      line-height: 1.2;
+      margin: 0.1rem 0;
+    }
+    .admin-section {
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.85rem;
+    }
+    .section-head.compact {
+      margin-bottom: 0.7rem;
+    }
+    .section-head p,
+    .section-head span {
+      margin: 0;
+      color: #64748b;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+    .section-head h2 {
+      margin: 0;
+      color: #0f172a;
+      font-size: 1rem;
+      line-height: 1.35;
+    }
+    .draft-list {
+      display: grid;
+      gap: 0.75rem;
+    }
+    .draft-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1rem;
+      background: #f8fafc;
+    }
+    .draft-topline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.45rem;
+    }
+    .draft-topline span {
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #075985;
+      padding: 0.12rem 0.5rem;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+    .draft-main h3 {
+      margin: 0 0 0.4rem;
+      color: #0f172a;
+      font-size: 1.05rem;
+      line-height: 1.5;
+    }
+    .draft-main p {
+      margin: 0;
+      color: #475569;
+      font-size: 0.88rem;
+      line-height: 1.75;
+    }
+    .draft-side {
+      display: grid;
+      align-content: start;
+      gap: 0.6rem;
+    }
+    .draft-side strong {
+      color: #0f172a;
+      font-size: 1.2rem;
+    }
+    .draft-side a {
+      display: inline-flex;
+      justify-content: center;
+      border-radius: 6px;
+      background: #2563eb;
+      color: #fff;
+      padding: 0.55rem 0.75rem;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 0.84rem;
+    }
+    .draft-warning {
+      display: grid;
+      gap: 0.25rem;
+      margin-top: 0.75rem;
+    }
+    .draft-warning span {
+      color: #92400e;
+      background: #fef3c7;
+      border-radius: 6px;
+      padding: 0.35rem 0.45rem;
+      font-size: 0.75rem;
+      line-height: 1.5;
+    }
+    .empty-state {
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 1rem;
+      background: #f8fafc;
+    }
+    .empty-state h3,
+    .empty-state p {
+      margin: 0 0 0.6rem;
+    }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .admin-panel {
+      padding: 1rem;
+    }
+    .queue-list {
+      display: grid;
+      gap: 0.55rem;
+      max-height: 420px;
+      overflow: auto;
+    }
+    .queue-list.wide {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .queue-list article {
+      display: grid;
+      gap: 0.1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.7rem;
+      background: #f8fafc;
+    }
+    .queue-list strong {
+      color: #0f172a;
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+    .queue-list span,
+    .queue-list small {
+      color: #64748b;
+      font-size: 0.76rem;
+    }
+    .purpose-list {
+      display: grid;
+      gap: 0.45rem;
+      padding-left: 1.1rem;
+      color: #334155;
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+    .affiliate-groups {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
+    .affiliate-group {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 0.75rem;
+    }
+    .affiliate-group h3 {
+      margin: 0 0 0.55rem;
+      color: #0f172a;
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+    .affiliate-list {
+      display: grid;
+      gap: 0.4rem;
+    }
+    .affiliate-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.75rem;
+      align-items: center;
+      border: 1px solid #e2e8f0;
+      border-left-width: 4px;
+      border-radius: 8px;
+      background: #fff;
+      padding: 0.65rem;
+      color: #334155;
+      text-decoration: none;
+    }
+    .affiliate-item.affiliate {
+      border-left-color: #16a34a;
+    }
+    .affiliate-item.pending {
+      border-left-color: #d97706;
+    }
+    .affiliate-item.official {
+      border-left-color: #2563eb;
+    }
+    .affiliate-item:hover {
+      border-color: #94a3b8;
+      border-left-color: inherit;
+      text-decoration: none;
+    }
+    .affiliate-item strong,
+    .affiliate-item span {
+      display: block;
+    }
+    .affiliate-item strong {
+      color: #0f172a;
+      font-size: 0.85rem;
+      line-height: 1.45;
+    }
+    .affiliate-item span {
+      color: #64748b;
+      font-size: 0.74rem;
+      line-height: 1.5;
+    }
+    .affiliate-item em {
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      padding: 0.14rem 0.48rem;
+      font-style: normal;
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+    .admin-footnote {
+      margin: 0;
+      color: #64748b;
+      font-size: 0.82rem;
+    }
+    @media (max-width: 860px) {
+      .admin-hero,
+      .admin-stats,
+      .admin-grid,
+      .draft-card,
+      .queue-list.wide,
+      .affiliate-groups,
+      .admin-auth {
+        grid-template-columns: 1fr;
+      }
+      .admin-hero h1 {
+        font-size: 1.55rem;
+      }
+    }
+  </style>
+  <script>
+    const tokenInput = document.querySelector('#admin-token');
+    const saveButton = document.querySelector('#save-admin-token');
+    const statusEl = document.querySelector('#admin-action-status');
+    const savedToken = window.sessionStorage.getItem('ren_blog_admin_token') || '';
+    if (tokenInput instanceof HTMLInputElement) tokenInput.value = savedToken;
+
+    function setStatus(message, isError = false) {
+      if (!(statusEl instanceof HTMLElement)) return;
+      statusEl.textContent = message;
+      statusEl.style.color = isError ? '#991b1b' : '#64748b';
+    }
+
+    saveButton?.addEventListener('click', () => {
+      if (!(tokenInput instanceof HTMLInputElement)) return;
+      window.sessionStorage.setItem('ren_blog_admin_token', tokenInput.value.trim());
+      setStatus('管理トークンをこのブラウザに保存しました。');
+    });
+
+    async function runAdminAction(button) {
+      if (!(button instanceof HTMLButtonElement)) return;
+      const token = tokenInput instanceof HTMLInputElement ? tokenInput.value.trim() : '';
+      if (!token) {
+        setStatus('管理トークンを入力してください。', true);
+        return;
+      }
+      window.sessionStorage.setItem('ren_blog_admin_token', token);
+
+      const action = button.dataset.adminAction;
+      const slug = button.dataset.slug;
+      button.disabled = true;
+      setStatus(action === 'publish-draft' ? `${slug} の公開処理を開始しています...` : '下書き生成を開始しています...');
+
+      try {
+        const res = await fetch('/api/admin-action', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'x-admin-token': token,
+          },
+          body: JSON.stringify({ action, slug }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || '実行に失敗しました');
+        setStatus('GitHub Actionsを起動しました。数分後にこのページを更新してください。');
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : '実行に失敗しました', true);
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    document.querySelectorAll('[data-admin-action]').forEach((button) => {
+      button.addEventListener('click', () => runAdminAction(button));
+    });
+  </script>
+</BaseLayout>

@@ -64,6 +64,12 @@ if (type === 'publish') {
     type: 'text',
     text: `✅ 記事を公開しました\n\n📄 ${slug}\n🕐 ${now}\n${charCount ? `📝 ${Number(charCount).toLocaleString()}字\n` : ''}🔗 ${url}`,
   }];
+} else if (type === 'draft') {
+  const url = `https://ren-money.com/admin/`;
+  lineMessages = [{
+    type: 'text',
+    text: `📝 記事下書きを保存しました\n\n📄 ${slug}\n🕐 ${now}\n${charCount ? `📝 ${Number(charCount).toLocaleString()}字\n` : ''}管理画面で確認してから手動公開してください。\n🔗 ${url}`,
+  }];
 } else if (type === 'error') {
   lineMessages = [{
     type: 'text',

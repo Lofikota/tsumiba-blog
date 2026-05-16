@@ -8,6 +8,8 @@
     "preview": "astro preview",
     "gsc:import": "node scripts/import-search-console.mjs",
     "article:generate": "node scripts/generate-article.mjs",
+    "draft:generate": "node scripts/generate-article.mjs --draft",
+    "draft:publish": "node scripts/publish-draft.mjs",
     "article:batch": "node scripts/batch-generate.mjs",
     "article:batch:dry": "node scripts/batch-generate.mjs --dry-run",
     "article:check": "node scripts/quality-gate.mjs",

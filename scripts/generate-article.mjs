@@ -14,7 +14,11 @@ const ROOT = path.join(__dirname, '..');
 
 const queuePath = path.join(ROOT, 'data/keyword-queue.json');
 const runReportDir = path.join(ROOT, 'KPI管理/automation-runs');
+const draftDir = path.join(ROOT, 'data/article-drafts');
+const draftIndexPath = path.join(draftDir, 'index.json');
 const queue = JSON.parse(fs.readFileSync(queuePath, 'utf-8'));
+const args = process.argv.slice(2);
+const draftMode = args.includes('--draft') || process.env.ARTICLE_OUTPUT_MODE === 'draft';
 
 function setOutput(key, value) {
   if (!process.env.GITHUB_OUTPUT) return;
@@ -71,6 +75,22 @@ function writeRunReport({ pending, qcResult, reportPath, status }) {
   fs.writeFileSync(reportPath, `${lines.join('\n')}\n`, 'utf-8');
 }
 
+function readDraftIndex() {
+  if (!fs.existsSync(draftIndexPath)) return [];
+  return JSON.parse(fs.readFileSync(draftIndexPath, 'utf-8'));
+}
+
+function writeDraftIndex(entries) {
+  fs.mkdirSync(draftDir, { recursive: true });
+  fs.writeFileSync(draftIndexPath, `${JSON.stringify(entries, null, 2)}\n`, 'utf-8');
+}
+
+function upsertDraftEntry(entry) {
+  const entries = readDraftIndex().filter((item) => item.slug !== entry.slug);
+  entries.unshift(entry);
+  writeDraftIndex(entries);
+}
+
 const pending = queue.find(k => k.status === 'pending');
 if (!pending) {
   console.log('キューに pending の記事がありません。終了します。');
@@ -78,14 +98,27 @@ if (!pending) {
   process.exit(0);
 }
 
-// 記事スラッグが既存の場合はスキップ
 const outputPath = path.join(ROOT, `src/content/blog/${pending.slug}.mdx`);
+const draftPath = path.join(draftDir, `${pending.slug}.mdx`);
+
+// 記事スラッグが既存の場合はスキップ
 if (fs.existsSync(outputPath)) {
   console.log(`既存記事があるためスキップ: ${pending.slug}`);
   pending.status = 'skipped';
   fs.writeFileSync(queuePath, JSON.stringify(queue, null, 2), 'utf-8');
   setOutput('status', 'skipped');
   setOutput('slug', pending.slug);
+  process.exit(0);
+}
+
+if (draftMode && fs.existsSync(draftPath)) {
+  console.log(`既存下書きがあるためスキップ: ${pending.slug}`);
+  pending.status = 'draft';
+  pending.draftedAt = pending.draftedAt || new Date().toISOString();
+  fs.writeFileSync(queuePath, JSON.stringify(queue, null, 2), 'utf-8');
+  setOutput('status', 'draft_exists');
+  setOutput('slug', pending.slug);
+  setOutput('article_path', `data/article-drafts/${pending.slug}.mdx`);
   process.exit(0);
 }
 
@@ -263,26 +296,49 @@ if (qcResult.warnings.length > 0) {
 }
 
 // 記事保存
-fs.writeFileSync(outputPath, generatedContent, 'utf-8');
-console.log(`\n✅ 記事保存完了: src/content/blog/${pending.slug}.mdx`);
+const savePath = draftMode ? draftPath : outputPath;
+fs.mkdirSync(path.dirname(savePath), { recursive: true });
+fs.writeFileSync(savePath, generatedContent, 'utf-8');
+console.log(`\n✅ ${draftMode ? '下書き' : '記事'}保存完了: ${path.relative(ROOT, savePath)}`);
 
 const runReportPath = path.join(runReportDir, `${today}-${pending.slug}-daily-article.md`);
 writeRunReport({
   pending,
   qcResult,
   reportPath: runReportPath,
-  status: 'generated',
+  status: draftMode ? 'draft' : 'generated',
 });
 console.log(`バケツリレーログ保存: KPI管理/automation-runs/${path.basename(runReportPath)}`);
 
 // キュー更新
-pending.status = 'published';
-pending.publishedAt = new Date().toISOString();
+if (draftMode) {
+  const draftedAt = new Date().toISOString();
+  pending.status = 'draft';
+  pending.draftedAt = draftedAt;
+  upsertDraftEntry({
+    slug: pending.slug,
+    keyword: pending.keyword,
+    type: pending.type,
+    category: pending.category,
+    channel: pending.channel || 'manual',
+    priority: pending.priority ?? null,
+    charCount: qcResult.charCount,
+    status: 'draft',
+    draftedAt,
+    draftPath: `data/article-drafts/${pending.slug}.mdx`,
+    reportPath: `KPI管理/automation-runs/${path.basename(runReportPath)}`,
+    warnings: qcResult.warnings,
+    nextAction: '管理画面で確認し、公開OKなら npm run draft:publish -- <slug> を実行する',
+  });
+} else {
+  pending.status = 'published';
+  pending.publishedAt = new Date().toISOString();
+}
 fs.writeFileSync(queuePath, JSON.stringify(queue, null, 2), 'utf-8');
-console.log(`キュー更新: ${pending.slug} → published`);
+console.log(`キュー更新: ${pending.slug} → ${draftMode ? 'draft' : 'published'}`);
 
-setOutput('status', 'published');
+setOutput('status', draftMode ? 'draft' : 'published');
 setOutput('slug', pending.slug);
 setOutput('char_count', qcResult.charCount);
-setOutput('article_path', `src/content/blog/${pending.slug}.mdx`);
+setOutput('article_path', draftMode ? `data/article-drafts/${pending.slug}.mdx` : `src/content/blog/${pending.slug}.mdx`);
 setOutput('report_path', `KPI管理/automation-runs/${path.basename(runReportPath)}`);

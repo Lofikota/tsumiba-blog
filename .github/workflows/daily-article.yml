@@ -1,4 +1,4 @@
-name: 毎日記事自動生成
+name: 毎日記事下書き生成
 
 on:
   schedule:
@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  generate-and-deploy:
+  generate-draft:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -33,86 +33,49 @@ jobs:
         id: queue-check
         run: npm run queue:check
 
-      - name: 記事生成
+      - name: 記事下書き生成
         id: article
         if: steps.queue-check.outputs.has_pending == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: node scripts/generate-article.mjs
+          ARTICLE_OUTPUT_MODE: draft
+        run: node scripts/generate-article.mjs --draft
 
-      - name: 内部リンク自動挿入
-        if: steps.article.outputs.status == 'published'
-        run: node scripts/internal-links.mjs
-
-      - name: 生成記事の品質再確認
-        if: steps.article.outputs.status == 'published'
+      - name: 下書きの品質再確認
+        if: steps.article.outputs.status == 'draft'
         env:
           ARTICLE_PATH: ${{ steps.article.outputs.article_path }}
         run: node scripts/quality-gate.mjs "$ARTICLE_PATH"
 
-      - name: Astroビルド（品質確認）
-        if: steps.article.outputs.status == 'published'
+      - name: Astroビルド（管理画面更新確認）
+        if: steps.article.outputs.status == 'draft'
         run: npm run build
 
-      - name: 変更をコミット＆プッシュ
-        id: commit-content
-        if: steps.article.outputs.status == 'published'
+      - name: 下書きをコミット＆プッシュ
+        id: commit-draft
+        if: steps.article.outputs.status == 'draft'
         env:
           ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
         run: |
           git config user.name "ren-bot[bot]"
           git config user.email "bot@ren-money.com"
-          git add src/content/blog/ data/keyword-queue.json KPI管理/automation-runs/
+          git add data/article-drafts/ data/keyword-queue.json KPI管理/automation-runs/
           if git diff --staged --quiet; then
             echo "committed=false" >> "$GITHUB_OUTPUT"
           else
-            git commit -m "feat(auto): 記事自動生成 ${ARTICLE_SLUG}"
+            git commit -m "draft(auto): 記事下書き生成 ${ARTICLE_SLUG}"
             git push
             echo "committed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Xスレッド投稿
-        if: steps.commit-content.outputs.committed == 'true'
-        env:
-          ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          X_API_KEY: ${{ secrets.X_API_KEY }}
-          X_API_SECRET: ${{ secrets.X_API_SECRET }}
-          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
-          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
-        run: |
-          sleep 90
-          node scripts/auto-post-x.mjs --slug "$ARTICLE_SLUG"
-
-      - name: X投稿ストック生成
-        id: x-stock
-        if: steps.commit-content.outputs.committed == 'true'
-        env:
-          ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: node scripts/generate-x-stock.mjs --slug "$ARTICLE_SLUG"
-
-      - name: X投稿フラグ＆ストックを保存
-        if: steps.commit-content.outputs.committed == 'true'
-        env:
-          ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
-        run: |
-          git add data/keyword-queue.json data/x-stock/
-          if git diff --staged --quiet; then
-            echo "変更なし"
-          else
-            git commit -m "chore(auto): record X post & stock ${ARTICLE_SLUG}"
-            git push
-          fi
-
-      - name: LINE通知（公開完了）
-        if: steps.commit-content.outputs.committed == 'true'
+      - name: LINE通知（下書き完了）
+        if: steps.commit-draft.outputs.committed == 'true'
         env:
           ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
           CHAR_COUNT: ${{ steps.article.outputs.char_count }}
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-        run: node scripts/notify-line.mjs --type publish --slug "$ARTICLE_SLUG" --chars "$CHAR_COUNT"
+        run: node scripts/notify-line.mjs --type draft --slug "$ARTICLE_SLUG" --chars "$CHAR_COUNT"
 
       - name: LINE通知（記事生成失敗）
         if: failure()
