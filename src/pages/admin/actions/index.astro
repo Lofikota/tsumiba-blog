@@ -1,0 +1,343 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import draftIndex from '../../../../data/article-drafts/index.json';
+
+type DraftEntry = {
+  slug: string;
+  keyword: string;
+  status: 'draft' | 'published';
+  draftedAt: string;
+};
+
+const drafts = (draftIndex as DraftEntry[]).filter((d) => d.status === 'draft');
+---
+
+<BaseLayout
+  title="操作パネル | 管理"
+  description="下書き生成・公開の操作パネル"
+  robots="noindex,nofollow"
+  wide={true}
+>
+  <div class="actions-wrap">
+    <header class="actions-header">
+      <a href="/admin/" class="back-link">← 管理トップへ</a>
+      <h1>操作パネル</h1>
+      <p class="subtitle">GitHub Actions を起動してブログを操作します</p>
+    </header>
+
+    <!-- トークン入力 -->
+    <section class="token-section">
+      <label for="admin-token">管理トークン (ADMIN_ACTION_TOKEN)</label>
+      <div class="token-row">
+        <input id="admin-token" type="password" placeholder="Cloudflareに設定したトークン" autocomplete="off" />
+        <button id="save-token" type="button">保存</button>
+      </div>
+      <p id="action-status" role="status" class="status-msg">ボタン操作はGitHub Actionsを起動します。トークンはこのブラウザにのみ保存されます。</p>
+    </section>
+
+    <div class="panels">
+      <!-- 下書き生成 -->
+      <section class="panel">
+        <div class="panel-icon">📝</div>
+        <h2>下書き生成を開始</h2>
+        <p>キューの pending 記事を1本選んで AI が下書きを生成します。<br>完了後 <a href="/admin/">/admin/</a> に下書きが追加されます。</p>
+        <button
+          id="btn-generate"
+          class="action-btn"
+          data-admin-action="generate-draft"
+          type="button"
+        >
+          ▶ 下書き生成を開始
+        </button>
+      </section>
+
+      <!-- 下書き公開（slug自由入力） -->
+      <section class="panel">
+        <div class="panel-icon">🚀</div>
+        <h2>slug を指定して公開</h2>
+        <p>公開したい下書きの slug を入力してください。<br>GitHub Actions が品質確認後にブログへ反映します。</p>
+
+        {drafts.length > 0 && (
+          <div class="draft-list">
+            <p class="draft-list-label">公開待ち下書き（クリックで入力）：</p>
+            <ul>
+              {drafts.map((d) => (
+                <li>
+                  <button class="slug-chip" data-slug={d.slug} type="button">
+                    {d.slug}
+                  </button>
+                  <span class="chip-kw">{d.keyword}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {drafts.length === 0 && (
+          <p class="no-drafts">現在公開待ちの下書きはありません。まず下書き生成を実行してください。</p>
+        )}
+
+        <div class="slug-row">
+          <input id="slug-input" type="text" placeholder="例: epos-card-merit-demerit" autocomplete="off" />
+          <button
+            id="btn-publish"
+            class="action-btn publish"
+            data-admin-action="publish-draft"
+            type="button"
+          >
+            ▶ この slug を公開
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <style>
+    .actions-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      font-family: system-ui, sans-serif;
+    }
+    .actions-header {
+      margin-bottom: 2rem;
+    }
+    .back-link {
+      font-size: 0.85rem;
+      color: #64748b;
+      text-decoration: none;
+    }
+    .back-link:hover { color: #0f172a; }
+    h1 {
+      margin: 0.5rem 0 0.25rem;
+      font-size: 1.7rem;
+      color: #0f172a;
+    }
+    .subtitle { margin: 0; color: #64748b; font-size: 0.9rem; }
+
+    /* トークン */
+    .token-section {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 2rem;
+    }
+    .token-section label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 0.5rem;
+    }
+    .token-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .token-row input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .token-row button {
+      padding: 0.5rem 1rem;
+      background: #475569;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .token-row button:hover { background: #334155; }
+    .status-msg {
+      margin: 0.6rem 0 0;
+      font-size: 0.82rem;
+      color: #64748b;
+    }
+
+    /* パネル */
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 700px) { .panels { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.6rem;
+    }
+    .panel-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .panel h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.15rem;
+      color: #0f172a;
+    }
+    .panel p {
+      margin: 0 0 1rem;
+      font-size: 0.875rem;
+      color: #475569;
+      line-height: 1.6;
+    }
+    .panel p a { color: #2563eb; }
+
+    /* 下書きリスト */
+    .draft-list { margin-bottom: 1rem; }
+    .draft-list-label {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-bottom: 0.4rem;
+    }
+    .draft-list ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .draft-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .slug-chip {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 0.18rem 0.65rem;
+      font-size: 0.78rem;
+      font-family: monospace;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .slug-chip:hover { background: #dbeafe; }
+    .chip-kw { font-size: 0.78rem; color: #64748b; }
+    .no-drafts {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      background: #f1f5f9;
+      border-radius: 6px;
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    /* slug入力 */
+    .slug-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .slug-row input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-family: monospace;
+    }
+
+    /* ボタン */
+    .action-btn {
+      padding: 0.65rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: #1e40af;
+      color: #fff;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .action-btn:hover { background: #1e3a8a; }
+    .action-btn.publish { background: #15803d; }
+    .action-btn.publish:hover { background: #166534; }
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+
+  <script>
+    const tokenInput = document.querySelector<HTMLInputElement>('#admin-token');
+    const saveTokenBtn = document.querySelector('#save-token');
+    const statusEl = document.querySelector<HTMLElement>('#action-status');
+    const slugInput = document.querySelector<HTMLInputElement>('#slug-input');
+
+    // セッションからトークンを復元
+    const saved = sessionStorage.getItem('ren_blog_admin_token') || '';
+    if (tokenInput) tokenInput.value = saved;
+
+    function setStatus(msg: string, isError = false) {
+      if (!statusEl) return;
+      statusEl.textContent = msg;
+      statusEl.style.color = isError ? '#991b1b' : '#15803d';
+    }
+
+    saveTokenBtn?.addEventListener('click', () => {
+      const val = tokenInput?.value.trim() || '';
+      sessionStorage.setItem('ren_blog_admin_token', val);
+      setStatus('トークンを保存しました。');
+    });
+
+    // slug チップ → input に転記
+    document.querySelectorAll<HTMLButtonElement>('.slug-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        if (slugInput) slugInput.value = chip.dataset.slug || '';
+      });
+    });
+
+    async function runAction(action: string, slug?: string) {
+      const token = tokenInput?.value.trim() || '';
+      if (!token) {
+        setStatus('管理トークンを入力してください。', true);
+        return;
+      }
+      sessionStorage.setItem('ren_blog_admin_token', token);
+
+      const btnGenerate = document.querySelector<HTMLButtonElement>('#btn-generate');
+      const btnPublish = document.querySelector<HTMLButtonElement>('#btn-publish');
+      if (btnGenerate) btnGenerate.disabled = true;
+      if (btnPublish) btnPublish.disabled = true;
+
+      setStatus(action === 'publish-draft' ? `「${slug}」の公開処理を開始しています...` : '下書き生成を開始しています...');
+
+      try {
+        const res = await fetch('/api/admin-action', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'x-admin-token': token,
+          },
+          body: JSON.stringify({ action, slug }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || '実行に失敗しました');
+        setStatus('GitHub Actions を起動しました。数分後にこのページを更新してください。');
+      } catch (err) {
+        setStatus(err instanceof Error ? err.message : '実行に失敗しました', true);
+      } finally {
+        if (btnGenerate) btnGenerate.disabled = false;
+        if (btnPublish) btnPublish.disabled = false;
+      }
+    }
+
+    document.querySelector('#btn-generate')?.addEventListener('click', () => {
+      runAction('generate-draft');
+    });
+
+    document.querySelector('#btn-publish')?.addEventListener('click', () => {
+      const slug = slugInput?.value.trim() || '';
+      if (!slug) {
+        setStatus('slug を入力してください。', true);
+        return;
+      }
+      runAction('publish-draft', slug);
+    });
+  </script>
+</BaseLayout>
