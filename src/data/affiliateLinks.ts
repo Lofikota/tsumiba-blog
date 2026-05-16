@@ -204,7 +204,7 @@ export const affiliateLinks: AffiliateLink[] = [
     provider: 'ファインドイット株式会社',
     category: '保険',
     destinationUrl: 'https://www.fp-sodan.com/',
-    status: 'pending', // A8.net s00000026218001 に申請が必要
+    status: 'pending', // A8.net s00000026218001 承認後、destinationUrlをASPリンクに差し替える
     risk: 'insurance',
     disclosure: 'FP相談は無料です。提案内容はFPにより異なります。加入を強制するものではありません。',
   },
@@ -214,7 +214,7 @@ export const affiliateLinks: AffiliateLink[] = [
     provider: '株式会社Global8',
     category: '保険',
     destinationUrl: 'https://www.hokengarden.com/',
-    status: 'pending', // A8.net s00000020819004 に申請が必要
+    status: 'pending', // A8.net s00000020819004 承認後、destinationUrlをASPリンクに差し替える
     risk: 'insurance',
     disclosure: '保険相談は無料です。相談内容や結果はFPにより異なります。',
   },
@@ -224,7 +224,7 @@ export const affiliateLinks: AffiliateLink[] = [
     provider: '保険見直しラボ',
     category: '保険',
     destinationUrl: 'https://www.hoken-minaoshi-lab.jp/',
-    status: 'pending', // A8.net s00000017791001 に申請が必要
+    status: 'pending', // A8.net s00000017791001 承認後、destinationUrlをASPリンクに差し替える
     risk: 'insurance',
     disclosure: '保険相談は無料です。相談内容や結果はFPにより異なります。',
   },
@@ -234,7 +234,7 @@ export const affiliateLinks: AffiliateLink[] = [
     provider: '株式会社保険見直し本舗',
     category: '保険',
     destinationUrl: 'https://www.hoken-minaoshi.jp/',
-    status: 'pending', // A8.net s00000027364001 に申請が必要
+    status: 'pending', // A8.net s00000027364001 承認後、destinationUrlをASPリンクに差し替える
     risk: 'insurance',
     disclosure: '保険相談は無料です。相談内容や結果はFPにより異なります。',
   },
