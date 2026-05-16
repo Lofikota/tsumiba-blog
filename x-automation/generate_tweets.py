@@ -1,0 +1,386 @@
+"""
+Claude API × 学習データ による翌週ツイート自動生成
+
+処理内容:
+1. learning_log.jsonl から高パフォーマンスツイートと編集パターンを取得
+2. 田中蓮ペルソナ + 学習データ を組み合わせて Claude API でツイートを生成
+3. 生成したツイートを tweet_queue.csv に投入（original_text も保存）
+
+工藤さんが過去に編集したツイートを「好みのシグナル」として参照するため、
+編集すればするほど生成精度が上がる設計になっている。
+"""
+import os
+import csv
+import json
+import tempfile
+import shutil
+from datetime import datetime, timedelta
+from pathlib import Path
+
+import anthropic
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).parent
+DATA_DIR = BASE_DIR / "data"
+QUEUE_FILE = DATA_DIR / "tweet_queue.csv"
+LEARNING_LOG = DATA_DIR / "learning_log.jsonl"
+FIELDNAMES = [
+    "id", "scheduled_date", "scheduled_time", "tweet_type",
+    "text", "original_text", "status", "posted_at", "tweet_id", "error",
+]
+
+POSTING_SCHEDULE = [
+    ("07:30", "型C"),  # 朝：入口づくり
+    ("12:00", "型B"),  # 昼：共感・迷い潰し
+    ("19:00", "型A"),  # 夕方：比較・保存
+    ("21:00", "型D"),  # 夜：ストーリー・回収
+]
+
+# ASP承認済みプログラム（収益優先順）
+ASP_PROGRAMS = {
+    "DMM_FX": {
+        "単価": "40,000円/件",
+        "ブログURL": "ren-money.com/blog/dmm-fx-review/",
+        "特徴": "初心者No.1・スプレッド0.2銭・24時間サポート・口座数400万超・最短1日開設",
+        "向いている人": "FX初心者・スマホ派・デイトレ",
+        "投稿比率": "週3本（最優先）",
+    },
+    "JFX": {
+        "単価": "15,000円/件",
+        "ブログURL": "ren-money.com/blog/jfx-review/",
+        "特徴": "2025年オリコン顧客満足度FX総合No.1・MT4対応・約定力業界最高水準",
+        "向いている人": "MT4ユーザー・約定力重視・自動売買",
+        "投稿比率": "週2本",
+    },
+    "FXTF": {
+        "単価": "15,000円/件",
+        "ブログURL": "ren-money.com/blog/fxtf-review/",
+        "特徴": "FX+CFD+ノックアウトオプションを一口座・高約定力・MT4対応",
+        "向いている人": "CFD・KOに興味ある人・MT4ユーザー",
+        "投稿比率": "週2本",
+    },
+    "エポスカード": {
+        "単価": "2,600円/件",
+        "ブログURL": "ren-money.com/blog/epos-card-review/",
+        "特徴": "年会費永久無料・海外旅行保険500万円・エポスゴールドへの招待あり",
+        "向いている人": "海外旅行好き・サブカード探し・ゴールド育成",
+        "投稿比率": "週2本",
+    },
+}
+
+WEEKLY_THEMES = {
+    0: "FX入門（何から始めるか・少額開始・失敗回避）",
+    1: "税金（副業・確定申告・控除）",
+    2: "クレカ（年会費無料・保険・ポイント最適化）",
+    3: "NISA補助（積立・証券口座・長期の土台）",
+    4: "FX比較（DMM FX / JFX / FXTF / 松井証券FX の選び方）",
+    5: "迷い潰し（申し込み前に確認したい3点）",
+    6: "週次まとめ（今週の学び・LINE診断・次の一歩）",
+}
+
+TYPE_DESCRIPTIONS = {
+    "型A": "比較・保存狙い。箇条書き・数字・判断軸。「迷ったらこれを見る」系。",
+    "型B": "共感あるある。読者の悩みを代弁。「わかる」「最初ここで止まる」。",
+    "型C": "入口づくり。診断・LINE・記事への導線を短く置く。",
+    "型D": "ストーリー・体験談。失敗→学び→今の判断基準。信頼を作る。",
+    "型E": "質問。選択肢を並べて、返信・反応を取りやすくする。",
+    "型HENSHIN": "変身ストーリー。「昔の自分→転換点→今の自分」の時系列。田中蓮の借金200万→副業月20万→資産500万への変化を軸に。読者に「自分もできるかも」と思わせる。",
+}
+
+PERSONA = """
+田中蓮（たなか れん）32歳・IT系会社員（SE）・東京在住
+- ストーリー：25歳で借金200万→28歳から副業開始→30歳で完済→現在は家計と投資を整理しながら運用中
+- 禁止：「確実に儲かる」「絶対」「必ず増える」「元本保証」・虚偽の実績数字・絵文字
+- 投稿の主目的は、FXをXで育てて比較・失敗回避・少額開始へ自然につなぐこと
+- 280文字以内厳守（日本語1文字=1カウント）
+
+【最重要：AIバレしない文体ルール（Grokリサーチ2026年最新）】
+
+■ 絶対禁止（AIっぽさの元凶）
+- → ━━━ ・ ① ② ③ などの記号・箇条書きを多用しない
+- 完璧に整列された構造（均等な改行・完全な対称）
+- 毎回同じ「問題提起→比較→リンク」の型
+- 「初心者・スマホ派・サポート重視」のような体言止め羅列
+
+■ 代わりに使う（人間らしさの出し方）
+- 話し言葉全開：「めっちゃ」「マジで」「正直」「意外と」「便利すぎ」「俺も最初は」
+- 感情ツッコミ：「これ気づかない人多い」「痛い目見たわ」「誰も教えてくれないよね」
+- 改行は不規則に（1行空けたり詰めたり。等間隔は禁止）
+- 言い切らない：「〜だと思う」「〜かもしれない」「〜かなって」
+
+■ 投稿の長さ・構造バリエーション（必須）
+- 1〜3行で終わる短投稿：28本中8本以上
+- CTAなし（URLもLINEも誘導なし）の純粋な一言：28本中6本
+- コメント誘導で終わる投稿：28本中6本以上（「コメントで教えて」「どれ使ってる？」）
+- 長文比較投稿：28本中4本まで
+- 型HENSHIN（変身ストーリー）：28本中2本以上（田中蓮の変化を時系列で語る）
+
+■ 実在感の出し方
+- 具体数字を必ず入れる：「32歳」「借金200万」「月5万」「2年で500万」
+- 時間軸を入れる：「昨日気づいたんだけど」「先週試してみて」「最近思うんだけど」
+
+■ 6つの有効な投稿型（Grokリサーチ結果）
+1. 問題解決型（★★★★★）：「あるある問題→解決策」。「何となく選んで9割後悔」系
+2. 体験談型（★★★★）：「自分が損した話→学んだこと」。「4つ使ってやっとわかった」
+3. 自然リスト型（★★★★）：矢印なし・自然文でつなぐ比較（3〜5個）
+4. 質問型（★★★★★）：最後に「あなたはどれ派？」でコメント誘導。コメント爆増
+5. ビフォーアフター型（★★★★）：「昔の失敗→今の正解」。変身ストーリー
+6. まとめ有益型（★★★）：「全部まとめたよ＋リンク」。信頼UP
+
+■ 変身ストーリー（型HENSHIN）の書き方
+- 田中蓮の実際の変化を語る（借金200万 → 副業月20万 → 資産500万）
+- 「転換点」を1つ特定する（「FX口座を変えてから」「確定申告の仕組みを知ってから」）
+- 読者に「自分もできるかも」と思わせる終わり方
+- 過去の自分を否定しすぎない（「あの頃の自分を責めない。知らなかっただけだから」）
+
+■ 最強の組み合わせ
+問題解決 → 体験談 → 自然リスト → 質問CTA → リンク
+
+■ ハッシュタグルール
+ハッシュタグは1投稿につき最大3個。多用禁止。
+使うもの：#FX #FX口座 #FX初心者 #FXおすすめ のどれかだけ
+ハッシュタグなし投稿も半数以上OK（むしろ自然）
+
+■ 参考：AIバレしないリライト例（この文体を目指す）
+---
+FX口座って、何となくで決めてない？
+
+「有名だから」「CMで見たから」だけで選んじゃう人、めっちゃ多いけど…
+開設してから「これヤバい」って気づくの、9割くらいだと思う。俺も最初はそうだった。
+
+スプレッドの計算間違えてたり、手数料トータルで全然考えてなかったり。
+正直、誰も教えてくれないよね。
+
+結局自分で4つくらい使ってみて、やっと「これが基準だ」ってわかった。
+
+DMM FXは初心者でスマホ派、サポートもしっかり欲しい人にはまずこれ。口座数No.1なだけある。
+JFXはMT4でガチでやりたい人向け。満足度もかなり高い。
+FXTFは意外と見落としがちなんだけど、スプレッド＋手数料をセットで計算すると実は一番コスパいいケースが多い。
+松井証券FXはiDeCoも一緒に管理したい人に最高。
+
+結局「どれが安いか」はトレードスタイルで全然変わる。
+比較表ブログに上げたから見てみて。
+ren-money.com/blog/fx-kouza-hikaku/
+
+自分はどんなスタイルで取引してる？コメントで教えてくれたら本気で答えるよ。
+---
+
+■ 変身ストーリー例（型HENSHIN）
+---
+25歳のとき、借金が200万あった。
+
+カードローンとか消費者金融とか、「とりあえず今月乗り切る」を繰り返してたら気づいたらそうなってた。
+誰にも言えなかったし、副業とか投資とか、自分には関係ない話だと思ってた。
+
+28歳で初めてFXを始めたのは、正直「一発逆転したい」って気持ちが半分あったのは否定しない。
+でも最初の3ヶ月は全然ダメで、仕組みを理解してから月5万くらい安定して出るようになった。
+
+今は借金ゼロで、資産500万弱。
+投資に回せるお金があることの安心感って、経験した人にしかわからないと思う。
+
+あの頃の自分を責めない。知らなかっただけだから。
+---
+"""
+
+
+def load_learning_data() -> dict:
+    """学習ログから良い投稿・編集パターンを抽出"""
+    if not LEARNING_LOG.exists():
+        return {"top_tweets": [], "edit_examples": []}
+
+    records = []
+    with open(LEARNING_LOG, encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                try:
+                    records.append(json.loads(line))
+                except json.JSONDecodeError:
+                    pass
+
+    if not records:
+        return {"top_tweets": [], "edit_examples": []}
+
+    # エンゲージメントスコア上位10本
+    top = sorted(records, key=lambda x: x.get("engagement_score", 0), reverse=True)[:10]
+    top_tweets = [
+        {
+            "text": r["final_text"],
+            "type": r.get("tweet_type", ""),
+            "score": r.get("engagement_score", 0),
+            "likes": r.get("like_count", 0),
+            "impressions": r.get("impression_count", 0),
+        }
+        for r in top
+    ]
+
+    # 工藤さんが実際に編集したペア（学習シグナル）
+    edited = [r for r in records if r.get("was_edited") and r.get("original_text")][:5]
+    edit_examples = [
+        {
+            "before": r["original_text"][:200],
+            "after": r["final_text"][:200],
+            "score": r.get("engagement_score", 0),
+        }
+        for r in edited
+    ]
+
+    return {"top_tweets": top_tweets, "edit_examples": edit_examples}
+
+
+def build_prompt(week_offset: int, learning: dict) -> str:
+    """Claude への生成プロンプトを構築"""
+    theme_idx = week_offset % len(WEEKLY_THEMES)
+    theme = WEEKLY_THEMES[theme_idx]
+
+    top_section = ""
+    if learning["top_tweets"]:
+        top_section = "\n## 過去の高パフォーマンスツイート（参考にすること）\n"
+        for t in learning["top_tweets"][:5]:
+            top_section += f"\n[{t['type']} / score:{t['score']:.3f}% / imp:{t['impressions']}]\n```\n{t['text']}\n```\n"
+
+    edit_section = ""
+    if learning["edit_examples"]:
+        edit_section = "\n## 工藤さんの編集パターン（このスタイルに寄せること）\n"
+        for e in learning["edit_examples"]:
+            edit_section += f"\n【修正前（AI生成）】\n```\n{e['before']}\n```\n【修正後（ユーザー好み）】\n```\n{e['after']}\n```\n"
+
+    type_section = "\n## 投稿タイプの定義\n"
+    for t, desc in TYPE_DESCRIPTIONS.items():
+        type_section += f"- {t}：{desc}\n"
+
+    asp_section = "\n## ASP承認済みプログラム（必ずこれを収益源にする）\n"
+    for name, info in ASP_PROGRAMS.items():
+        asp_section += (
+            f"\n### {name}（{info['単価']}）\n"
+            f"- URL: {info['ブログURL']}\n"
+            f"- 特徴: {info['特徴']}\n"
+            f"- 向いている人: {info['向いている人']}\n"
+            f"- 投稿比率: {info['投稿比率']}\n"
+        )
+    asp_section += "\n**ルール**: 7日28本のうち最低10本にブログURLまたはLINE導線を含めること。DMM FX最優先だが、FX全体は比較と失敗回避を中心にする。\n"
+
+    schedule_section = "\n## 今週の投稿スケジュール（7日分・計28本）\n"
+    schedule_section += "各日に以下の順番で4本生成する:\n"
+    for time, tweet_type in POSTING_SCHEDULE:
+        schedule_section += f"- {time}: {tweet_type}\n"
+    schedule_section += "さらに各週2本以上は型HENSHINを必ず入れること。\n"
+
+    output_format = """
+## 出力形式（厳守）
+
+以下の JSON 配列だけを出力する。説明文・マークダウン・コードブロックは不要。
+
+[
+  {
+    "day": 1,
+    "time": "07:30",
+    "type": "型C",
+    "text": "ツイート本文"
+  },
+  ...
+]
+
+- day: 1〜7（1=今週の1日目）
+- time: "07:30" / "12:00" / "19:00" / "21:00"
+- type: "型A" / "型B" / "型C" / "型D" / "型E" / "型HENSHIN" または "DMM_FX" / "JFX" / "FXTF" / "エポスカード" / "バズ汎用"
+- text: 280文字以内・改行は \\n で表現
+- ASP連動ツイートはブログURLを必ず本文末尾に含める（▶ URL形式で）
+"""
+
+    return f"""あなたは田中蓮（32歳・IT会社員）として X（Twitter）に投稿するコンテンツを生成するシステムです。
+
+## ペルソナ
+{PERSONA}
+
+## 今週のテーマ
+{theme}
+{asp_section}{type_section}{top_section}{edit_section}{schedule_section}{output_format}"""
+
+
+def next_id() -> int:
+    with open(QUEUE_FILE, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    return max((int(r["id"]) for r in rows), default=0) + 1
+
+
+def get_next_week_dates(week_offset: int = 0) -> list[str]:
+    """翌週月曜から7日分の日付を返す（week_offset=1で翌々週）"""
+    today = datetime.now()
+    days_until_monday = (7 - today.weekday()) % 7 or 7
+    monday = today + timedelta(days=days_until_monday + week_offset * 7)
+    return [(monday + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+
+
+def add_to_queue(tweets: list[dict], dates: list[str]) -> int:
+    start_id = next_id()
+    new_rows = []
+
+    for i, tweet in enumerate(tweets):
+        day_idx = tweet.get("day", 1) - 1
+        if day_idx >= len(dates):
+            continue
+        text = tweet.get("text", "").replace("\\n", "\n")
+        new_rows.append({
+            "id": start_id + len(new_rows),
+            "scheduled_date": dates[day_idx],
+            "scheduled_time": tweet.get("time", "09:00"),
+            "tweet_type": tweet.get("type", ""),
+            "text": text,
+            "original_text": text,
+            "status": "pending",
+            "posted_at": "",
+            "tweet_id": "",
+            "error": "",
+        })
+
+    with open(QUEUE_FILE, "a", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        writer.writerows(new_rows)
+
+    return len(new_rows)
+
+
+def main(week_offset: int = 0) -> None:
+    load_dotenv(BASE_DIR / ".env")
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    if not api_key:
+        print("❌ ANTHROPIC_API_KEY が未設定です")
+        return
+
+    print("📊 学習データを読み込み中...")
+    learning = load_learning_data()
+    print(f"   高パフォーマンス参照: {len(learning['top_tweets'])}本")
+    print(f"   編集パターン参照: {len(learning['edit_examples'])}件")
+
+    print("🤖 Claude API でツイートを生成中...")
+    client = anthropic.Anthropic(api_key=api_key)
+    prompt = build_prompt(week_offset, learning)
+
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=8192,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    raw = response.content[0].text.strip()
+
+    start = raw.find("[")
+    end = raw.rfind("]") + 1
+    if start == -1 or end == 0:
+        print(f"❌ JSON が見つかりません:\n{raw[:300]}")
+        return
+
+    try:
+        tweets = json.loads(raw[start:end])
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON パースエラー: {e}\n{raw[start:start+200]}")
+        return
+
+    dates = get_next_week_dates(week_offset)
+    count = add_to_queue(tweets, dates)
+    print(f"✅ {count}本を翌週キューに追加しました（{dates[0]}〜{dates[-1]}）")
+
+
+if __name__ == "__main__":
+    import sys
+    offset = int(sys.argv[1]) if len(sys.argv) > 1 else 0
+    main(week_offset=offset)

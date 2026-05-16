@@ -1,0 +1,47 @@
+name: X投稿自動生成（週次）
+
+on:
+  schedule:
+    # JST 日曜 08:00 = UTC 土曜 23:00
+    - cron: '0 23 * * 6'
+  workflow_dispatch:
+    inputs:
+      week_offset:
+        description: '何週先を生成するか（0=翌週, 1=翌々週）'
+        required: false
+        default: '0'
+
+jobs:
+  generate-tweets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Python セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 依存関係インストール
+        run: pip install -r x-automation/requirements.txt
+
+      - name: ツイート生成
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WEEK_OFFSET: ${{ github.event.inputs.week_offset || '0' }}
+        run: python x-automation/generate_tweets.py "$WEEK_OFFSET"
+
+      - name: キュー更新をコミット
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add x-automation/data/tweet_queue.csv
+          TIMESTAMP=$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M')
+          git diff --staged --quiet || git commit -m "chore: X投稿キュー週次生成 ${TIMESTAMP} JST"
+          git push
