@@ -39,8 +39,13 @@ async function triggerWorkflow(env: Env, workflow: string, inputs?: Record<strin
   });
 
   if (!res.ok) {
-    const body = await res.text();
-    return { ok: false, status: res.status, message: body || res.statusText };
+    const message =
+      res.status === 401 ? 'GITHUB_ACTIONS_TOKEN が無効または期限切れです。Cloudflare の環境変数を確認してください。' :
+      res.status === 403 ? 'GITHUB_ACTIONS_TOKEN の権限が不足しています。Actions: Write 権限が必要です。' :
+      res.status === 404 ? `ワークフロー "${workflow}" が見つかりません。リポジトリ名またはワークフローファイル名を確認してください。` :
+      res.status === 422 ? 'リクエストが不正です。slug または ref を確認してください。' :
+      `GitHub API エラー (${res.status})`;
+    return { ok: false, status: res.status, message };
   }
 
   return { ok: true, status: res.status, message: 'workflow dispatched' };
