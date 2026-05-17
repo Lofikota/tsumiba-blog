@@ -77,7 +77,7 @@ export const affiliateLinks: AffiliateLink[] = [
     name: 'DMM FX',
     provider: '株式会社DMM.com証券',
     category: 'FX',
-    destinationUrl: 'https://px.a8.net/svt/ejp?a8mat=3Z4OMV+ADW8OI+1WP2+6J4IA',
+    destinationUrl: 'https://px.a8.net/svt/ejp?a8mat=3Z4OMV+ADW8OI+1WP2+69WPU',
     status: 'affiliate',
     risk: 'fx',
     disclosure: 'FXには元本割れや預け入れた資金を上回る損失が発生するリスクがあります。',

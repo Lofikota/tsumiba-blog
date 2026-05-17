@@ -22,7 +22,7 @@ QUEUE_FILE = DATA_DIR / "tweet_queue.csv"
 LOG_DIR = BASE_DIR / "logs"
 LOG_FILE = LOG_DIR / "x_poster.log"
 TIME_WINDOW_MINUTES = 35  # GitHub Actionsは30分単位で起動するため余裕を持たせる
-CATCH_UP_HOURS = 48      # GitHub Actionsが止まっていた場合の取りこぼし対応
+CATCH_UP_HOURS = 3       # 直近3時間以内の取りこぼしのみ対象（48hは二重投稿リスクが高すぎる）
 
 LOG_DIR.mkdir(exist_ok=True)
 logging.basicConfig(
