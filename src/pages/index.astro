@@ -142,7 +142,9 @@ const catStyle: Record<string, CatStyle> = {
      HERO
   ═══════════════════════════════════════ */
   .hero {
-    background: linear-gradient(180deg, #1E3A8A 0%, #2563EB 100%);
+    background:
+      radial-gradient(circle at 18% 18%, rgba(59,130,246,.38) 0, rgba(59,130,246,0) 34%),
+      linear-gradient(180deg, #102A6B 0%, #1D4ED8 100%);
     color: #fff;
     overflow: hidden;
     padding: 56px 0 72px;
@@ -151,7 +153,7 @@ const catStyle: Record<string, CatStyle> = {
   .hero::before {
     content: '';
     position: absolute; inset: 0;
-    background-image: radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba(255,255,255,.075) 1px, transparent 1px);
     background-size: 24px 24px;
     pointer-events: none;
   }
@@ -166,47 +168,65 @@ const catStyle: Record<string, CatStyle> = {
     font-size: 11px; font-weight: 700; letter-spacing: .18em;
     text-transform: uppercase; color: var(--c-yellow);
     margin-bottom: 20px;
+    text-shadow: 0 1px 12px rgba(0,0,0,.18);
     animation: fadeUp .5s ease forwards;
   }
   .hero-h1 {
     font-size: clamp(30px, 4vw, 48px);
     font-weight: 900; line-height: 1.3;
     margin-bottom: 20px;
+    max-width: 680px;
+    text-shadow: 0 2px 18px rgba(0,0,0,.22);
     animation: fadeUp .6s ease .1s both;
   }
-  .hero-h1 strong { color: var(--c-yellow); }
+  .hero-h1 strong {
+    color: #FBBF24;
+    text-shadow: 0 2px 16px rgba(0,0,0,.28);
+  }
   .hero-lead {
-    font-size: 14px; line-height: 1.9; opacity: .9;
+    font-size: 15px; line-height: 1.95; color: rgba(255,255,255,.94);
     margin-bottom: 28px;
+    text-shadow: 0 1px 10px rgba(0,0,0,.18);
     animation: fadeUp .6s ease .2s both;
   }
-  .hero-disclaimer { display: block; font-size: 10.5px; opacity: .6; margin-top: 6px; }
+  .hero-disclaimer { display: block; font-size: 11px; color: rgba(255,255,255,.78); margin-top: 8px; }
   .hero-cta-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 32px; animation: fadeUp .6s ease .3s both; }
+  .hero .btn-primary {
+    background: #fff;
+    color: #163D91;
+    box-shadow: 0 4px 0 rgba(15,23,42,.26), 0 10px 28px rgba(15,23,42,.18);
+  }
+  .hero .btn-outline {
+    background: rgba(15,23,42,.14);
+    border-color: rgba(255,255,255,.78);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
+  }
   .hero-stats {
     display: flex; gap: 0;
-    border-top: 1px solid rgba(255,255,255,.2);
+    border-top: 1px solid rgba(255,255,255,.34);
     padding-top: 24px;
     animation: fadeUp .6s ease .4s both;
   }
   .hero-stat {
     flex: 1; text-align: center; padding: 0 16px;
-    border-right: 1px solid rgba(255,255,255,.2);
+    border-right: 1px solid rgba(255,255,255,.30);
   }
   .hero-stat:last-child { border-right: none; }
   .hero-stat-num   { display: block; font-size: 26px; font-weight: 900; color: var(--c-yellow); }
-  .hero-stat-label { display: block; font-size: 10.5px; opacity: .75; line-height: 1.5; margin-top: 3px; }
+  .hero-stat-label { display: block; font-size: 11px; color: rgba(255,255,255,.86); line-height: 1.5; margin-top: 3px; }
 
   .hero-art {
-    background: rgba(255,255,255,.08);
-    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(18,54,139,.72);
+    border: 1px solid rgba(255,255,255,.34);
     border-radius: 16px;
     padding: 28px 24px;
     backdrop-filter: blur(2px);
+    box-shadow: 0 24px 60px rgba(15,23,42,.22), inset 0 1px 0 rgba(255,255,255,.14);
     animation: fadeUp .7s ease .2s both;
   }
   .hero-tl-heading {
     font-size: 10px; font-weight: 700; letter-spacing: .18em;
-    text-transform: uppercase; color: rgba(255,255,255,.4);
+    text-transform: uppercase; color: rgba(255,255,255,.72);
     margin-bottom: 18px;
   }
   /* vertical timeline layout */
@@ -219,18 +239,18 @@ const catStyle: Record<string, CatStyle> = {
   .hero-tl-icon--red   { background: rgba(239,68,68,.18);  border: 1.5px solid rgba(239,68,68,.55);  color: #FCA5A5; }
   .hero-tl-icon--amber { background: rgba(251,191,36,.15); border: 1.5px solid rgba(251,191,36,.55); color: #FCD34D; }
   .hero-tl-icon--green { background: rgba(34,197,94,.18);  border: 1.5px solid rgba(34,197,94,.55);  color: #86EFAC; }
-  .hero-tl-connector { width: 2px; flex: 1; min-height: 12px; background: rgba(255,255,255,.1); margin: 4px 0; }
+  .hero-tl-connector { width: 2px; flex: 1; min-height: 12px; background: rgba(255,255,255,.22); margin: 4px 0; }
   .hero-tl-body { padding: 3px 0 16px; }
-  .hero-tl-year  { font-size: 10px; color: rgba(255,255,255,.4); letter-spacing: .06em; }
+  .hero-tl-year  { font-size: 10.5px; color: rgba(255,255,255,.70); letter-spacing: .06em; font-weight: 700; }
   .hero-tl-num   { font-size: 23px; font-weight: 900; color: var(--c-yellow); line-height: 1.1; margin: 2px 0 3px; }
-  .hero-tl-desc  { font-size: 11.5px; color: rgba(255,255,255,.7); }
+  .hero-tl-desc  { font-size: 12px; color: rgba(255,255,255,.86); }
   /* mini sparkline */
-  .hero-sparkline { margin-top: 2px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.1); }
-  .hero-spark-lbl { font-size: 9px; color: rgba(255,255,255,.3); letter-spacing: .14em; margin-bottom: 8px; }
-  .hero-spark-years { display: flex; justify-content: space-between; font-size: 9px; color: rgba(255,255,255,.35); margin-top: 4px; padding: 0 2px; }
+  .hero-sparkline { margin-top: 2px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.20); }
+  .hero-spark-lbl { font-size: 9px; color: rgba(255,255,255,.58); letter-spacing: .14em; margin-bottom: 8px; }
+  .hero-spark-years { display: flex; justify-content: space-between; font-size: 9px; color: rgba(255,255,255,.62); margin-top: 4px; padding: 0 2px; }
   .hero-tl-footer {
     margin-top: 12px; padding-top: 12px;
-    border-top: 1px solid rgba(255,255,255,.1);
+    border-top: 1px solid rgba(255,255,255,.20);
     font-size: 12px; font-weight: 700; color: var(--c-yellow);
     text-align: center; letter-spacing: .04em;
   }
