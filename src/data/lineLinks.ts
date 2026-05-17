@@ -91,8 +91,16 @@ export const lineRefs: LineRef[] = [
     label: '漫画LP',
     source: 'lp',
     intent: 'general',
-    headline: '蓮の失敗談から学ぶお金のLINE',
-    description: '借金、家計、副業、資産形成の失敗をもとに、判断材料を届けます。',
+    headline: '失敗しない順番を整理するLINE',
+    description: '副業・FX・保険のどこから始めるべきか、7日間で順番に整理して届けます。',
+  },
+  {
+    ref: 'lp-fx-main',
+    label: 'FX特化LP',
+    source: 'lp',
+    intent: 'fx',
+    headline: 'FX口座を作る前に3分だけ確認するLINE',
+    description: '特典額だけで選んで失敗しないように、DMM FX・JFX・FXTFの条件、リスク、見る順番を整理して届けます。',
   },
   {
     ref: 'campaign-dmm-fx',

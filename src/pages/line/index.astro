@@ -3,26 +3,29 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getLineAddUrl, getLineRef, lineOfficial, type LineRef } from '../../data/lineLinks';
 
 const addUrl = getLineAddUrl('direct-line-page');
-const featuredRefs: LineRef[] = ['blog-main', 'blog-tax-basic', 'blog-card-roundup', 'blog-fx-roundup', 'blog-nisa-mistake']
+const featuredRefs: LineRef[] = ['blog-main', 'blog-tax-basic', 'blog-fx-roundup', 'blog-nisa-mistake']
   .map((ref) => getLineRef(ref))
   .filter((ref): ref is LineRef => Boolean(ref));
-const campaignRefs: LineRef[] = ['campaign-smbc-gold-nl', 'campaign-epos-card', 'campaign-dmm-fx', 'campaign-jfx', 'campaign-fxtf']
+const campaignRefs: LineRef[] = ['campaign-dmm-fx', 'campaign-jfx', 'campaign-fxtf']
   .map((ref) => getLineRef(ref))
   .filter((ref): ref is LineRef => Boolean(ref));
 ---
 
 <BaseLayout
   title="田中蓮の公式LINE"
-  description="FX、クレカ、副業税金を先に整理し、NISAは補助入口として届ける田中蓮の公式LINEです。"
+  description="副業・FX・保険の順番を整理し、FX口座は条件とリスクを先に見てから判断する田中蓮の公式LINEです。"
 >
   <section class="line-hero">
     <p class="line-kicker">公式LINE</p>
     <h1>今の悩みを1つ選べるLINE</h1>
     <p>
-      FX、クレカ、副業税金を先に整理し、NISAは補助として届けます。
+      副業・FX・保険の順番を整理し、NISAは補助として届けます。
       登録したら、まずは4択から1つだけ選ぶだけです。
     </p>
-    <a class="line-button" href={addUrl} rel="noopener noreferrer">1分で診断を始める</a>
+    <a class="line-button" href={addUrl} rel="noopener noreferrer"
+       data-google-event="line_add_click"
+       data-google-category="line"
+       data-google-label="direct-line-page">1分で診断を始める</a>
     <p class="line-note">LINE ID: {lineOfficial.accountId}</p>
   </section>
 
@@ -38,8 +41,8 @@ const campaignRefs: LineRef[] = ['campaign-smbc-gold-nl', 'campaign-epos-card', 
         <p>収入、経費、青色申告、控除の確認順を整理します。</p>
       </article>
       <article>
-        <h3>クレカ・ポイント</h3>
-        <p>年会費、還元条件、クレカ積立の相性を整理します。</p>
+        <h3>保険見直し</h3>
+        <p>今の保障、固定費、相談前に聞くことを整理します。</p>
       </article>
       <article>
         <h3>NISA・証券口座</h3>

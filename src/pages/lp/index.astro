@@ -1,15 +1,29 @@
 ---
 import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 const siteUrl = 'https://ren-money.com';
 const allPosts = (await getCollection('blog')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+const featuredSlugs = [
+  'fx-kouza-hikaku',
+  'fx-small-start-guide',
+  'hoken-soudan-muryou-hikaku',
+  'hoken-minaoshi-fp-soudan',
+  'fx-company-barenai',
+  'hoken-minaoshi-30dai-kaisha-in',
+];
+const featuredPosts: CollectionEntry<'blog'>[] = featuredSlugs
+  .map((slug) => allPosts.find((post) => post.id === slug))
+  .filter((post): post is CollectionEntry<'blog'> => Boolean(post));
+const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';
 type CatStyle = { cls: string; bg: string };
 const catStyle: Record<string, CatStyle> = {
   'NISA・投資': { cls: 'cat-invest',  bg: 'linear-gradient(135deg,#DBEAFE,#93C5FD)' },
   '副業・節税': { cls: 'cat-income',  bg: 'linear-gradient(135deg,#D4EDDA,#86EFAC)' },
   'お得情報':   { cls: 'cat-savings', bg: 'linear-gradient(135deg,#FEF3C7,#FDE68A)' },
   'FX・外貨':   { cls: 'cat-debt',    bg: 'linear-gradient(135deg,#FFE4E6,#FCA5A5)' },
+  '保険':       { cls: 'cat-insurance', bg: 'linear-gradient(135deg,#DCFCE7,#86EFAC)' },
 };
 ---
 <!doctype html>
@@ -17,13 +31,42 @@ const catStyle: Record<string, CatStyle> = {
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>やさしいお金の教室 | 借金とお金の不安を、知識で立て直す。</title>
-  <meta name="description" content="借金200万→副業月20万→資産500万。お金の知識で人生を立て直した体験談ベースのメディア。NISA・副業・節税を初心者向けにわかりやすく解説。"/>
+  <title>やさしいお金の教室 | 副業・FX・保険、失敗しない順番をLINEで無料整理。</title>
+  <meta name="description" content="副業・FX・保険、何から始めればいいか分からない人へ。田中蓮が失敗しないための順番をLINEで無料で整理します。勧誘なし・3分で登録完了・いつでも退会OK。"/>
   <meta name="robots" content="index,follow"/>
   <link rel="canonical" href={`${siteUrl}/lp/`}/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@700;900&display=swap" rel="stylesheet"/>
+
+  {googleTagId && (
+    <>
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}></script>
+      <script is:inline define:vars={{ googleTagId }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = window.gtag || gtag;
+        gtag('js', new Date());
+        gtag('config', googleTagId);
+
+        document.addEventListener('click', (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          const anchor = target.closest('a[data-google-event]');
+          if (!anchor || !window.gtag) return;
+          const eventName = anchor.getAttribute('data-google-event') || 'click';
+          const label = anchor.getAttribute('data-google-label') || anchor.textContent?.trim().replace(/\s+/g, ' ').slice(0, 80) || '';
+          window.gtag('event', eventName, {
+            event_category: anchor.getAttribute('data-google-category') || 'engagement',
+            event_label: label,
+            link_url: anchor.getAttribute('href') || '',
+            page_path: window.location.pathname,
+            lp_variant: 'money_anxiety_to_line_v1',
+          });
+        }, true);
+      </script>
+    </>
+  )}
 
   <style>
   /* ═══════════════════════════════════════
@@ -57,6 +100,7 @@ const catStyle: Record<string, CatStyle> = {
     --r-sm: 6px;
     --r-md: 10px;
     --r-lg: 16px;
+    --r-pill: 999px;
 
     /* Shadows */
     --sh-sm: 0 1px 3px rgba(10,10,10,.08), 0 4px 10px rgba(10,10,10,.06);
@@ -284,6 +328,14 @@ const catStyle: Record<string, CatStyle> = {
     margin-top: 4px; line-height: 1.4;
     display: block;
   }
+  .hero-microcopy {
+    display: block;
+    width: 100%;
+    color: rgba(255,255,255,.58);
+    font-size: 11px;
+    line-height: 1.6;
+    margin-top: -4px;
+  }
 
   /* Right panel: amber manga character */
   .hero-right {
@@ -404,6 +456,47 @@ const catStyle: Record<string, CatStyle> = {
   }
   .sb-title { font-family: var(--serif); font-size: 15px; font-weight: 700; }
   .sb-sub   { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+  /* ═══════════════════════════════════════
+     DECISION PATH — Result / Evidence / Trust / Safety
+  ═══════════════════════════════════════ */
+  .decision-grid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 14px;
+    margin-top: 12px;
+  }
+  .decision-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 20px 18px;
+    min-height: 150px;
+  }
+  .decision-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 900;
+    margin-bottom: 12px;
+  }
+  .decision-title {
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.45;
+    margin-bottom: 6px;
+  }
+  .decision-body {
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.75;
+  }
 
   /* ═══════════════════════════════════════
      PROBLEM SECTION — こんな悩みありませんか？
@@ -623,6 +716,7 @@ const catStyle: Record<string, CatStyle> = {
   .cat-income   { background: var(--sage-pale); color: #155234; }
   .cat-debt     { background: #FFE4E6; color: #9B1C1C; }
   .cat-tax      { background: #EDE9FE; color: #4C1D95; }
+  .cat-insurance { background: #DCFCE7; color: #166534; }
 
   .article-title {
     font-size: 13.5px; font-weight: 700;
@@ -893,6 +987,7 @@ const catStyle: Record<string, CatStyle> = {
     .hero-left { padding: 56px 28px 40px; }
     .hero-right { min-height: 320px; }
     .themes-grid, .reasons-grid, .footer-grid { grid-template-columns: 1fr 1fr; }
+    .decision-grid { grid-template-columns: 1fr 1fr; }
     .articles-grid { grid-template-columns: 1fr 1fr; }
     .problem-grid  { grid-template-columns: 1fr; }
     .manga-grid    { grid-template-columns: 1fr 1fr; gap: 2px; }
@@ -907,6 +1002,7 @@ const catStyle: Record<string, CatStyle> = {
     .hero-stats { flex-direction: column; gap: 16px; }
     .hero-stat { border-right: none; padding-right: 0; }
     .themes-grid, .reasons-grid { grid-template-columns: 1fr; }
+    .decision-grid { grid-template-columns: 1fr; }
     .articles-grid { grid-template-columns: 1fr; }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
     .manga-grid { grid-template-columns: 1fr 1fr; }
@@ -939,11 +1035,11 @@ const catStyle: Record<string, CatStyle> = {
       </a>
       <nav class="nav">
         {[
-          { label: "学ぶ", href: "/blog/" },
-          { label: "稼ぐ", href: "/blog/fukugyo-zeikin/" },
-          { label: "始める", href: "/blog/nisa-hajimekata/" },
-          { label: "節約", href: "/blog/credit-card-osusume/" },
-          { label: "投資", href: "/blog/sbi-rakuten-hikaku/" },
+          { label: "FX比較", href: "/blog/fx-kouza-hikaku/" },
+          { label: "少額FX", href: "/blog/fx-small-start-guide/" },
+          { label: "保険相談", href: "/blog/hoken-soudan-muryou-hikaku/" },
+          { label: "FP相談", href: "/blog/hoken-minaoshi-fp-soudan/" },
+          { label: "LINE", href: "/line/lp-manga-main/" },
         ].map((item) => (
           <a href={item.href} class="nav-link">{item.label}</a>
         ))}
@@ -959,37 +1055,44 @@ const catStyle: Record<string, CatStyle> = {
   <section class="hero">
     <!-- Left: editorial dark -->
     <div class="hero-left">
-      <div class="hero-issue">Vol. 01 — Money Journal Tokyo</div>
+      <div class="hero-issue">Free 7-day guide — Money Journal Tokyo</div>
       <h1 class="hero-h1">
-        借金とお金の不安を、<br/>
-        <em>知識</em>で立て直す。
+        副業・FX・保険、<br/>
+        何から始めればいいか分からないあなたへ。
       </h1>
       <p class="hero-lead">
-        ブログと動画で「学ぶ・実践する・続ける」。<br/>
-        やさしいお金の教室は、初心者・再出発の方のための<br/>
-        無料の総合メディアです。
+        借金200万から資産500万まで立て直した田中蓮が、<br/>
+        失敗しないための順番をLINEで無料で教えます。<br/>
+        登録後は7日間で、家計・副業・FX・保険を順番に整理します。
         <span class="hero-disclaimer">※当サイトはアフィリエイト広告を含みます。成果を保証するものではありません。</span>
       </p>
       <div class="hero-cta-row">
-        <a class="btn btn-primary btn-lg" href="/blog/nisa-hajimekata/">
-          まずは記事で学ぶ <span class="arrow">→</span>
+        <a class="btn btn-primary btn-lg" href="/line/lp-manga-main/"
+           data-google-event="lp_line_cta_click"
+           data-google-category="lp"
+           data-google-label="hero_primary_line">
+          LINEで無料診断を受け取る <span class="arrow">→</span>
         </a>
-        <a class="btn btn-ghost btn-lg" href="#compare">
-          サービスを比較する
+        <a class="btn btn-ghost btn-lg" href="#articles"
+           data-google-event="lp_article_anchor_click"
+           data-google-category="lp"
+           data-google-label="hero_secondary_articles">
+          判断前の記事を読む
         </a>
+        <span class="hero-microcopy">勧誘なし・3分で登録完了・いつでも退会OK。FXや保険の申込みを急がせるものではありません。</span>
       </div>
       <div class="hero-stats">
         <div class="hero-stat">
-          <span class="hero-stat-num">200万</span>
-          <span class="hero-stat-label">借金から<br/>スタート</span>
+          <span class="hero-stat-num">7日間</span>
+          <span class="hero-stat-label">順番に届く<br/>教育LINE</span>
         </div>
         <div class="hero-stat">
-          <span class="hero-stat-num">月20万</span>
-          <span class="hero-stat-label">副業収入を<br/>達成</span>
+          <span class="hero-stat-num">FX</span>
+          <span class="hero-stat-label">メイン収益の<br/>判断軸</span>
         </div>
         <div class="hero-stat">
-          <span class="hero-stat-num">500万</span>
-          <span class="hero-stat-label">資産形成<br/>達成</span>
+          <span class="hero-stat-num">保険</span>
+          <span class="hero-stat-label">家計見直しの<br/>サブ導線</span>
         </div>
       </div>
     </div>
@@ -1051,11 +1154,14 @@ const catStyle: Record<string, CatStyle> = {
           </svg>
         </div>
         <div>
-          <div class="sb-title">学ぶ・知る・行動するを応援する</div>
-          <div class="sb-sub">お金の知識から実践まで、わかりやすくサポートします。</div>
+          <div class="sb-title">このLPのゴールは、FX申込みではなくLINE登録です</div>
+          <div class="sb-sub">まず安心して順番を知り、必要な人だけFX比較・保険相談へ進める設計です。</div>
         </div>
       </div>
-      <a class="btn btn-navy" href="/blog/">人気の最新記事を読む →</a>
+      <a class="btn btn-navy" href="/line/lp-manga-main/"
+         data-google-event="lp_line_cta_click"
+         data-google-category="lp"
+         data-google-label="subbanner_line">LINEで無料診断を受け取る →</a>
     </div>
   </div>
 
@@ -1065,26 +1171,59 @@ const catStyle: Record<string, CatStyle> = {
       <div class="section-head reveal">
         <div class="editorial-label">Problem</div>
         <h2 class="section-title">こんな悩みを<br/>抱えていませんか？</h2>
-        <p class="section-sub">多くの方が、まず「知識の壁」にぶつかります。</p>
+        <p class="section-sub">今の読者は、まだFX口座を選ぶ前の「何から始めるか分からない」段階です。</p>
       </div>
       <div class="problem-grid">
         <div class="problem-card reveal">
           <div class="problem-num">01</div>
-          <div class="problem-icon">💸</div>
-          <div class="problem-title">給料だけでは将来が<br/>不安で仕方ない</div>
-          <div class="problem-body">毎月何となく使って、気づけばほとんど残っていない。老後2000万円問題も他人事じゃない。</div>
+          <div class="problem-icon">¥</div>
+          <div class="problem-title">お金の不安はあるのに<br/>最初の一手が分からない</div>
+          <div class="problem-body">副業、FX、保険、家計管理。全部大事そうに見えて、優先順位を決められない。</div>
         </div>
         <div class="problem-card reveal" style="animation-delay:.1s">
           <div class="problem-num">02</div>
-          <div class="problem-icon">📊</div>
-          <div class="problem-title">投資を始めたいけど<br/>怖くて踏み出せない</div>
-          <div class="problem-body">NISAやiDeCoの言葉は知っているのに、損したらどうしようという恐怖が先に来る。</div>
+          <div class="problem-icon">FX</div>
+          <div class="problem-title">FXは気になるけど<br/>失敗や損が怖い</div>
+          <div class="problem-body">特典額だけで選んでいいのか、スプレッドや取引条件をどう見ればいいのか分からない。</div>
         </div>
         <div class="problem-card reveal" style="animation-delay:.2s">
           <div class="problem-num">03</div>
-          <div class="problem-icon">🔄</div>
-          <div class="problem-title">情報が多すぎて<br/>何から始めればいいか謎</div>
-          <div class="problem-body">YouTube・ブログ・SNS、みんな言うことが違う。正しい情報を選ぶ基準がわからない。</div>
+          <div class="problem-icon">保</div>
+          <div class="problem-title">保険も気になるけど<br/>営業されそうで不安</div>
+          <div class="problem-body">無料相談に行く前に、今の保険・家計・必要保障をどう整理すればいいか分からない。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DECISION PATH ───────────────── -->
+  <section class="section section--tint">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="editorial-label">7-day Flow</div>
+        <h2 class="section-title">LINEでは7日間で、<br/>失敗しない順番を整理します</h2>
+        <p class="section-sub">いきなり申し込ませず、安心 → 理解 → 比較 → 行動の順番で進めます。</p>
+      </div>
+      <div class="decision-grid">
+        <div class="decision-card reveal">
+          <span class="decision-step">1</span>
+          <div class="decision-title">Day 1: 現状整理</div>
+          <p class="decision-body">今の不安を言語化し、家計・副業・FX・保険のどこから見るかを決めます。</p>
+        </div>
+        <div class="decision-card reveal" style="animation-delay:.08s">
+          <span class="decision-step">2</span>
+          <div class="decision-title">Day 2-3: 土台づくり</div>
+          <p class="decision-body">固定費と副業の考え方を整理し、無理なく動ける順番を作ります。</p>
+        </div>
+        <div class="decision-card reveal" style="animation-delay:.16s">
+          <span class="decision-step">3</span>
+          <div class="decision-title">Day 4-5: FX判断</div>
+          <p class="decision-body">FXのリスク、口座条件、スプレッド、取引条件を先に確認します。</p>
+        </div>
+        <div class="decision-card reveal" style="animation-delay:.24s">
+          <span class="decision-step">4</span>
+          <div class="decision-title">Day 6-7: 保険と次の行動</div>
+          <p class="decision-body">保険見直しの準備と、自分に合う次の行動を1つに絞ります。</p>
         </div>
       </div>
     </div>
@@ -1095,14 +1234,14 @@ const catStyle: Record<string, CatStyle> = {
     <div class="container">
       <div class="section-head reveal">
         <div class="editorial-label">Story</div>
-        <h2 class="section-title">4コマでわかる<br/>お金の改善ストーリー</h2>
-        <p class="section-sub">借金200万円から資産500万円へ。田中蓮の実話（架空キャラクター）。</p>
+        <h2 class="section-title">4コマでわかる<br/>お金の判断ミス</h2>
+        <p class="section-sub">田中蓮という架空キャラクターの失敗談を通じて、焦って決める怖さを整理します。</p>
       </div>
 
       <div class="manga-img-wrap reveal">
         <img
           src="/images/yonkoma.jpg"
-          alt="4コマでわかるお金の改善ストーリー：借金200万円→どん底の毎日→きっかけとの出会い→資産500万円達成！"
+          alt="4コマでわかるお金の判断ミス：借金200万円→どん底の毎日→きっかけとの出会い→立て直しの一歩"
           class="manga-strip-img"
           width="1081"
           height="389"
@@ -1117,20 +1256,20 @@ const catStyle: Record<string, CatStyle> = {
     <div class="container">
       <div class="achievement-inner">
         <div class="achievement-item reveal">
-          <span class="achievement-num">借金→０</span>
-          <span class="achievement-label">借金200万円を完済<br/>知識と節約の力で</span>
+          <span class="achievement-num">失敗</span>
+          <span class="achievement-label">勢いで決めて<br/>あとから後悔</span>
         </div>
         <div class="achievement-item reveal" style="animation-delay:.12s">
-          <span class="achievement-num">月+20万</span>
-          <span class="achievement-label">副業収入を達成<br/>ブログ・アフィリエイトで</span>
+          <span class="achievement-num">整理</span>
+          <span class="achievement-label">条件とリスクを<br/>先に確認</span>
         </div>
         <div class="achievement-item reveal" style="animation-delay:.24s">
-          <span class="achievement-num">資産500万</span>
-          <span class="achievement-label">NISA・投資で形成<br/>3年間のコツコツ継続</span>
+          <span class="achievement-num">比較</span>
+          <span class="achievement-label">自分に合う選択肢を<br/>記事で確認</span>
         </div>
         <div class="achievement-item reveal" style="animation-delay:.36s">
-          <span class="achievement-num">35歳FIRE</span>
-          <span class="achievement-label">経済的自由への道<br/>今も進行中</span>
+          <span class="achievement-num">行動</span>
+          <span class="achievement-label">納得してから<br/>公式条件を見る</span>
         </div>
       </div>
     </div>
@@ -1140,9 +1279,9 @@ const catStyle: Record<string, CatStyle> = {
   <section class="section">
     <div class="container">
       <div class="section-head reveal">
-        <div class="editorial-label">Learn</div>
-        <h2 class="section-title">お金の不安を解消する<br/>4つの学習テーマ</h2>
-        <p class="section-sub">まずは自分に合うテーマから、今日からの一歩を踏み出しましょう。</p>
+        <div class="editorial-label">Focus</div>
+        <h2 class="section-title">LINEで整理する<br/>4つの順番</h2>
+        <p class="section-sub">フェーズ1は「安心入口」。FXを主軸にしつつ、最初は順番づくりから始めます。</p>
       </div>
       <div class="themes-grid">
         <div class="theme-card reveal">
@@ -1153,8 +1292,8 @@ const catStyle: Record<string, CatStyle> = {
               <circle cx="34" cy="27" r="3" fill="#FBBF24" stroke="#8B5E0A"/>
             </svg>
           </div>
-          <div class="theme-title">お金の基礎</div>
-          <div class="theme-body">知識ゼロから始めたい方に。家計簿の付け方、収支管理、今日から使える小さな習慣。</div>
+          <div class="theme-title">1. 家計の現在地</div>
+          <div class="theme-body">FXや保険の前に、毎月の固定費・余剰資金・生活防衛費を整理します。</div>
         </div>
         <div class="theme-card reveal" style="animation-delay:.08s">
           <div class="theme-icon-wrap">
@@ -1166,8 +1305,8 @@ const catStyle: Record<string, CatStyle> = {
               <path d="M36 8 L42 8 L42 14" stroke="#1E6B45" stroke-width="3" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="theme-title">副業</div>
-          <div class="theme-body">在宅でできる副業から始めて、収入の柱を増やす実践的な情報を紹介。</div>
+          <div class="theme-title">2. 副業の土台</div>
+          <div class="theme-body">収入を増やす前に、税金・記録・無理のない作業量を確認します。</div>
         </div>
         <div class="theme-card reveal" style="animation-delay:.16s">
           <div class="theme-icon-wrap">
@@ -1178,8 +1317,8 @@ const catStyle: Record<string, CatStyle> = {
               <text x="36" y="38" text-anchor="middle" font-family="Noto Sans JP" font-weight="900" font-size="10" fill="#7A4A00">¥</text>
             </svg>
           </div>
-          <div class="theme-title">資産形成</div>
-          <div class="theme-body">つみたてNISA・iDeCo・投資信託。資産を着実に増やすための情報を発信。</div>
+          <div class="theme-title">3. FX口座の比較軸</div>
+          <div class="theme-body">特典だけでなく、取引条件・スプレッド・初心者が見落としやすいリスクを確認します。</div>
         </div>
         <div class="theme-card reveal" style="animation-delay:.24s">
           <div class="theme-icon-wrap">
@@ -1192,30 +1331,33 @@ const catStyle: Record<string, CatStyle> = {
               <path d="M14 24 L22 18 L28 20 L34 14" stroke="#1E6B45" stroke-width="2" fill="none"/>
             </svg>
           </div>
-          <div class="theme-title">借金・返済</div>
-          <div class="theme-body">借金の見直し、返し方、相談先など、安心して立て直すための整理済み情報。</div>
+          <div class="theme-title">4. 保険相談の準備</div>
+          <div class="theme-body">無料相談に行く前に、今の保障内容・家族構成・不要な重複を確認します。</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ── ARTICLES ───────────────────── -->
-  <section class="section section--tint">
+  <section class="section section--tint" id="articles">
     <div class="container">
       <div class="section-head reveal">
         <div class="editorial-label">Articles</div>
-        <h2 class="section-title">体験談・解説ベースで<br/>学べる人気記事</h2>
-        <p class="section-sub">リアルな経験から学べる、初心者にも読みやすい記事を集めました。</p>
+        <h2 class="section-title">判断前に読む<br/>注目記事</h2>
+        <p class="section-sub">熱量が高い人だけ、LINE登録前に記事で確認できます。主導線はLINE登録です。</p>
       </div>
       <div class="articles-grid">
-        {allPosts.map((post, i) => {
+        {featuredPosts.map((post, i) => {
           const cs = catStyle[post.data.category] ?? { cls: 'cat-invest', bg: 'linear-gradient(135deg,#DBEAFE,#93C5FD)' };
           const bg = cs.bg;
           const cls = cs.cls;
           const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
           return (
             <article class={`article-card reveal`} style={`animation-delay:${i * 0.08}s`}>
-              <a href={`/blog/${post.id}/`} style="display:block;color:inherit;text-decoration:none;">
+              <a href={`/blog/${post.id}/`} style="display:block;color:inherit;text-decoration:none;"
+                 data-google-event="lp_featured_article_click"
+                 data-google-category="lp"
+                 data-google-label={post.id}>
                 <div class="article-thumb" style={`background:${bg}`}>
                   <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
                     {post.data.category === 'NISA・投資' && (
@@ -1266,6 +1408,14 @@ const catStyle: Record<string, CatStyle> = {
                         <text x="160" y="175" text-anchor="middle" font-family="Noto Sans JP" font-size="12" fill="#6B6560">為替・FX</text>
                       </>
                     )}
+                    {post.data.category === '保険' && (
+                      <>
+                        <path d="M160 34 L238 66 V116 C238 148 208 174 160 188 C112 174 82 148 82 116 V66 Z" fill="#1E6B45" opacity=".92"/>
+                        <path d="M160 56 L218 80 V116 C218 140 196 158 160 170 C124 158 102 140 102 116 V80 Z" fill="#DCFCE7"/>
+                        <path d="M160 82 V144 M130 112 H190" stroke="#1E6B45" stroke-width="12" stroke-linecap="round"/>
+                        <text x="160" y="178" text-anchor="middle" font-family="Noto Sans JP" font-size="12" fill="#166534">保険相談</text>
+                      </>
+                    )}
                   </svg>
                 </div>
                 <div class="article-body">
@@ -1289,7 +1439,7 @@ const catStyle: Record<string, CatStyle> = {
     <div class="container">
       <div class="section-head reveal">
         <div class="editorial-label">Why Us</div>
-        <h2 class="section-title">このブログが<br/>選ばれる理由</h2>
+        <h2 class="section-title">判断材料として<br/>信頼できる理由</h2>
       </div>
       <div class="reasons-grid">
         <div class="reason-card reveal">
@@ -1311,7 +1461,7 @@ const catStyle: Record<string, CatStyle> = {
               </g>
             </svg>
           </div>
-          <p class="reason-text">専門用語はなるべく使わず、やさしく丁寧に解説します。</p>
+          <p class="reason-text">専門用語は短く言い換え、初心者でも比較しやすくします。</p>
         </div>
         <div class="reason-card reveal" style="animation-delay:.08s">
           <div class="reason-badge">実体験ベース</div>
@@ -1320,7 +1470,7 @@ const catStyle: Record<string, CatStyle> = {
               <path d="M16 28 C 6 20, 4 14, 8 10 C 12 6, 16 10, 16 12 C 16 10, 20 6, 24 10 C 28 14, 26 20, 16 28Z" fill="#C0392B"/>
             </svg>
           </div>
-          <p class="reason-text">実際に経験したことだけを、誠実にお届けします。</p>
+          <p class="reason-text">メリットだけでなく、向かない人や注意点も同じ画面で示します。</p>
         </div>
         <div class="reason-card reveal" style="animation-delay:.16s">
           <div class="reason-badge">情報の透明性</div>
@@ -1331,7 +1481,7 @@ const catStyle: Record<string, CatStyle> = {
               <path d="M12 16 H22 M12 20 H22 M12 24 H18" stroke-linecap="round"/>
             </svg>
           </div>
-          <p class="reason-text">根拠・写真・データを必ず添えて信頼性を担保します。</p>
+          <p class="reason-text">PR表記を出し、公式条件や一次情報の確認を前提に編集します。</p>
         </div>
         <div class="reason-card reveal" style="animation-delay:.24s">
           <div class="reason-badge">行動を後押し</div>
@@ -1341,7 +1491,7 @@ const catStyle: Record<string, CatStyle> = {
               <path d="M8 6 H24 L20 12 L24 18 H8 Z" fill="#0B1942"/>
             </svg>
           </div>
-          <p class="reason-text">今日から始められる小さな一歩をいつも用意しています。</p>
+          <p class="reason-text">申込みを急がせず、まず確認する小さな行動へ案内します。</p>
         </div>
       </div>
     </div>
@@ -1351,56 +1501,71 @@ const catStyle: Record<string, CatStyle> = {
   <section class="section" id="compare">
     <div class="container">
       <div class="section-head reveal">
-        <div class="editorial-label">Compare</div>
-        <h2 class="section-title">目的別おすすめ<br/>サービス比較</h2>
-        <p class="section-sub">あなたに合ったサービスを目的別に比較できます。<small style="color:var(--amber)">※PRを含みます</small></p>
+        <div class="editorial-label">Next Action</div>
+        <h2 class="section-title">迷ったら、目的別に<br/>ここから確認</h2>
+        <p class="section-sub">申込み前の確認先を目的別に整理しました。<small style="color:var(--amber)">※PRを含みます</small></p>
       </div>
       <div class="compare-wrap reveal">
         <table class="compare-table">
           <thead>
             <tr>
               <th style="text-align:left">カテゴリ</th>
-              <th>節約・家計</th>
-              <th>資産形成</th>
-              <th>副収入を増やしたい</th>
-              <th style="width:150px">公式サイト</th>
+              <th>まず見ること</th>
+              <th>注意点</th>
+              <th>向いている人</th>
+              <th style="width:150px">確認先</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>家計管理</td>
-              <td>マネーフォワード ME</td>
-              <td>マネーフォワード ME</td>
-              <td>ZAIM</td>
-              <td><a class="btn-compare" href="/blog/fukugyo-zeikin/">管理方法を読む</a></td>
-            </tr>
-            <tr>
-              <td>証券口座</td>
-              <td>SBI証券</td>
-              <td class="highlight-cell">楽天証券</td>
-              <td>松井証券</td>
-              <td><a class="btn-compare" href="/blog/sbi-rakuten-hikaku/">比較記事を読む</a></td>
-            </tr>
-            <tr>
-              <td>NISA</td>
-              <td>つみたてNISA</td>
-              <td class="highlight-cell">つみたてNISA</td>
-              <td>ロボアドバイザー</td>
-              <td><a class="btn-compare" href="/blog/nisa-hajimekata/">始め方を読む</a></td>
-            </tr>
-            <tr>
               <td>FX口座</td>
-              <td>—</td>
-              <td>GMOクリック証券</td>
-              <td class="highlight-cell">DMM FX</td>
-              <td><a class="btn-compare" href="/blog/fx-kouza-hikaku/">FX比較を読む</a></td>
+              <td>特典条件・スプレッド・取引ルール</td>
+              <td>損失リスクとレバレッジ管理</td>
+              <td class="highlight-cell">少額から比較したい人</td>
+              <td><a class="btn-compare" href="/blog/fx-kouza-hikaku/"
+                     data-google-event="lp_direct_article_click"
+                     data-google-category="lp"
+                     data-google-label="compare_fx_roundup">FX比較を読む</a></td>
             </tr>
             <tr>
-              <td>副業・スキル</td>
-              <td>Udemy</td>
-              <td>ポイント投資</td>
-              <td class="highlight-cell">ブログ副業</td>
-              <td><a class="btn-compare" href="/blog/fukugyo-zeikin/">副業税金を読む</a></td>
+              <td>DMM FX</td>
+              <td>口座開設条件・取引ツール</td>
+              <td>取引には元本割れリスクあり</td>
+              <td>主要口座から見たい人</td>
+              <td><a class="btn-compare" href="/blog/dmm-fx-review/"
+                     data-google-event="lp_direct_article_click"
+                     data-google-category="lp"
+                     data-google-label="compare_dmm_fx">レビューを読む</a></td>
+            </tr>
+            <tr>
+              <td>JFX / FXTF</td>
+              <td>ツール・注文方式・取引スタイル</td>
+              <td>初心者は少額確認が前提</td>
+              <td>複数口座を比べたい人</td>
+              <td><a class="btn-compare" href="/line/blog-fx-roundup/"
+                     data-google-event="lp_line_cta_click"
+                     data-google-category="lp"
+                     data-google-label="compare_fx_line">LINEで整理</a></td>
+            </tr>
+            <tr>
+              <td>保険相談</td>
+              <td>現在の保障・固定費・家族構成</td>
+              <td>不要な加入や重複保障に注意</td>
+              <td class="highlight-cell">保険料を見直したい人</td>
+              <td><a class="btn-compare" href="/blog/hoken-soudan-muryou-hikaku/"
+                     data-google-event="lp_direct_article_click"
+                     data-google-category="lp"
+                     data-google-label="compare_hoken_roundup">保険比較を読む</a></td>
+            </tr>
+            <tr>
+              <td>FP相談</td>
+              <td>相談前に聞きたいことをメモ</td>
+              <td>相談先ごとの提案範囲を確認</td>
+              <td>第三者に整理してほしい人</td>
+              <td><a class="btn-compare" href="/blog/hoken-minaoshi-fp-soudan/"
+                     data-google-event="lp_direct_article_click"
+                     data-google-category="lp"
+                     data-google-label="compare_fp_soudan">準備を読む</a></td>
             </tr>
           </tbody>
         </table>
@@ -1419,18 +1584,18 @@ const catStyle: Record<string, CatStyle> = {
         <details class="faq-item">
           <summary>
             <div class="faq-q-icon">Q</div>
-            <span class="faq-q-text">このブログのお金の知識はどこで学べますか？</span>
+            <span class="faq-q-text">LINEでは何が届きますか？</span>
             <span class="faq-toggle">+</span>
           </summary>
-          <div class="faq-a">「学ぶ」カテゴリーから、家計管理・投資・借金返済まで、初心者向けの記事を順番に読み進められます。</div>
+          <div class="faq-a">FX口座、保険相談、家計整理など、申し込む前に見るべき条件・注意点・関連記事の順番を短く届けます。</div>
         </details>
         <details class="faq-item">
           <summary>
             <div class="faq-q-icon">Q</div>
-            <span class="faq-q-text">初心者でも理解しやすく書かれていますか？</span>
+            <span class="faq-q-text">FXや保険に詳しくなくても大丈夫ですか？</span>
             <span class="faq-toggle">+</span>
           </summary>
-          <div class="faq-a">専門用語にはすべて補足を添え、図解と実例を交えて、ゼロから読めるように構成しています。</div>
+          <div class="faq-a">専門用語はなるべく使わず、使う場合も「何を確認すればよいか」に落として説明します。</div>
         </details>
         <details class="faq-item">
           <summary>
@@ -1438,15 +1603,15 @@ const catStyle: Record<string, CatStyle> = {
             <span class="faq-q-text">アフィリエイト広告はどのように扱われていますか？</span>
             <span class="faq-toggle">+</span>
           </summary>
-          <div class="faq-a">PR表記を必ず明示し、実際に使ったサービスのみを推奨しています。広告主から内容指示を受けることはありません。</div>
+          <div class="faq-a">PR表記を必ず明示し、広告であることが分かる形で案内します。最終判断前には公式条件の確認を前提にしています。</div>
         </details>
         <details class="faq-item">
           <summary>
             <div class="faq-q-icon">Q</div>
-            <span class="faq-q-text">記事の内容はどのように作られていますか？</span>
+            <span class="faq-q-text">登録すると申込みを強く勧められますか？</span>
             <span class="faq-toggle">+</span>
           </summary>
-          <div class="faq-a">運営者の実体験と、一次情報・公的データに基づき編集しています。情報の更新日を記事下部に表示しています。</div>
+          <div class="faq-a">いいえ。まずは判断材料の整理が目的です。不要ならいつでも解除できます。</div>
         </details>
       </div>
     </div>
@@ -1456,17 +1621,20 @@ const catStyle: Record<string, CatStyle> = {
   <section class="finalcta">
     <div class="finalcta-inner">
       <span class="finalcta-eyebrow">Start Today</span>
-      <h2 class="finalcta-h">お金の不安を、<br/>今日から少しずつ減らそう。</h2>
-      <p class="finalcta-sub">知識と行動が、あなたの未来を支えていきます。</p>
+      <h2 class="finalcta-h">まずはLINEで、<br/>失敗しない順番を受け取ろう。</h2>
+      <p class="finalcta-sub">勧誘なし。登録後、7日間で家計・副業・FX・保険を順番に整理します。</p>
       <div class="finalcta-row">
-        <a class="btn btn-primary btn-lg" href="/blog/">
-          まずは記事で学ぶ <span class="arrow">→</span>
+        <a class="btn btn-primary btn-lg" href="/line/lp-manga-main/"
+           data-google-event="lp_line_cta_click"
+           data-google-category="lp"
+           data-google-label="final_primary_line">
+          LINEで無料診断を受け取る <span class="arrow">→</span>
         </a>
-        <a class="btn btn-ghost btn-lg" href="#compare">
-          サービスを比較する
-        </a>
-        <a class="btn btn-sage btn-lg" href="/line/lp-manga-main/">
-          LINEで相談する
+        <a class="btn btn-ghost btn-lg" href="#articles"
+           data-google-event="lp_article_anchor_click"
+           data-google-category="lp"
+           data-google-label="final_secondary_articles">
+          判断前の記事を読む
         </a>
       </div>
     </div>
@@ -1484,12 +1652,12 @@ const catStyle: Record<string, CatStyle> = {
         </ul>
       </div>
       <div>
-        <div class="footer-h">学ぶカテゴリ</div>
+        <div class="footer-h">判断前に読む</div>
         <ul class="footer-list">
-          <li><a href="/blog/">お金の基礎</a></li>
-          <li><a href="/blog/">節約・家計</a></li>
-          <li><a href="/blog/">投資・資産形成</a></li>
-          <li><a href="/blog/">借金・返済</a></li>
+          <li><a href="/blog/fx-kouza-hikaku/">FX口座比較</a></li>
+          <li><a href="/blog/fx-small-start-guide/">少額FXの始め方</a></li>
+          <li><a href="/blog/hoken-soudan-muryou-hikaku/">保険相談比較</a></li>
+          <li><a href="/blog/hoken-minaoshi-fp-soudan/">FP相談の準備</a></li>
         </ul>
       </div>
       <div>
@@ -1501,7 +1669,7 @@ const catStyle: Record<string, CatStyle> = {
         </ul>
       </div>
       <div>
-        <div class="footer-h">LINE相談窓口</div>
+        <div class="footer-h">LINEチェック</div>
         <ul class="footer-list">
           <li><a href="/line/lp-manga-main/">登録はこちら</a></li>
           <li><a href="/line/">お知らせ</a></li>
@@ -1527,8 +1695,11 @@ const catStyle: Record<string, CatStyle> = {
 
   <!-- Sticky CTA (mobile) -->
   <div class="sticky-cta" id="stickyCta">
-    <a class="btn btn-primary" href="/blog/nisa-hajimekata/">
-      まずは無料で記事を読む →
+    <a class="btn btn-primary" href="/line/lp-manga-main/"
+       data-google-event="lp_line_cta_click"
+       data-google-category="lp"
+       data-google-label="sticky_line">
+      LINEで無料診断を受け取る →
     </a>
   </div>
 

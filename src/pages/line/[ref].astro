@@ -16,8 +16,11 @@ interface Props {
 const { lineRef } = Astro.props;
 const addUrl = getLineAddUrl(lineRef.ref);
 const isCampaign = lineRef.source === 'campaign';
+const isFx = lineRef.intent === 'fx';
 const flowLead = isCampaign
   ? '案件は、特典額より先に条件を見ると迷いが減ります。'
+  : isFx
+    ? 'FXは、口座を作る前に条件とリスクを見ると判断が安定します。'
   : '登録直後に、今の悩みに近い記事をまとめて受け取れます。';
 ---
 
@@ -28,10 +31,13 @@ const flowLead = isCampaign
     <p>{lineRef.description}</p>
     <ul class="line-ref-list">
       <li>{flowLead}</li>
-      <li>{isCampaign ? 'DMM FX / JFX / FXTF / エポスカードのように、案件ごとに確認順を変えます。' : 'テーマ別に整理しているので、あとで見返しやすいです。'}</li>
+      <li>{isCampaign || isFx ? 'DMM FX / JFX / FXTF のように、案件ごとに確認順を変えます。' : 'テーマ別に整理しているので、あとで見返しやすいです。'}</li>
       <li>必要ない配信はいつでも止められます。</li>
     </ul>
-    <a class="line-ref-button" href={addUrl} rel="noopener noreferrer">{isCampaign ? 'この案件を受け取る' : 'このテーマで受け取る'}</a>
+    <a class="line-ref-button" href={addUrl} rel="noopener noreferrer"
+       data-google-event="line_add_click"
+       data-google-category="line"
+       data-google-label={lineRef.ref}>{isCampaign ? 'この案件を受け取る' : 'このテーマで受け取る'}</a>
     <p class="line-ref-note">{isCampaign ? '申し込む前に、条件だけ先に整理します。' : '登録後、知りたいテーマを番号で選べます。'}</p>
   </section>
 </BaseLayout>
