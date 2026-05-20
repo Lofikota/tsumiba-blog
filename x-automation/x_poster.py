@@ -21,8 +21,8 @@ DATA_DIR = BASE_DIR / "data"
 QUEUE_FILE = DATA_DIR / "tweet_queue.csv"
 LOG_DIR = BASE_DIR / "logs"
 LOG_FILE = LOG_DIR / "x_poster.log"
-TIME_WINDOW_MINUTES = 35  # GitHub Actionsは30分単位で起動するため余裕を持たせる
-CATCH_UP_HOURS = 3       # 直近3時間以内の取りこぼしのみ対象（48hは二重投稿リスクが高すぎる）
+WINDOW_BEFORE_MINUTES = 20  # 実行時刻の何分前まで拾うか（Actions早期起動・clock skew対応）
+WINDOW_AFTER_MINUTES = 20   # 実行時刻の何分後まで拾うか（Actions遅延対応）
 
 LOG_DIR.mkdir(exist_ok=True)
 logging.basicConfig(
@@ -56,10 +56,10 @@ def get_client(creds: dict) -> tweepy.Client:
 
 
 def find_pending_tweets() -> list[dict]:
-    """予定時刻を過ぎた未投稿（最大12時間前まで）＋今から3分先までを返す"""
+    """実行時刻の前後ウィンドウ内に予定された未投稿ツイートを返す（重複投稿防止）"""
     now = datetime.now()
-    catch_up_start = now - timedelta(hours=CATCH_UP_HOURS)
-    window_end = now + timedelta(minutes=TIME_WINDOW_MINUTES // 2)
+    window_start = now - timedelta(minutes=WINDOW_BEFORE_MINUTES)
+    window_end = now + timedelta(minutes=WINDOW_AFTER_MINUTES)
 
     pending = []
     with open(QUEUE_FILE, encoding="utf-8", newline="") as f:
@@ -71,11 +71,10 @@ def find_pending_tweets() -> list[dict]:
                     f"{row['scheduled_date']} {row['scheduled_time']}",
                     "%Y-%m-%d %H:%M",
                 )
-                if catch_up_start <= scheduled <= window_end:
+                if window_start <= scheduled <= window_end:
                     pending.append(row)
             except ValueError:
                 logger.warning(f"日時パースエラー: id={row.get('id')}")
-    # 古い順に投稿（取りこぼしが先に出る）
     pending.sort(key=lambda r: f"{r['scheduled_date']} {r['scheduled_time']}")
     return pending
 

@@ -32,7 +32,7 @@ const articleJsonLd = JSON.stringify({
   '@type': articleType === 'review' ? 'Review' : 'Article',
   headline: title,
   description,
-  image: heroImage ? [heroImage] : [`${SITE_URL}/og/${slug}.svg`],
+  image: heroImage ? [heroImage] : [`${SITE_URL}/og/${slug}.svg`, `${SITE_URL}/thumbnails/${slug}.svg`],
   datePublished: pubDate.toISOString(),
   dateModified: (updatedDate ?? pubDate).toISOString(),
   author: AUTHOR,

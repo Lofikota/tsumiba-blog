@@ -1,9 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 256" width="384" height="256">
-  <rect width="384" height="256" fill="#E8EAF6" rx="12"/>
-  <rect width="384" height="8" fill="#1A237E" rx="12"/>
-  <rect x="20" y="24" width="88" height="22" fill="#1A237E" rx="6"/>
-  <text x="64" y="39" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">NISA・投資</text>
-  <text x="192" y="140" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="60" text-anchor="middle" dominant-baseline="middle">📊</text>
-  <text x="192" y="196" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="20" font-weight="700" fill="#1A1A2E" text-anchor="middle">SBI vs 楽天証券</text>
-  <text x="192" y="228" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="13" fill="#1A237E" text-anchor="middle" font-weight="700">新NISAはどちらで開く？</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="64" viewBox="0 0 96 64">
+  <rect width="96" height="64" rx="6" fill="#1D4ED8"/>
+  <rect x="4" y="4" width="88" height="56" rx="4" fill="#3B82F6"/>
+  <text x="48" y="22" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="18" fill="#FFFFFF" text-anchor="middle">📈</text>
+  <text x="48" y="40" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="8" fill="#FFFFFF" text-anchor="middle">NISA・投資</text>
+  <text x="48" y="52" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="500" font-size="6.5" fill="rgba(255,255,255,0.8)" text-anchor="middle">ren-money.com</text>
 </svg>
