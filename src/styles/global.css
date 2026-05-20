@@ -230,15 +230,15 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 5px 16px rgba(220,38,38,.45);
 }
 
-/* ─── カラーボックス ─── */
-.box-green  { background: var(--color-accent-green);  border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
-.box-yellow { background: var(--color-accent-yellow); border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
-.box-blue   { background: var(--color-primary-light); border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
-.box-red    { background: var(--color-accent-red);    border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
+/* ─── カラーボックス（シンプル：白地＋左ボーダー） ─── */
+.box-green  { background: #ffffff; border: 1px solid var(--color-border); border-left: 4px solid #4ade80; border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
+.box-yellow { background: #ffffff; border: 1px solid var(--color-border); border-left: 4px solid #facc15; border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
+.box-blue   { background: #ffffff; border: 1px solid var(--color-border); border-left: 4px solid var(--color-primary); border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
+.box-red    { background: #ffffff; border: 1px solid var(--color-border); border-left: 4px solid #f87171; border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
 
 /* ─── アフィリエイト開示 ─── */
 .affiliate-disclosure {
-  background: var(--color-primary-light);
+  background: #f8f9fa;
   border-left: 4px solid var(--color-primary);
   border-radius: 0 var(--radius) var(--radius) 0;
   padding: 0.75rem 1rem;
@@ -265,7 +265,7 @@ a:hover { text-decoration: underline; }
 .prose li { margin-bottom: 0.4rem; }
 .prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
 .prose th, .prose td { border: 1px solid var(--color-border); padding: 0.6rem 0.75rem; text-align: left; }
-.prose th { background: var(--color-primary-light); font-weight: 700; }
+.prose th { background: #f8f9fa; font-weight: 700; }
 
 /* ─── LP専用スタイル ─── */
 
