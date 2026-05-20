@@ -7,6 +7,7 @@ quote_tweet_url 列があれば引用ツイートとして投稿する
 import os
 import re
 import csv
+import time
 import tempfile
 import shutil
 import logging
@@ -123,7 +124,10 @@ def main() -> None:
 
     client = get_client(creds)
 
-    for tweet in pending:
+    for i, tweet in enumerate(pending):
+        if i > 0:
+            logger.info("次の投稿まで30秒待機...")
+            time.sleep(30)
         text = tweet["text"]
         quote_url = tweet.get("quote_tweet_url", "").strip()
         logger.info(f"投稿試行: id={tweet['id']} | {text[:40].strip()}...")

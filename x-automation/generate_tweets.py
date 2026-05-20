@@ -352,18 +352,30 @@ def get_next_week_dates(week_offset: int = 0) -> list[str]:
 
 
 def add_to_queue(tweets: list[dict], dates: list[str]) -> int:
+    # 既存 pending のスロット（日付+時刻）を取得して重複を防ぐ
+    existing_slots: set[tuple[str, str]] = set()
+    with open(QUEUE_FILE, encoding="utf-8", newline="") as f:
+        for row in csv.DictReader(f):
+            if row["status"] == "pending":
+                existing_slots.add((row["scheduled_date"], row["scheduled_time"]))
+
     start_id = next_id()
     new_rows = []
+    skipped = 0
 
-    for i, tweet in enumerate(tweets):
+    for tweet in tweets:
         day_idx = tweet.get("day", 1) - 1
         if day_idx >= len(dates):
+            continue
+        slot = (dates[day_idx], tweet.get("time", "09:00"))
+        if slot in existing_slots:
+            skipped += 1
             continue
         text = tweet.get("text", "").replace("\\n", "\n")
         new_rows.append({
             "id": start_id + len(new_rows),
-            "scheduled_date": dates[day_idx],
-            "scheduled_time": tweet.get("time", "09:00"),
+            "scheduled_date": slot[0],
+            "scheduled_time": slot[1],
             "tweet_type": tweet.get("type", ""),
             "text": text,
             "original_text": text,
@@ -372,6 +384,10 @@ def add_to_queue(tweets: list[dict], dates: list[str]) -> int:
             "tweet_id": "",
             "error": "",
         })
+        existing_slots.add(slot)
+
+    if skipped:
+        print(f"⚠️ 既存pendingと重複のためスキップ: {skipped}本")
 
     with open(QUEUE_FILE, "a", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
