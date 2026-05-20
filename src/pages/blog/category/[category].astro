@@ -1,0 +1,110 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { CATEGORIES, SLUG_TO_CATEGORY } from '../../../data/categories';
+
+export async function getStaticPaths() {
+  return Object.values(CATEGORIES).map(({ slug }) => ({
+    params: { category: slug },
+  }));
+}
+
+const { category: slug } = Astro.params;
+const categoryName = SLUG_TO_CATEGORY[slug] ?? '';
+const catInfo = CATEGORIES[categoryName];
+
+const allPosts = await getCollection('blog');
+const posts = allPosts
+  .filter(p => p.data.category === categoryName)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const SITE_URL = 'https://ren-money.com';
+const canonicalUrl = `${SITE_URL}/blog/category/${slug}/`;
+
+const breadcrumbJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'ホーム',     item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: '記事一覧',   item: `${SITE_URL}/blog/` },
+    { '@type': 'ListItem', position: 3, name: categoryName, item: canonicalUrl },
+  ],
+});
+
+const catColors: Record<string, { bg: string; text: string }> = {
+  'FX・外貨':     { bg: '#FEE2E2', text: '#991B1B' },
+  'NISA・投資':   { bg: '#DBEAFE', text: '#1E40AF' },
+  '副業・節税':   { bg: '#D1FAE5', text: '#065F46' },
+  '保険':         { bg: '#E0E7FF', text: '#3730A3' },
+  'お得情報':     { bg: '#FEF3C7', text: '#92400E' },
+  '投資・資産運用': { bg: '#DBEAFE', text: '#1E40AF' },
+  'クレジットカード': { bg: '#FEF3C7', text: '#92400E' },
+  '家計・節約':   { bg: '#D1FAE5', text: '#065F46' },
+};
+const cc = catColors[categoryName] ?? { bg: '#E5E7EB', text: '#374151' };
+---
+
+<BaseLayout
+  title={`${categoryName}の記事一覧`}
+  description={catInfo?.description ?? `${categoryName}に関する記事一覧。`}
+>
+  <script is:inline type="application/ld+json" set:html={breadcrumbJsonLd} />
+
+  <!-- パンくず -->
+  <nav aria-label="パンくずリスト" style="font-size:0.8rem;color:#6b7280;margin-bottom:1.25rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">
+    <a href="/" style="color:#2563eb;text-decoration:none;">ホーム</a>
+    <span aria-hidden="true">›</span>
+    <a href="/blog/" style="color:#2563eb;text-decoration:none;">記事一覧</a>
+    <span aria-hidden="true">›</span>
+    <span style={`background:${cc.bg};color:${cc.text};padding:0.1rem 0.5rem;border-radius:4px;font-weight:700;`}>{categoryName}</span>
+  </nav>
+
+  <div style="margin-bottom:1.5rem;">
+    <h1 style="font-size:1.5rem;font-weight:700;margin:0 0 0.5rem;">{categoryName}の記事一覧</h1>
+    {catInfo && <p style="font-size:0.9rem;color:#6b7280;margin:0;">{catInfo.description}</p>}
+    <p style="font-size:0.8rem;color:#9ca3af;margin-top:0.4rem;">{posts.length}件</p>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:0.875rem;">
+    {posts.map(post => {
+      const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+      return (
+        <a
+          href={`/blog/${post.id}/`}
+          style="display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.25rem;border:1px solid #e5e7eb;border-radius:12px;text-decoration:none;color:inherit;background:#fff;transition:box-shadow .15s,transform .15s;"
+          onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.08)';this.style.transform='translateY(-2px)'"
+          onmouseout="this.style.boxShadow='none';this.style.transform='translateY(0)'"
+        >
+          <img
+            src={post.data.heroImage ?? `/thumbnails/${post.id}.svg`}
+            alt=""
+            aria-hidden="true"
+            width="96"
+            height="64"
+            loading="lazy"
+            style="width:96px;height:64px;object-fit:cover;border-radius:6px;flex-shrink:0;background:#f1f5f9;"
+          />
+          <div style="min-width:0;flex:1;">
+            <div style="margin-bottom:0.3rem;">
+              <span style={`background:${cc.bg};color:${cc.text};font-size:0.72rem;font-weight:700;padding:0.15rem 0.55rem;border-radius:4px;`}>
+                {categoryName}
+              </span>
+            </div>
+            <h2 style="font-size:0.975rem;font-weight:700;margin:0 0 0.3rem;line-height:1.5;color:#1f2937;">{post.data.title}</h2>
+            <p style="font-size:0.8rem;color:#6b7280;margin:0 0 0.4rem;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{post.data.description}</p>
+            <span style="font-size:0.72rem;color:#9ca3af;">{dateStr}</span>
+          </div>
+        </a>
+      );
+    })}
+  </div>
+
+  <!-- 記事がない場合 -->
+  {posts.length === 0 && (
+    <p style="color:#6b7280;padding:2rem 0;">まだ記事がありません。</p>
+  )}
+
+  <div style="margin-top:1.5rem;">
+    <a href="/blog/" style="font-size:0.875rem;color:#2563eb;text-decoration:none;">← 記事一覧に戻る</a>
+  </div>
+</BaseLayout>

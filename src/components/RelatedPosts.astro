@@ -1,0 +1,162 @@
+---
+import { getCollection } from 'astro:content';
+import { CATEGORIES } from '../data/categories';
+
+interface Props {
+  currentSlug: string;
+  category: string;
+}
+
+const { currentSlug, category } = Astro.props;
+
+const allPosts = await getCollection('blog');
+const related = allPosts
+  .filter(p => p.id !== currentSlug && p.data.category === category)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const catInfo = CATEGORIES[category];
+const catUrl = catInfo ? `/blog/category/${catInfo.slug}/` : '/blog/';
+
+const catColors: Record<string, { bg: string; text: string }> = {
+  'FX・外貨':     { bg: '#FEE2E2', text: '#991B1B' },
+  'NISA・投資':   { bg: '#DBEAFE', text: '#1E40AF' },
+  '副業・節税':   { bg: '#D1FAE5', text: '#065F46' },
+  '保険':         { bg: '#E0E7FF', text: '#3730A3' },
+  'お得情報':     { bg: '#FEF3C7', text: '#92400E' },
+  '投資・資産運用': { bg: '#DBEAFE', text: '#1E40AF' },
+  'クレジットカード': { bg: '#FEF3C7', text: '#92400E' },
+  '家計・節約':   { bg: '#D1FAE5', text: '#065F46' },
+};
+const cc = catColors[category] ?? { bg: '#E5E7EB', text: '#374151' };
+---
+
+{related.length > 0 && (
+  <section class="related-posts">
+    <div class="related-header">
+      <p class="related-label">Related</p>
+      <h2 class="related-title">「{category}」の関連記事</h2>
+      <a class="related-all" href={catUrl}>一覧を見る →</a>
+    </div>
+    <div class="related-grid">
+      {related.map(post => {
+        const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        return (
+          <a href={`/blog/${post.id}/`} class="related-card">
+            <div class="related-thumb" style={`background:${cc.bg}`}>
+              {post.data.heroImage
+                ? <img src={post.data.heroImage} alt={post.data.title} width="240" height="135" loading="lazy" />
+                : <span class="related-thumb-text" style={`color:${cc.text}`}>{category}</span>
+              }
+            </div>
+            <div class="related-body">
+              <span class="related-cat" style={`background:${cc.bg};color:${cc.text}`}>{category}</span>
+              <p class="related-post-title">{post.data.title}</p>
+              <span class="related-date">{dateStr}</span>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-posts {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e5e7eb;
+  }
+  .related-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .related-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .related-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    flex: 1;
+  }
+  .related-all {
+    font-size: 0.8rem;
+    color: #2563eb;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .related-all:hover { text-decoration: underline; }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.875rem;
+  }
+  @media (max-width: 640px) {
+    .related-grid { grid-template-columns: 1fr; }
+  }
+  .related-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .related-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,.08);
+    transform: translateY(-2px);
+  }
+  .related-thumb {
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .related-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .related-thumb-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .related-body {
+    padding: 0.75rem;
+  }
+  .related-cat {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 0.4rem;
+  }
+  .related-post-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.5;
+    margin: 0 0 0.35rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: #1f2937;
+  }
+  .related-date {
+    font-size: 0.72rem;
+    color: #9ca3af;
+  }
+</style>

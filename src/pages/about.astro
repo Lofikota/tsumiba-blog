@@ -1,8 +1,26 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const personJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "田中蓮",
+  "url": "https://ren-money.com/about/",
+  "description": "32歳IT会社員。宮城県出身・東京在住。借金200万円から副業・投資で資産500万円を達成。35歳FIREを目指して発信中。",
+  "knowsAbout": ["FX", "NISA", "副業", "節税", "保険", "確定申告", "iDeCo", "投資"],
+  "hasCredential": [
+    { "@type": "EducationalOccupationalCredential", "credentialCategory": "副業収入月20万円達成" },
+    { "@type": "EducationalOccupationalCredential", "credentialCategory": "資産500万円形成" }
+  ],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://ren-money.com/about/"
+  }
+});
 ---
 
-<BaseLayout title="このブログについて" description="田中蓮のプロフィールとブログの目的">
+<BaseLayout title="田中蓮のプロフィール｜借金200万から資産500万を達成した32歳のリアルな軌跡" description="田中蓮のプロフィール。32歳IT会社員、借金200万円→副業月20万→資産500万円達成。FX・NISA・副業・節税を実体験ベースで発信しています。">
+  <script is:inline type="application/ld+json" set:html={personJsonLd}></script>
   <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;">このブログについて</h1>
 
   <div class="prose">
