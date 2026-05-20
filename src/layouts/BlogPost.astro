@@ -117,13 +117,13 @@ const tocHeadings = headings.filter(h => h.depth === 2);
 
     {tocHeadings.length > 2 && (
       <nav class="toc" aria-label="目次">
-        <p class="toc-title">この記事の内容</p>
+        <p class="toc-title">この記事の目次</p>
         <ol class="toc-list">
           {tocHeadings.map((h, i) => (
             <li class="toc-item">
               <a href={`#${h.slug}`} class="toc-link">
                 <span class="toc-num">{i + 1}</span>
-                {h.text}
+                <span>{h.text}</span>
               </a>
             </li>
           ))}
@@ -157,6 +157,32 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     {faqJsonLd && <script is:inline type="application/ld+json" set:html={faqJsonLd} />}
     <script is:inline type="application/ld+json" set:html={breadcrumbJsonLd} />
 
+    <!-- 著者プロフィールボックス -->
+    <aside class="author-box">
+      <div class="author-box-avatar">
+        <svg width="56" height="56" viewBox="0 0 120 120" aria-hidden="true">
+          <defs><clipPath id="ab1"><circle cx="60" cy="60" r="56"/></clipPath></defs>
+          <g clip-path="url(#ab1)">
+            <rect width="120" height="120" fill="#EEF1F7"/>
+            <rect x="50" y="62" width="20" height="20" fill="#F4D5BA"/>
+            <path d="M30 92 Q60 80 90 92 L100 120 L20 120 Z" fill="#fff"/>
+            <path d="M18 120 L30 86 Q42 94 42 110 L60 120 Z" fill="#0B1942"/>
+            <path d="M102 120 L90 86 Q78 94 78 110 L60 120 Z" fill="#0B1942"/>
+            <ellipse cx="60" cy="52" rx="22" ry="26" fill="#F4D5BA"/>
+            <path d="M38 46 Q38 22 60 22 Q82 22 82 46 Q82 38 76 34 Q70 30 60 32 Q50 34 44 40 Q40 44 38 46Z" fill="#1A1A1A"/>
+            <ellipse cx="51" cy="54" rx="2.2" ry="3" fill="#111"/>
+            <ellipse cx="69" cy="54" rx="2.2" ry="3" fill="#111"/>
+            <path d="M55 66 Q60 70 65 66" stroke="#9B5A4A" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          </g>
+        </svg>
+      </div>
+      <div class="author-box-body">
+        <p class="author-box-label">この記事を書いた人</p>
+        <p class="author-box-name">田中 蓮</p>
+        <p class="author-box-bio">32歳のIT会社員。借金200万円からFX・副業・NISA で資産500万円を達成。35歳FIREを目指して情報発信中。体験ベースで初心者にわかりやすく解説します。</p>
+      </div>
+    </aside>
+
     <RelatedPosts currentSlug={slug} category={category} />
 
     <section class="line-cta">
@@ -181,18 +207,29 @@ const tocHeadings = headings.filter(h => h.depth === 2);
   /* ── 目次 ── */
   .toc {
     margin: 1.5rem 0;
-    padding: 1.1rem 1.25rem;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    padding: 1.1rem 1.25rem 1.25rem;
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
     border-radius: 10px;
   }
   .toc-title {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    margin: 0 0 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #1d4ed8;
+    letter-spacing: 0.06em;
+    margin: 0 0 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .toc-title::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background: #2563eb;
+    border-radius: 3px;
+    flex-shrink: 0;
   }
   .toc-list {
     margin: 0;
@@ -200,25 +237,38 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.45rem;
+    gap: 0.5rem;
   }
   .toc-item { margin: 0; }
   .toc-link {
     display: flex;
     align-items: baseline;
     gap: 0.6rem;
-    font-size: 0.9rem;
-    color: #1d4ed8;
+    font-size: 0.88rem;
+    color: #1e40af;
     text-decoration: none;
-    line-height: 1.5;
+    line-height: 1.55;
+    padding: 0.3rem 0.5rem;
+    border-radius: 5px;
+    transition: background 0.15s;
   }
-  .toc-link:hover { text-decoration: underline; }
+  .toc-link:hover {
+    background: rgba(255,255,255,0.65);
+    text-decoration: none;
+  }
   .toc-num {
     flex-shrink: 0;
-    width: 1.3rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #94a3b8;
+    width: 1.4rem;
+    height: 1.4rem;
+    background: #2563eb;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
 
   /* ── LINE CTA ── */
@@ -282,6 +332,46 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     color: var(--color-text-muted);
     font-size: 0.9rem;
     line-height: 1.75;
+  }
+
+  /* ── 著者プロフィールボックス ── */
+  .author-box {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-top: 2.5rem;
+    padding: 1.25rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+  }
+  .author-box-avatar {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #dbeafe;
+  }
+  .author-box-avatar svg { display: block; }
+  .author-box-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.06em;
+    margin: 0 0 0.2rem;
+  }
+  .author-box-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 0.4rem;
+  }
+  .author-box-bio {
+    font-size: 0.83rem;
+    color: #64748b;
+    line-height: 1.7;
+    margin: 0;
   }
 
   .line-cta {

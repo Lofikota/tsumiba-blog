@@ -171,18 +171,18 @@ const catStyle: Record<string, CatStyle> = {
   ═══════════════════════════════════════ */
   .hero {
     background:
-      radial-gradient(circle at 18% 18%, rgba(59,130,246,.38) 0, rgba(59,130,246,0) 34%),
-      linear-gradient(180deg, #102A6B 0%, #1D4ED8 100%);
+      radial-gradient(circle at 18% 18%, rgba(59,130,246,.28) 0, rgba(59,130,246,0) 34%),
+      linear-gradient(160deg, #1a3a7a 0%, #2563EB 100%);
     color: #fff;
     overflow: hidden;
-    padding: 56px 0 72px;
+    padding: 48px 0 60px;
     position: relative;
   }
   .hero::before {
     content: '';
     position: absolute; inset: 0;
-    background-image: radial-gradient(circle, rgba(255,255,255,.075) 1px, transparent 1px);
-    background-size: 24px 24px;
+    background-image: radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size: 28px 28px;
     pointer-events: none;
   }
   .hero-inner {
@@ -377,6 +377,43 @@ const catStyle: Record<string, CatStyle> = {
   }
   .theme-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
   .theme-body  { font-size: 12.5px; color: var(--c-gray); line-height: 1.7; }
+
+  /* ═══════════════════════════════════════
+     LINE CTA BANNER
+  ═══════════════════════════════════════ */
+  .line-banner {
+    background: #06c755;
+    color: #fff;
+    border-radius: 12px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 16px rgba(6,199,85,0.22);
+  }
+  .line-banner-left { display: flex; align-items: center; gap: 14px; }
+  .line-banner-icon {
+    width: 46px; height: 46px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .line-banner-title { font-size: 15px; font-weight: 700; margin: 0 0 3px; }
+  .line-banner-sub   { font-size: 12px; opacity: 0.9; margin: 0; }
+  .line-banner-btn {
+    background: #fff; color: #059952;
+    font-weight: 800; font-size: 13px;
+    padding: 10px 18px; border-radius: 8px;
+    white-space: nowrap; flex-shrink: 0;
+    transition: opacity 0.15s;
+  }
+  .line-banner-btn:hover { opacity: 0.88; text-decoration: none; }
+  @media (max-width: 640px) {
+    .line-banner { flex-direction: column; align-items: flex-start; }
+    .line-banner-btn { width: 100%; text-align: center; }
+  }
 
   /* ═══════════════════════════════════════
      ARTICLES
@@ -890,8 +927,28 @@ const catStyle: Record<string, CatStyle> = {
   </section>
 
   <!-- ── ARTICLES ───────────────────── -->
-  <section class="section section--tint">
+  <section class="section section--tint" id="articles">
     <div class="container">
+      <!-- LINE CTAバナー -->
+      <div class="line-banner">
+        <div class="line-banner-left">
+          <div class="line-banner-icon">
+            <svg width="28" height="28" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+              <rect x="4" y="8" width="40" height="32" rx="8" fill="white" opacity="0.9"/>
+              <path d="M24 16 C14 16 6 22 6 29 C6 34 10 38 16 40 L15 44 L20 41 C21.3 41.3 22.6 41.5 24 41.5 C34 41.5 42 35.5 42 29 C42 22 34 16 24 16Z" fill="#06c755"/>
+              <circle cx="17" cy="29" r="2" fill="white"/>
+              <circle cx="24" cy="29" r="2" fill="white"/>
+              <circle cx="31" cy="29" r="2" fill="white"/>
+            </svg>
+          </div>
+          <div>
+            <p class="line-banner-title">FX・副業・節税の無料情報をLINEで受け取る</p>
+            <p class="line-banner-sub">登録0円・いつでも解除OK。月20万稼いだ方法をまとめてお届け。</p>
+          </div>
+        </div>
+        <a class="line-banner-btn" href="/line/x-profile-main/" rel="noopener">LINEで受け取る →</a>
+      </div>
+
       <div class="section-head">
         <div class="section-label">Articles</div>
         <h2 class="section-title">体験談・解説ベースで<br/>学べる人気記事</h2>

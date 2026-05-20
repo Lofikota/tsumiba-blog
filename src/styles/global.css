@@ -261,14 +261,30 @@ a:hover { text-decoration: underline; }
 }
 
 /* ─── 記事コンテンツ（prose） ─── */
-.prose h2 { font-size: 1.4rem; font-weight: 700; margin: 2rem 0 1rem; border-left: 4px solid var(--color-primary); padding-left: 0.75rem; }
-.prose h3 { font-size: 1.15rem; font-weight: 700; margin: 1.5rem 0 0.75rem; }
+.prose h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 2.5rem 0 1rem;
+  background: #EFF6FF;
+  border-left: 4px solid var(--color-primary);
+  padding: 0.7rem 1rem;
+  border-radius: 0 6px 6px 0;
+  line-height: 1.5;
+}
+.prose h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 1.75rem 0 0.75rem;
+  padding-left: 0.75rem;
+  border-left: 3px solid #93C5FD;
+  color: #1e293b;
+}
 .prose p  { margin-bottom: 1rem; }
 .prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 1rem; }
 .prose li { margin-bottom: 0.4rem; }
 .prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
 .prose th, .prose td { border: 1px solid var(--color-border); padding: 0.6rem 0.75rem; text-align: left; }
-.prose th { background: #f8f9fa; font-weight: 700; }
+.prose th { background: #EFF6FF; font-weight: 700; color: var(--color-primary); }
 
 /* ─── LP専用スタイル ─── */
 
