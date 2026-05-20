@@ -230,11 +230,14 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 5px 16px rgba(220,38,38,.45);
 }
 
-/* ─── カラーボックス（シンプル：白地＋左ボーダー） ─── */
-.box-green  { background: #ffffff; border: 1px solid var(--color-border); border-left: 4px solid #4ade80; border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
-.box-yellow { background: #ffffff; border: 1px solid var(--color-border); border-left: 4px solid #facc15; border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
-.box-blue   { background: #ffffff; border: 1px solid var(--color-border); border-left: 4px solid var(--color-primary); border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
-.box-red    { background: #ffffff; border: 1px solid var(--color-border); border-left: 4px solid #f87171; border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0; }
+/* ─── カラーボックス（シンプル：白地＋グレー枠のみ） ─── */
+.box-green, .box-yellow, .box-blue, .box-red {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+}
 
 /* ─── アフィリエイト開示 ─── */
 .affiliate-disclosure {
