@@ -195,5 +195,655 @@
     "status": "pending",
     "priority": 1,
     "channel": "seo_x_organic"
+  },
+  {
+    "slug": "gmo-click-fx-review",
+    "keyword": "GMOクリック証券FX 評判 スプレッド",
+    "type": "review",
+    "category": "FX・外貨",
+    "notes": "GMOクリック証券FXのスプレッド・ツール・サポートを田中蓮視点でレビュー。松井・DMMとの比較で差別化ポイントを明示。fx-kouza-hikaküへ内部リンク。",
+    "status": "pending",
+    "priority": 2,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "ig-securities-fx-review",
+    "keyword": "IG証券FX 初心者 レバレッジ",
+    "type": "review",
+    "category": "FX・外貨",
+    "notes": "IG証券FXを初心者視点でレビュー。取引通貨ペア数・レバレッジ上限・規制面の安心感を解説。",
+    "status": "pending",
+    "priority": 3,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "oanda-fx-review",
+    "keyword": "OANDA FX スキャルピング 評判",
+    "type": "review",
+    "category": "FX・外貨",
+    "notes": "OANDA Japanのスキャルピング適性・スプレッド・APIを田中蓮視点でレビュー。短期売買志向の読者向け。",
+    "status": "pending",
+    "priority": 4,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "rakuten-fx-review",
+    "keyword": "楽天FX 評判 手数料",
+    "type": "review",
+    "category": "FX・外貨",
+    "notes": "楽天証券FX部門のレビュー。楽天経済圏ユーザーへのメリット・SPU活用・スプレッド比較を含める。",
+    "status": "pending",
+    "priority": 5,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "sbi-fx-alpha-review",
+    "keyword": "SBI FXα 評判 使い方",
+    "type": "review",
+    "category": "FX・外貨",
+    "notes": "SBI FXαをSBI証券ユーザー視点でレビュー。証券口座との連携・スプレッド・初心者向けツールを解説。",
+    "status": "pending",
+    "priority": 6,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-spread-hikaku",
+    "keyword": "FX スプレッド比較 主要通貨",
+    "type": "comparison",
+    "category": "FX・外貨",
+    "notes": "ドル円・ユーロ円など主要通貨ペアのスプレッドを主要FX業者で比較。初心者が口座選ぶ判断軸を整理。",
+    "status": "pending",
+    "priority": 7,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-best-time",
+    "keyword": "FX 取引時間 稼ぎやすい 時間帯",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "東京・ロンドン・NY時間の特徴を初心者向けに解説。副業として会社員が取引しやすい時間帯も明示。",
+    "status": "pending",
+    "priority": 8,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-demo-tsukaikata",
+    "keyword": "FX デモトレード やり方 初心者",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "デモ口座の活用法・実口座との違い・練習期間の目安を初心者向けに解説。口座開設CTAへ誘導。",
+    "status": "pending",
+    "priority": 9,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-swap-hikaku",
+    "keyword": "FXスワップポイント比較 高金利通貨",
+    "type": "comparison",
+    "category": "FX・外貨",
+    "notes": "南アランド・トルコリラ・メキシコペソなど高金利通貨のスワップポイントを比較。リスクも正直に記載。",
+    "status": "pending",
+    "priority": 10,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-chart-yomikata",
+    "keyword": "FXチャート 読み方 初心者 ローソク足",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "ローソク足・移動平均線・RSIなど基本的なチャートの読み方を初心者向けに図解で解説。",
+    "status": "pending",
+    "priority": 11,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-dollar-yen-ugoki",
+    "keyword": "ドル円 動きやすい時間 初心者",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "ドル円が動く時間帯・経済指標発表・NY時間の特徴を初心者向けに解説。リスク管理を前提にした内容。",
+    "status": "pending",
+    "priority": 12,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-loss-cut-shikumi",
+    "keyword": "FXロスカット 仕組み 証拠金",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "ロスカットの仕組み・証拠金維持率・追加証拠金の流れを初心者向けに解説。自動ロスカットの安心感も説明。",
+    "status": "pending",
+    "priority": 13,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-nanpin-risk",
+    "keyword": "FX なんぴん やめとけ リスク",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "難平（ナンピン）のリスクを初心者向けに解説。損失拡大のメカニズムを具体例で示し、初心者に推奨しない理由を明記。",
+    "status": "pending",
+    "priority": 14,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-tax-keisan",
+    "keyword": "FX 税金 計算 雑所得 20.315",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "FX所得の税率・雑所得の計算方法・会社員の年末調整との違いを解説。個別税務相談ではなく一般情報として。",
+    "status": "pending",
+    "priority": 15,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "kaigai-fx-risk",
+    "keyword": "海外FX リスク 出金できない 国内推奨",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "海外FX業者のリスク（規制なし・出金トラブル・税制）を解説。国内業者を推奨する理由を法的観点から整理。",
+    "status": "pending",
+    "priority": 16,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-fundamen-shoshinsha",
+    "keyword": "FX ファンダメンタルズ 初心者 経済指標",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "雇用統計・CPI・金利発表などFX重要経済指標の基礎を初心者向けに解説。テクニカルとの組み合わせも。",
+    "status": "pending",
+    "priority": 17,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-technical-indicator",
+    "keyword": "FX テクニカル分析 指標 MACD RSI",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "MACD・RSI・ボリンジャーバンドなど主要テクニカル指標の使い方を初心者向けに解説。",
+    "status": "pending",
+    "priority": 18,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-auto-trade-shoshinsha",
+    "keyword": "FX 自動売買 EA 初心者 リスク",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "FX自動売買・EA（エキスパートアドバイザー）の仕組みとリスクを初心者向けに解説。詐欺EAの見分け方も。",
+    "status": "pending",
+    "priority": 19,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-funin-shotoku-genjitsu",
+    "keyword": "FX 不労所得 月5万 現実",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "FXで月5万の不労所得は現実的か？必要な元手・リスク・失敗率を正直に解説。夢を煽らず現実を伝える。",
+    "status": "pending",
+    "priority": 20,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "nisa-tsumitate-kingaku",
+    "keyword": "新NISA 積立 毎月いくら 計算",
+    "type": "guide",
+    "category": "投資・資産運用",
+    "notes": "新NISAで毎月いくら積み立てるべきか。年収・目標額・期間別のシミュレーション。iDeCoとの組み合わせも。",
+    "status": "pending",
+    "priority": 1,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "nisa-fund-osusume",
+    "keyword": "新NISA おすすめファンド eMAXIS Slim",
+    "type": "guide",
+    "category": "投資・資産運用",
+    "notes": "新NISAで買えるおすすめインデックスファンドを比較。eMAXIS SlimシリーズとSBI・楽天ファンドの特徴整理。",
+    "status": "pending",
+    "priority": 2,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "nisa-seichoku-tsumitate-chigai",
+    "keyword": "NISA 成長投資枠 積立投資枠 違い",
+    "type": "guide",
+    "category": "投資・資産運用",
+    "notes": "新NISAの成長投資枠と積立投資枠の違いを初心者向けに解説。どちらを優先すべきか判断フローも提示。",
+    "status": "pending",
+    "priority": 3,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "nisa-2000man-simulation",
+    "keyword": "新NISA 2000万 達成 シミュレーション",
+    "type": "guide",
+    "category": "投資・資産運用",
+    "notes": "新NISAで老後2000万円を達成するための積立額・期間のシミュレーション。30代・40代別に具体的に試算。",
+    "status": "pending",
+    "priority": 4,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "nisa-stop-hoho",
+    "keyword": "NISA 途中でやめる 解約 方法",
+    "type": "guide",
+    "category": "投資・資産運用",
+    "notes": "NISAを途中解約する場合の手順・注意点・税制上の扱いを解説。やめるより続けるメリットも明示。",
+    "status": "pending",
+    "priority": 5,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "nisa-rakuten-sbi-chigai",
+    "keyword": "楽天証券 SBI証券 NISA どっち 2024",
+    "type": "comparison",
+    "category": "投資・資産運用",
+    "notes": "楽天証券とSBI証券のNISA口座を比較。ポイント還元・銘柄数・操作性で田中蓮の判断を示す。",
+    "status": "pending",
+    "priority": 6,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "ideco-zeikin-merit",
+    "keyword": "iDeCo 節税 いくら 会社員 計算",
+    "type": "guide",
+    "category": "投資・資産運用",
+    "notes": "iDeCoの節税効果を年収・掛け金別に具体的に計算。所得控除・住民税の軽減額を数字で示す。",
+    "status": "pending",
+    "priority": 7,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "ideco-kinyu-hikaku",
+    "keyword": "iDeCo 金融機関 比較 SBI 楽天 マネックス",
+    "type": "comparison",
+    "category": "投資・資産運用",
+    "notes": "iDeCo口座の金融機関をSBI・楽天・マネックスで比較。手数料・銘柄数・使いやすさで田中蓮の推奨を示す。",
+    "status": "pending",
+    "priority": 8,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "ideco-kaishi-age",
+    "keyword": "iDeCo いつから 始める 年齢",
+    "type": "guide",
+    "category": "投資・資産運用",
+    "notes": "iDeCoをいつから始めるべきかを年齢別に解説。20代・30代・40代それぞれの戦略と節税メリットを整理。",
+    "status": "pending",
+    "priority": 9,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "ideco-ukitori-hoho",
+    "keyword": "iDeCo 受け取り 一時金 年金 どっち",
+    "type": "guide",
+    "category": "投資・資産運用",
+    "notes": "iDeCoの受け取り方（一時金・年金・組み合わせ）の税制上の違いを解説。退職所得控除・公的年金控除の活用法。",
+    "status": "pending",
+    "priority": 10,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "ideco-nisa-fufu",
+    "keyword": "iDeCo NISA 夫婦 戦略 優先順位",
+    "type": "guide",
+    "category": "投資・資産運用",
+    "notes": "夫婦でiDeCoとNISAをどう組み合わせるか。共働き・専業主婦(夫)別の最適戦略を田中蓮視点で整理。",
+    "status": "pending",
+    "priority": 11,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "index-fund-shoshinsha",
+    "keyword": "インデックス投資 始め方 全世界 米国",
+    "type": "guide",
+    "category": "投資・資産運用",
+    "notes": "インデックス投資の基礎・全世界株vs米国株の選び方・始め方を初心者向けに解説。NISAとの組み合わせも。",
+    "status": "pending",
+    "priority": 12,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "seimei-hoken-hitsuyou-kingaku",
+    "keyword": "生命保険 いくら 必要 計算 家族",
+    "type": "guide",
+    "category": "保険",
+    "notes": "生命保険の必要保障額を家族構成・収入・住宅ローン別に計算する方法を解説。多すぎる保険料の見直しにつなげる。",
+    "status": "pending",
+    "priority": 1,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "seimei-hoken-hikaku-30dai",
+    "keyword": "生命保険 比較 おすすめ 30代 掛け捨て",
+    "type": "comparison",
+    "category": "保険",
+    "notes": "30代が選ぶべき生命保険を掛け捨て型で比較。保険見直しラボ・FP相談へのCTA。コスパ重視の視点で。",
+    "status": "pending",
+    "priority": 2,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "iryo-hoken-hitsuyou",
+    "keyword": "医療保険 必要 不要 公的保険 比較",
+    "type": "guide",
+    "category": "保険",
+    "notes": "高額療養費制度があれば医療保険は不要か？公的保険の手厚さと民間保険の必要性を整理。FP相談CTAへ。",
+    "status": "pending",
+    "priority": 3,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "iryo-hoken-hikaku",
+    "keyword": "医療保険 比較 おすすめ 入院給付",
+    "type": "comparison",
+    "category": "保険",
+    "notes": "主要医療保険を入院給付・通院・先進医療特約で比較。保険見直しラボ経由のFP相談へ誘導。",
+    "status": "pending",
+    "priority": 4,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "hoken-minaoshi-40dai-hitori",
+    "keyword": "保険 見直し 40代 独身",
+    "type": "guide",
+    "category": "保険",
+    "notes": "40代独身が見直すべき保険の種類・金額を整理。老後の医療・就業不能リスクに絞った内容。FP相談CTA。",
+    "status": "pending",
+    "priority": 5,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "hoken-minaoshi-50dai",
+    "keyword": "保険 見直し 50代 老後 必要なもの",
+    "type": "guide",
+    "category": "保険",
+    "notes": "50代の保険見直しポイント。子供独立後に不要になる保険と、介護・就業不能保険の重要性を整理。",
+    "status": "pending",
+    "priority": 6,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "shuushin-vs-teiki-hoken",
+    "keyword": "終身保険 定期保険 どっち 比較",
+    "type": "comparison",
+    "category": "保険",
+    "notes": "終身保険と定期保険の違い・コスト・向いている人を整理。田中蓮は掛け捨て派として明確に立場表明。",
+    "status": "pending",
+    "priority": 7,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "cancer-hoken-hitsuyou",
+    "keyword": "がん保険 必要 いらない 判断基準",
+    "type": "guide",
+    "category": "保険",
+    "notes": "がん保険が必要な人・不要な人の判断基準を整理。高額療養費・貯蓄額・家族状況で判断する方法を解説。",
+    "status": "pending",
+    "priority": 8,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "cancer-hoken-hikaku",
+    "keyword": "がん保険 比較 おすすめ 人気",
+    "type": "comparison",
+    "category": "保険",
+    "notes": "主要がん保険を一時金・診断給付・治療給付で比較。FP相談・保険見直しラボへのCTA。",
+    "status": "pending",
+    "priority": 9,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "gakushi-hoken-vs-nisa",
+    "keyword": "学資保険 vs NISA どっち 子供 教育費",
+    "type": "comparison",
+    "category": "保険",
+    "notes": "子供の教育費準備は学資保険とNISAどっちか。返戻率・流動性・税制で比較し田中蓮の推奨を明示。",
+    "status": "pending",
+    "priority": 10,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "car-hoken-hikaku",
+    "keyword": "車 任意保険 比較 安い おすすめ",
+    "type": "comparison",
+    "category": "保険",
+    "notes": "自動車任意保険を補償内容・保険料で比較。一括見積りサービスへの誘導。等級・年齢別の選び方も解説。",
+    "status": "pending",
+    "priority": 11,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "salaryman-hoken-minimum",
+    "keyword": "サラリーマン 保険 最低限 必要なもの",
+    "type": "guide",
+    "category": "保険",
+    "notes": "会社員が最低限入るべき保険を整理。健康保険・厚生年金の公的保障を踏まえ、民間で補う部分を明示。",
+    "status": "pending",
+    "priority": 12,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "furusato-nozei-hikaku",
+    "keyword": "ふるさと納税 サイト比較 楽天 さとふる",
+    "type": "comparison",
+    "category": "副業・節税",
+    "notes": "ふるさと納税サイト（楽天・さとふる・ふるなび・マイナビ）を使いやすさ・還元率で比較。楽天経済圏ユーザー向け推奨。",
+    "status": "pending",
+    "priority": 1,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "furusato-nozei-jougen-keisan",
+    "keyword": "ふるさと納税 上限額 計算 年収",
+    "type": "guide",
+    "category": "副業・節税",
+    "notes": "ふるさと納税の上限額を年収・家族構成別に計算する方法を解説。ワンストップ特例と確定申告の違いも。",
+    "status": "pending",
+    "priority": 2,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "setsuzei-jissen-guide",
+    "keyword": "節税 サラリーマン できること 一覧",
+    "type": "guide",
+    "category": "副業・節税",
+    "notes": "サラリーマンができる節税を網羅。iDeCo・NISA・ふるさと納税・生命保険料控除・住宅ローン控除を整理。",
+    "status": "pending",
+    "priority": 3,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "kakuteishinkoku-hitsuyou-hito",
+    "keyword": "確定申告 必要な人 条件 会社員",
+    "type": "guide",
+    "category": "副業・節税",
+    "notes": "確定申告が必要な会社員の条件（副業20万・医療費控除・住宅取得等）をわかりやすく整理。必要書類も含める。",
+    "status": "pending",
+    "priority": 4,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "kojinjigyonushi-kaishi",
+    "keyword": "個人事業主 開業届 メリット デメリット",
+    "type": "guide",
+    "category": "副業・節税",
+    "notes": "副業で個人事業主になるメリット（経費・青色申告）とデメリット（社保・融資）を整理。田中蓮の実体験ベースで。",
+    "status": "pending",
+    "priority": 5,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "money-plan-30dai",
+    "keyword": "30代 お金 資産形成 ロードマップ",
+    "type": "guide",
+    "category": "副業・節税",
+    "notes": "30代が実践すべき資産形成のステップ。家計見直し→iDeCo→NISA→副業の順番で田中蓮の経験ベースで解説。",
+    "status": "pending",
+    "priority": 6,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "money-plan-20dai",
+    "keyword": "20代 貯金 投資 始め方 順番",
+    "type": "guide",
+    "category": "副業・節税",
+    "notes": "20代が貯金・投資を始める順番を整理。生活防衛資金→iDeCo→NISA→FXの優先順位を田中蓮視点で解説。",
+    "status": "pending",
+    "priority": 7,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "rougo-2000man-taisaku",
+    "keyword": "老後2000万問題 解決策 30代 シミュレーション",
+    "type": "guide",
+    "category": "副業・節税",
+    "notes": "老後2000万円問題の実態と30代が今からできる対策。NISAとiDeCoを組み合わせたシミュレーションを提示。",
+    "status": "pending",
+    "priority": 8,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "kakeibo-app-hikaku",
+    "keyword": "家計簿アプリ 比較 無料 おすすめ",
+    "type": "comparison",
+    "category": "副業・節税",
+    "notes": "マネーフォワードME・Zaim・マネーツリーを機能・使いやすさ・副業対応で比較。田中蓮の推奨を明示。",
+    "status": "pending",
+    "priority": 9,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fukugyo-kehi-setsuzei",
+    "keyword": "副業 個人事業主 経費 節税 やり方",
+    "type": "guide",
+    "category": "副業・節税",
+    "notes": "副業の経費に計上できるもの・できないものを整理。青色申告65万控除の方法も解説。税理士相談推奨も。",
+    "status": "pending",
+    "priority": 10,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "toushin-tsumitate-kingaku",
+    "keyword": "投資信託 積立 いくらから 始め方",
+    "type": "guide",
+    "category": "副業・節税",
+    "notes": "投資信託の積立を100円からでも始める方法を解説。SBI証券・楽天証券でのNISA設定手順も含める。",
+    "status": "pending",
+    "priority": 11,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "zaisan-keisei-tejun",
+    "keyword": "資産形成 順番 初心者 ステップ",
+    "type": "guide",
+    "category": "副業・節税",
+    "notes": "資産形成の正しい順番（生活防衛資金→保険整理→iDeCo→NISA→投資）を初心者向けに整理。田中蓮のロードマップ。",
+    "status": "pending",
+    "priority": 12,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "rakuten-shoken-review",
+    "keyword": "楽天証券 評判 初心者 使い方",
+    "type": "review",
+    "category": "証券・投資",
+    "notes": "楽天証券を初心者視点でレビュー。NISAの使いやすさ・楽天ポイント投資・iDeCo対応を田中蓮の実体験で。",
+    "status": "pending",
+    "priority": 1,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "sbi-shoken-review",
+    "keyword": "SBI証券 評判 口座開設 手順",
+    "type": "review",
+    "category": "証券・投資",
+    "notes": "SBI証券の評判・口座開設手順・NISA活用法を初心者向けに解説。楽天証券との比較で田中蓮の推奨理由を明示。",
+    "status": "pending",
+    "priority": 2,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "monex-shoken-review",
+    "keyword": "マネックス証券 評判 特徴 iDeCo",
+    "type": "review",
+    "category": "証券・投資",
+    "notes": "マネックス証券をiDeCo・米国株・NISA観点でレビュー。SBI・楽天との違いを整理し向いている人を明示。",
+    "status": "pending",
+    "priority": 3,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "kabu-shoshinsha-hajimekata",
+    "keyword": "株 初心者 始め方 最低金額",
+    "type": "guide",
+    "category": "証券・投資",
+    "notes": "株式投資を最低金額で始める方法。単元未満株・投資信託との違い・リスク理解を前提にした内容。",
+    "status": "pending",
+    "priority": 4,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "etf-shoshinsha-guide",
+    "keyword": "ETF 初心者 おすすめ 買い方 違い",
+    "type": "guide",
+    "category": "証券・投資",
+    "notes": "ETFと投資信託の違い・メリット・おすすめETFを初心者向けに解説。NISAでのETF活用法も含める。",
+    "status": "pending",
+    "priority": 5,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "us-stock-hajimekata",
+    "keyword": "米国株 始め方 初心者 証券会社",
+    "type": "guide",
+    "category": "証券・投資",
+    "notes": "米国株投資の始め方を証券会社選び・為替リスク・税制を含めて解説。S&P500やNASDAQへの投資信託との比較も。",
+    "status": "pending",
+    "priority": 6,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "roboadvisor-hikaku",
+    "keyword": "ロボアドバイザー 比較 ウェルスナビ THEO",
+    "type": "comparison",
+    "category": "証券・投資",
+    "notes": "ウェルスナビ・THEO・楽ラップを手数料・実績・操作性で比較。初心者向けNISA活用との違いも整理。",
+    "status": "pending",
+    "priority": 7,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "global-stock-fund",
+    "keyword": "全世界株式 おすすめ 楽天 SBI 比較",
+    "type": "comparison",
+    "category": "証券・投資",
+    "notes": "全世界株式インデックスファンドを楽天・SBI・eMAXIS Slimで比較。コスト・純資産・パフォーマンスを整理。",
+    "status": "pending",
+    "priority": 8,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "reit-shoshinsha",
+    "keyword": "J-REIT 始め方 初心者 リスク 配当",
+    "type": "guide",
+    "category": "証券・投資",
+    "notes": "J-REITの仕組み・始め方・リスク（空室・金利）を初心者向けに解説。株との違いと配当利回りの考え方も。",
+    "status": "pending",
+    "priority": 9,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "asset-portfolio-shoshinsha",
+    "keyword": "ポートフォリオ 組み方 初心者 リスク管理",
+    "type": "guide",
+    "category": "証券・投資",
+    "notes": "初心者向けポートフォリオの基本。株・債券・REITの分散比率・年齢別リスク調整の考え方を田中蓮視点で。",
+    "status": "pending",
+    "priority": 10,
+    "channel": "seo_x_organic"
   }
 ]
