@@ -163,9 +163,10 @@
     "type": "guide",
     "category": "保険相談",
     "notes": "30代独身向け保険見直し。保険見直し本舗・FPに相談へ誘導。LINE登録CTAを末尾に設置。",
-    "status": "pending",
+    "status": "published",
     "priority": 1,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-05-21T16:38:23.958Z"
   },
   {
     "slug": "hoken-minaoshi-40dai-family",
