@@ -352,11 +352,11 @@ def get_next_week_dates(week_offset: int = 0) -> list[str]:
 
 
 def add_to_queue(tweets: list[dict], dates: list[str]) -> int:
-    # 既存 pending のスロット（日付+時刻）を取得して重複を防ぐ
+    # pending/skip/posted すべてのスロットを除外対象にする（重複生成防止）
     existing_slots: set[tuple[str, str]] = set()
     with open(QUEUE_FILE, encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
-            if row["status"] == "pending":
+            if row["status"] in ("pending", "posted", "skip"):
                 existing_slots.add((row["scheduled_date"], row["scheduled_time"]))
 
     start_id = next_id()
