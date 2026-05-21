@@ -177,7 +177,7 @@ export const affiliateLinks: AffiliateLink[] = [
     name: '松井証券 MATSUI FX',
     provider: '松井証券',
     category: 'FX',
-    destinationUrl: 'https://www.matsui.co.jp/service/fx/',
+    destinationUrl: 'https://www.matsui.co.jp/service/fx/', // ValueCommerce承認済み(2026-05-18) → 管理画面でリンク取得後にdestinationUrlを差し替える
     status: 'pending',
     risk: 'fx',
     disclosure: 'FXには元本割れや預け入れた資金を上回る損失が発生するリスクがあります。',

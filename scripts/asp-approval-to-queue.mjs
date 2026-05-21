@@ -333,6 +333,47 @@ const PROGRAM_MAP = [
       notes: '保険チャンネルのFP相談・オンライン対応・保険見直しポイントを田中蓮視点でレビュー',
     },
   },
+  // ── afb経由の保険相談案件（A8.net申請中のバックアップ）─────
+  {
+    match: ['fpに相談', 'ファインドイット', 'fp-soudan', 'fp sodan', 'ファイナンシャルプランナーに相談'],
+    entry: {
+      slug: 'fp-soudan-muryou-review',
+      keyword: 'FPに相談 無料 評判 保険見直し 資産運用',
+      type: 'review',
+      category: '保険',
+      notes: 'FPへの無料相談サービスの仕組み・活用法・田中蓮が試した体験談ベースで解説。FIRE・副業との掛け算で資産形成テーマを絡める',
+    },
+  },
+  {
+    match: ['保険ガーデン', '保険の無料相談サイト', 'hoken garden', 'global8'],
+    entry: {
+      slug: 'hoken-garden-review',
+      keyword: '保険ガーデン 評判 無料相談 口コミ',
+      type: 'review',
+      category: '保険',
+      notes: '保険ガーデンの無料相談・FPのマッチング・他社との違いを田中蓮視点でレビュー',
+    },
+  },
+  {
+    match: ['保険見直しラボ', 'hoken minaoshi labo', 'hoken-minaoshi-labo'],
+    entry: {
+      slug: 'hoken-minaoshi-labo-review',
+      keyword: '保険見直しラボ 評判 無料 FP相談 口コミ',
+      type: 'review',
+      category: '保険',
+      notes: '保険見直しラボの相談品質・担当FPの選び方・実際の見直し効果を田中蓮視点でレビュー',
+    },
+  },
+  {
+    match: ['保険見直し本舗', 'hoken minaoshi honpo', 'hoken-minaoshi-honpo'],
+    entry: {
+      slug: 'hoken-minaoshi-honpo-review',
+      keyword: '保険見直し本舗 評判 店舗 無料相談',
+      type: 'review',
+      category: '保険',
+      notes: '保険見直し本舗の全国店舗・対面相談・オンライン相談の違いを田中蓮視点でレビュー',
+    },
+  },
 ];
 
 // ── プログラム名 → entry 変換 ────────────────────────
