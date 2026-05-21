@@ -393,6 +393,22 @@ def add_to_queue(tweets: list[dict], dates: list[str]) -> int:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
         writer.writerows(new_rows)
 
+    # D1同期用SQLファイルを生成（x-generate.ymlがwrangler d1 executeで使う）
+    if new_rows:
+        def esc(s: str) -> str:
+            return s.replace("'", "''")
+        sql_lines = []
+        for r in new_rows:
+            sql_lines.append(
+                f"INSERT OR IGNORE INTO tweet_queue "
+                f"(id, scheduled_date, scheduled_time, tweet_type, text, original_text, status) VALUES ("
+                f"{r['id']}, '{r['scheduled_date']}', '{r['scheduled_time']}', "
+                f"'{esc(r['tweet_type'])}', '{esc(r['text'])}', '{esc(r['original_text'])}', 'pending');"
+            )
+        d1_sql_file = DATA_DIR / "d1_sync.sql"
+        d1_sql_file.write_text("\n".join(sql_lines), encoding="utf-8")
+        print(f"📄 D1同期SQL生成: {d1_sql_file}")
+
     return len(new_rows)
 
 

@@ -34,8 +34,21 @@ jobs:
       - name: ツイート生成
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          WEEK_OFFSET: ${{ github.event.inputs.week_offset || '0' }}
-        run: python x-automation/generate_tweets.py "$WEEK_OFFSET"
+        run: |
+          WEEK_OFFSET="${{ github.event.inputs.week_offset }}"
+          python x-automation/generate_tweets.py "${WEEK_OFFSET:-0}"
+
+      - name: D1に同期（Cloudflare Workers用）
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -f x-automation/data/d1_sync.sql ]; then
+            npx wrangler d1 execute x-tweet-queue --file=x-automation/data/d1_sync.sql --remote
+            echo "D1同期完了"
+          else
+            echo "D1同期SQLなし（新規生成なし）"
+          fi
 
       - name: キュー更新をコミット
         run: |

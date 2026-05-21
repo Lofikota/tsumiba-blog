@@ -1,15 +1,6 @@
-name: X自動投稿
+name: X自動投稿（無効・Cloudflare Workersに移行済み）
 
 on:
-  schedule:
-    # JST 07:30 = UTC 22:30（前日）
-    - cron: '30 22 * * *'
-    # JST 12:00 = UTC 03:00
-    - cron: '0 3 * * *'
-    # JST 19:00 = UTC 10:00
-    - cron: '0 10 * * *'
-    # JST 21:00 = UTC 12:00
-    - cron: '0 12 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
