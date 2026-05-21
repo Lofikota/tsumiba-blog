@@ -11,6 +11,9 @@ on:
         required: false
         default: '0'
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   generate-tweets:
     runs-on: ubuntu-latest

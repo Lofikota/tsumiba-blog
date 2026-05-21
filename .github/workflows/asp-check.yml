@@ -14,6 +14,9 @@ on:
     - cron: '0 2 * * *'           # 毎日 11:00 JST に念押しチェック
   workflow_dispatch:               # 手動実行も可
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 concurrency:
   group: asp-check
   cancel-in-progress: false

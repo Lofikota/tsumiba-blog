@@ -5,6 +5,9 @@ on:
     - cron: '0 3 * * 3'   # 毎週水曜 12:00 JST
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 concurrency:
   group: ren-blog-automation-${{ github.ref }}
   cancel-in-progress: false
