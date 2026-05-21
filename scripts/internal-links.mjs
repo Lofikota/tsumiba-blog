@@ -146,8 +146,8 @@ function splitSafeRegions(content) {
   return regions;
 }
 
-// 1つの記事にリンクを挿入
-function insertLinksIntoArticle(content, linkMap, currentSlug) {
+// 1つの記事にリンクを挿入（sortedEntriesは外部で一度だけ生成して渡す）
+function insertLinksIntoArticle(content, sortedEntries, currentSlug) {
   const regions = splitSafeRegions(content);
   const usedTargets = new Set(); // 同一記事内で同一ターゲットへのリンクは1回のみ
   let result = '';
@@ -159,9 +159,6 @@ function insertLinksIntoArticle(content, linkMap, currentSlug) {
       result += segment;
       continue;
     }
-
-    // リンクマップ全エントリを試す（長いキーワード優先でソート）
-    const sortedEntries = [...linkMap.entries()].sort((a, b) => b[0].length - a[0].length);
 
     for (const [keyword, { url, slug }] of sortedEntries) {
       if (slug === currentSlug) continue; // 自己リンクはスキップ
@@ -193,6 +190,9 @@ function escapeRegex(str) {
 const linkMap = buildLinkMap();
 console.log(`リンクマップ構築完了: ${linkMap.size}エントリ`);
 
+// ソートは一度だけ（長いキーワード優先）
+const sortedEntries = [...linkMap.entries()].sort((a, b) => b[0].length - a[0].length);
+
 const files = fs.readdirSync(BLOG_DIR).filter(f => f.endsWith('.mdx'));
 let totalInserted = 0;
 
@@ -200,7 +200,7 @@ for (const file of files) {
   const slug = file.replace('.mdx', '');
   const filePath = path.join(BLOG_DIR, file);
   const original = fs.readFileSync(filePath, 'utf-8');
-  const updated = insertLinksIntoArticle(original, linkMap, slug);
+  const updated = insertLinksIntoArticle(original, sortedEntries, slug);
 
   if (updated !== original) {
     fs.writeFileSync(filePath, updated, 'utf-8');
