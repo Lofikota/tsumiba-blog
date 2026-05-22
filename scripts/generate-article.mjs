@@ -68,7 +68,9 @@ function writeRunReport({ pending, qcResult, reportPath, status }) {
   fs.writeFileSync(reportPath, `${lines.join('\n')}\n`, 'utf-8');
 }
 
-const pending = queue.find((item) => item.status === 'pending');
+const pending = queue
+  .filter((item) => item.status === 'pending')
+  .sort((a, b) => (a.priority ?? 50) - (b.priority ?? 50))[0];
 if (!pending) {
   console.log('キューに pending の記事がありません。終了します。');
   setOutput('status', 'no_pending');

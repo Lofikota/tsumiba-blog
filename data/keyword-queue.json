@@ -394,9 +394,9 @@
     "keyword": "新NISA 積立 毎月いくら 計算",
     "type": "guide",
     "category": "投資・資産運用",
-    "notes": "新NISAで毎月いくら積み立てるべきか。年収・目標額・期間別のシミュレーション。iDeCoとの組み合わせも。",
+    "notes": "新NISAで毎月いくら積み立てるべきか。年収・目標額・期間別のシミュレーション。iDeCoとの組み合わせも。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 1,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -404,9 +404,9 @@
     "keyword": "新NISA おすすめファンド eMAXIS Slim",
     "type": "guide",
     "category": "投資・資産運用",
-    "notes": "新NISAで買えるおすすめインデックスファンドを比較。eMAXIS SlimシリーズとSBI・楽天ファンドの特徴整理。",
+    "notes": "新NISAで買えるおすすめインデックスファンドを比較。eMAXIS SlimシリーズとSBI・楽天ファンドの特徴整理。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 2,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -414,9 +414,9 @@
     "keyword": "NISA 成長投資枠 積立投資枠 違い",
     "type": "guide",
     "category": "投資・資産運用",
-    "notes": "新NISAの成長投資枠と積立投資枠の違いを初心者向けに解説。どちらを優先すべきか判断フローも提示。",
+    "notes": "新NISAの成長投資枠と積立投資枠の違いを初心者向けに解説。どちらを優先すべきか判断フローも提示。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 3,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -424,9 +424,9 @@
     "keyword": "新NISA 2000万 達成 シミュレーション",
     "type": "guide",
     "category": "投資・資産運用",
-    "notes": "新NISAで老後2000万円を達成するための積立額・期間のシミュレーション。30代・40代別に具体的に試算。",
+    "notes": "新NISAで老後2000万円を達成するための積立額・期間のシミュレーション。30代・40代別に具体的に試算。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 4,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -434,9 +434,9 @@
     "keyword": "NISA 途中でやめる 解約 方法",
     "type": "guide",
     "category": "投資・資産運用",
-    "notes": "NISAを途中解約する場合の手順・注意点・税制上の扱いを解説。やめるより続けるメリットも明示。",
+    "notes": "NISAを途中解約する場合の手順・注意点・税制上の扱いを解説。やめるより続けるメリットも明示。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 5,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -444,9 +444,9 @@
     "keyword": "楽天証券 SBI証券 NISA どっち 2024",
     "type": "comparison",
     "category": "投資・資産運用",
-    "notes": "楽天証券とSBI証券のNISA口座を比較。ポイント還元・銘柄数・操作性で田中蓮の判断を示す。",
+    "notes": "楽天証券とSBI証券のNISA口座を比較。ポイント還元・銘柄数・操作性で田中蓮の判断を示す。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 6,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -454,9 +454,9 @@
     "keyword": "iDeCo 節税 いくら 会社員 計算",
     "type": "guide",
     "category": "投資・資産運用",
-    "notes": "iDeCoの節税効果を年収・掛け金別に具体的に計算。所得控除・住民税の軽減額を数字で示す。",
+    "notes": "iDeCoの節税効果を年収・掛け金別に具体的に計算。所得控除・住民税の軽減額を数字で示す。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 7,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -464,9 +464,9 @@
     "keyword": "iDeCo 金融機関 比較 SBI 楽天 マネックス",
     "type": "comparison",
     "category": "投資・資産運用",
-    "notes": "iDeCo口座の金融機関をSBI・楽天・マネックスで比較。手数料・銘柄数・使いやすさで田中蓮の推奨を示す。",
+    "notes": "iDeCo口座の金融機関をSBI・楽天・マネックスで比較。手数料・銘柄数・使いやすさで田中蓮の推奨を示す。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 8,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -474,9 +474,9 @@
     "keyword": "iDeCo いつから 始める 年齢",
     "type": "guide",
     "category": "投資・資産運用",
-    "notes": "iDeCoをいつから始めるべきかを年齢別に解説。20代・30代・40代それぞれの戦略と節税メリットを整理。",
+    "notes": "iDeCoをいつから始めるべきかを年齢別に解説。20代・30代・40代それぞれの戦略と節税メリットを整理。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 9,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -484,9 +484,9 @@
     "keyword": "iDeCo 受け取り 一時金 年金 どっち",
     "type": "guide",
     "category": "投資・資産運用",
-    "notes": "iDeCoの受け取り方（一時金・年金・組み合わせ）の税制上の違いを解説。退職所得控除・公的年金控除の活用法。",
+    "notes": "iDeCoの受け取り方（一時金・年金・組み合わせ）の税制上の違いを解説。退職所得控除・公的年金控除の活用法。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 10,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -494,9 +494,9 @@
     "keyword": "iDeCo NISA 夫婦 戦略 優先順位",
     "type": "guide",
     "category": "投資・資産運用",
-    "notes": "夫婦でiDeCoとNISAをどう組み合わせるか。共働き・専業主婦(夫)別の最適戦略を田中蓮視点で整理。",
+    "notes": "夫婦でiDeCoとNISAをどう組み合わせるか。共働き・専業主婦(夫)別の最適戦略を田中蓮視点で整理。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 11,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -604,9 +604,9 @@
     "keyword": "学資保険 vs NISA どっち 子供 教育費",
     "type": "comparison",
     "category": "保険",
-    "notes": "子供の教育費準備は学資保険とNISAどっちか。返戻率・流動性・税制で比較し田中蓮の推奨を明示。",
+    "notes": "子供の教育費準備は学資保険とNISAどっちか。返戻率・流動性・税制で比較し田中蓮の推奨を明示。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 10,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
@@ -774,9 +774,9 @@
     "keyword": "マネックス証券 評判 特徴 iDeCo",
     "type": "review",
     "category": "証券・投資",
-    "notes": "マネックス証券をiDeCo・米国株・NISA観点でレビュー。SBI・楽天との違いを整理し向いている人を明示。",
+    "notes": "マネックス証券をiDeCo・米国株・NISA観点でレビュー。SBI・楽天との違いを整理し向いている人を明示。 ※戦略転換(2026-05-17)によりFX/保険主軸。NISAは内部リンク先として参照用に降格。",
     "status": "pending",
-    "priority": 3,
+    "priority": 99,
     "channel": "seo_x_organic"
   },
   {
