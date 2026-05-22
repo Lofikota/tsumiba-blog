@@ -5,350 +5,588 @@ import { getCollection } from 'astro:content';
 const allPosts = (await getCollection('blog')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
-const featuredPosts = allPosts.slice(0, 6);
-const hokenPosts = allPosts.filter((post) => post.data.category.includes('保険')).slice(0, 3);
+
+const mustReadSlugs = [
+  'hoken-soudan-muryou-hikaku',
+  'hoken-minaoshi-30dai-kaisha-in',
+  'fx-kouza-hikaku',
+  'dmm-fx-review',
+  'nisa-hajimekata',
+  'fukugyo-zeikin',
+];
+
+const rankingSlugs = [
+  'hoken-soudan-muryou-hikaku',
+  'dmm-fx-review',
+  'fx-kouza-hikaku',
+  'hoken-minaoshi-fp-soudan',
+  'nisa-hajimekata',
+];
+
+const postBySlug = new Map(allPosts.map((post) => [post.id, post]));
+const mustReadPosts = mustReadSlugs.map((slug) => postBySlug.get(slug)).filter(Boolean);
+const rankingPosts = rankingSlugs.map((slug) => postBySlug.get(slug)).filter(Boolean);
+const latestPosts = allPosts.slice(0, 8);
 
 const categoryTone: Record<string, string> = {
-  '保険': 'tone-green',
-  '保険相談': 'tone-green',
-  'NISA・投資': 'tone-blue',
-  '投資・資産運用': 'tone-blue',
-  '副業・節税': 'tone-amber',
-  'FX・外貨': 'tone-red',
-  'お得情報': 'tone-yellow',
-  'クレジットカード': 'tone-yellow',
-  '家計・節約': 'tone-green',
+  '保険': 'cat-green',
+  '保険相談': 'cat-green',
+  'FX・外貨': 'cat-red',
+  'NISA・投資': 'cat-blue',
+  '投資・資産運用': 'cat-blue',
+  '副業・節税': 'cat-amber',
+  'お得情報': 'cat-yellow',
+  'クレジットカード': 'cat-yellow',
+  '家計・節約': 'cat-green',
 };
+
+const categories = [
+  { label: '保険相談', href: '/blog/category/hoken/', count: allPosts.filter((p) => p.data.category.includes('保険')).length },
+  { label: 'FX・外貨', href: '/blog/category/fx/', count: allPosts.filter((p) => p.data.category === 'FX・外貨').length },
+  { label: 'NISA・投資', href: '/blog/category/nisa/', count: allPosts.filter((p) => p.data.category.includes('投資') || p.data.category.includes('NISA')).length },
+  { label: '副業・節税', href: '/blog/category/fukugyo/', count: allPosts.filter((p) => p.data.category === '副業・節税').length },
+  { label: '家計・節約', href: '/blog/category/kakei/', count: allPosts.filter((p) => p.data.category === '家計・節約').length },
+];
+
+const primary = postBySlug.get('hoken-soudan-muryou-hikaku') ?? allPosts[0];
 ---
 
 <BaseLayout
   title="田中蓮のマネーブログ"
-  description="30代会社員の目線で、保険・家計・NISA・副業・FXを無理なく整理する個人ブログ。無料相談やサービス選びの前に、注意点と選び方をわかりやすく確認できます。"
-  image="/images/ren-consultation-hero.svg"
+  description="保険相談・FX・NISA・副業を、30代会社員の目線で比較する収益ブログ。申し込み前に条件・注意点・向き不向きを整理できます。"
+  image="/og/hoken-soudan-muryou-hikaku.svg"
   wide={true}
 >
-  <section class="home-hero">
-    <div class="home-hero-copy">
-      <p class="home-eyebrow">PRを含む個人マネーブログ</p>
-      <h1>保険・家計・投資の迷いを、<br />会社員目線でやさしく整理。</h1>
-      <p class="home-lead">
-        いきなり申し込みをすすめるのではなく、まずは「何を比べるべきか」「どこに注意するか」を整理します。
-        30代会社員の田中蓮が、保険相談・NISA・副業・FXを初心者向けにまとめています。
+  <section class="wp-hero">
+    <div>
+      <p class="wp-kicker">30代会社員向けの金融・保険アフィリエイトブログ</p>
+      <h1>保険相談・FX・NISAを<br />申し込む前に比較するブログ</h1>
+      <p class="wp-lead">
+        公式サイトを見る前に、条件・注意点・向いている人を整理。
+        収益導線は置きつつ、即決させない比較型の記事で信頼を取りにいきます。
       </p>
-      <div class="home-actions">
-        <a class="home-btn home-btn-primary" href="/blog/hoken-soudan-muryou-hikaku/">無料保険相談を比較する</a>
-        <a class="home-btn home-btn-secondary" href="/blog/">記事一覧を見る</a>
-      </div>
-      <p class="home-note">投資・保険・副業にはリスクや個人差があります。最終判断は公式情報を確認してください。</p>
-    </div>
-    <div class="home-hero-visual" aria-label="家計相談のイメージ画像">
-      <img src="/images/ren-consultation-hero.svg" alt="家計や保険を相談する会社員のイメージ" width="640" height="520" />
-      <div class="home-proof-card home-proof-card-a">
-        <strong>相談前に整理</strong>
-        <span>保険料・保障・家計</span>
-      </div>
-      <div class="home-proof-card home-proof-card-b">
-        <strong>PR明記</strong>
-        <span>広告と注意点を分けて掲載</span>
+      <div class="wp-hero-actions">
+        <a class="wp-btn primary" href="/blog/hoken-soudan-muryou-hikaku/">無料保険相談を比較する</a>
+        <a class="wp-btn ghost" href="/blog/fx-kouza-hikaku/">FX口座を比較する</a>
       </div>
     </div>
-  </section>
-
-  <section class="trust-strip" aria-label="ブログの特徴">
-    <div>
-      <strong>無料相談</strong>
-      <span>相談料0円の窓口を比較</span>
-    </div>
-    <div>
-      <strong>30代会社員</strong>
-      <span>生活目線で判断</span>
-    </div>
-    <div>
-      <strong>注意点も掲載</strong>
-      <span>即決をすすめない構成</span>
-    </div>
-    <div>
-      <strong>LINE導線</strong>
-      <span>迷った内容を後で整理</span>
-    </div>
-  </section>
-
-  <section class="home-section hoken-focus" id="hoken">
-    <div class="section-copy">
-      <p class="section-kicker">Insurance Guide</p>
-      <h2>保険相談は「どこが良いか」より、<br />先に比べ方を決める。</h2>
-      <p>
-        参考サイトのような安心感は残しつつ、個人ブログとして「中立に整理する」「強引に売らない」雰囲気に寄せました。
-        店舗・オンライン・FPとの相性など、申し込む前に見るべき観点から読めます。
-      </p>
-    </div>
-    <div class="hoken-grid">
-      {hokenPosts.map((post) => (
-        <a class="hoken-card" href={`/blog/${post.id}/`}>
-          <img src={post.data.heroImage ?? `/og/${post.id}.svg`} alt="" width="360" height="200" loading="lazy" />
-          <span>{post.data.category}</span>
-          <strong>{post.data.title}</strong>
-        </a>
-      ))}
-    </div>
-  </section>
-
-  <section class="home-section issue-section" id="themes">
-    <div class="section-headline">
-      <p class="section-kicker">What You Can Read</p>
-      <h2>今の悩みから選べる4テーマ</h2>
-    </div>
-    <div class="issue-grid">
-      <a class="issue-card" href="/blog/hoken-soudan-muryou-hikaku/">
-        <img src="/images/ren-insurance-consult.svg" alt="保険相談のイメージ" width="280" height="170" loading="lazy" />
-        <span>保険相談</span>
-        <strong>毎月の保険料や保障内容を見直したい</strong>
-      </a>
-      <a class="issue-card" href="/blog/nisa-hajimekata/">
-        <img src="/images/ren-investment-desk.svg" alt="資産形成のイメージ" width="280" height="170" loading="lazy" />
-        <span>資産形成</span>
-        <strong>NISA・iDeCoを何から始めるか知りたい</strong>
-      </a>
-      <a class="issue-card" href="/blog/fukugyo-zeikin/">
-        <img src="/images/ren-work-desk.svg" alt="副業と家計整理のイメージ" width="280" height="170" loading="lazy" />
-        <span>副業・節税</span>
-        <strong>会社員のまま収入の柱を増やしたい</strong>
-      </a>
-      <a class="issue-card" href="/blog/fx-kouza-hikaku/">
-        <img src="/og/fx-kouza-hikaku.svg" alt="FX比較のイメージ" width="280" height="170" loading="lazy" />
-        <span>FX・外貨</span>
-        <strong>リスクを理解した上で口座を比較したい</strong>
+    <div class="wp-hero-panel">
+      <p>まず読むべき記事</p>
+      <a href={`/blog/${primary.id}/`}>
+        <img src={primary.data.heroImage ?? `/og/${primary.id}.svg`} alt="" width="420" height="236" />
+        <strong>{primary.data.title}</strong>
+        <span>{primary.data.description}</span>
       </a>
     </div>
   </section>
 
-  <section class="home-section latest-section" id="articles">
-    <div class="section-headline with-link">
-      <div>
-        <p class="section-kicker">Latest Articles</p>
-        <h2>新着記事</h2>
-      </div>
-      <a href="/blog/">すべての記事を見る</a>
-    </div>
-    <div class="latest-grid">
-      {featuredPosts.map((post) => {
-        const tone = categoryTone[post.data.category] ?? 'tone-gray';
-        const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
-        return (
-          <article class="latest-card">
-            <a href={`/blog/${post.id}/`}>
-              <img src={post.data.heroImage ?? `/thumbnails/${post.id}.svg`} alt="" width="320" height="190" loading="lazy" />
-              <div class="latest-body">
-                <span class={`category-pill ${tone}`}>{post.data.category}</span>
-                <h3>{post.data.title}</h3>
-                <p>{post.data.description}</p>
-                <time datetime={post.data.pubDate.toISOString()}>{dateStr}</time>
-              </div>
-            </a>
-          </article>
-        );
-      })}
-    </div>
-  </section>
+  <div class="wp-layout">
+    <main class="wp-main">
+      <section class="wp-section">
+        <div class="wp-section-head">
+          <p>START HERE</p>
+          <h2>まず読むべき記事</h2>
+        </div>
+        <div class="featured-grid">
+          {mustReadPosts.map((post) => {
+            const tone = categoryTone[post.data.category] ?? 'cat-gray';
+            return (
+              <article class="featured-card">
+                <a href={`/blog/${post.id}/`}>
+                  <img src={post.data.heroImage ?? `/thumbnails/${post.id}.svg`} alt="" width="360" height="210" loading="lazy" />
+                  <div class="featured-body">
+                    <span class={`cat ${tone}`}>{post.data.category}</span>
+                    <h3>{post.data.title}</h3>
+                    <p>{post.data.description}</p>
+                  </div>
+                </a>
+              </article>
+            );
+          })}
+        </div>
+      </section>
 
-  <section class="home-final">
-    <div>
-      <p class="section-kicker">Before You Decide</p>
-      <h2>申し込む前に、条件と注意点を一緒に確認する。</h2>
-      <p>無料相談・口座開設・カード申込は、先に比較軸を決めるだけで失敗しにくくなります。</p>
-    </div>
-    <a class="home-btn home-btn-primary" href="/blog/">比較記事から読む</a>
-  </section>
+      <section class="wp-section">
+        <div class="wp-section-head">
+          <p>RANKING</p>
+          <h2>収益導線に近い人気記事</h2>
+        </div>
+        <div class="ranking-list">
+          {rankingPosts.map((post, index) => (
+            <article class="ranking-item">
+              <a href={`/blog/${post.id}/`}>
+                <span class="rank-num">{index + 1}</span>
+                <img src={post.data.heroImage ?? `/thumbnails/${post.id}.svg`} alt="" width="132" height="82" loading="lazy" />
+                <div>
+                  <span class={`cat ${categoryTone[post.data.category] ?? 'cat-gray'}`}>{post.data.category}</span>
+                  <h3>{post.data.title}</h3>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="wp-section cta-box">
+        <div>
+          <p class="wp-kicker">LINE FUNNEL</p>
+          <h2>記事で迷った人をLINEへ回収する</h2>
+          <p>保険・FX・NISAのどれから見るべきか、登録後にテーマ別で整理できます。売り込みより先に、比較軸を渡す導線です。</p>
+        </div>
+        <a class="wp-btn line" href="/line/x-profile-main/">LINEで受け取る</a>
+      </section>
+
+      <section class="wp-section">
+        <div class="wp-section-head">
+          <p>NEW POSTS</p>
+          <h2>新着記事</h2>
+        </div>
+        <div class="post-list">
+          {latestPosts.map((post) => {
+            const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            return (
+              <article class="post-row">
+                <a href={`/blog/${post.id}/`}>
+                  <img src={post.data.heroImage ?? `/thumbnails/${post.id}.svg`} alt="" width="176" height="104" loading="lazy" />
+                  <div>
+                    <span class={`cat ${categoryTone[post.data.category] ?? 'cat-gray'}`}>{post.data.category}</span>
+                    <h3>{post.data.title}</h3>
+                    <p>{post.data.description}</p>
+                    <time datetime={post.data.pubDate.toISOString()}>{dateStr}</time>
+                  </div>
+                </a>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    </main>
+
+    <aside class="wp-sidebar">
+      <section class="side-card profile">
+        <div class="avatar">蓮</div>
+        <h2>田中 蓮</h2>
+        <p>30代IT会社員。保険・FX・NISA・副業を、会社員目線で比較。広告導線はPRとして明記し、注意点もセットで整理します。</p>
+        <a href="/about/">プロフィールを見る</a>
+      </section>
+
+      <section class="side-card">
+        <h2>カテゴリー</h2>
+        <ul class="category-list">
+          {categories.map((category) => (
+            <li>
+              <a href={category.href}>
+                <span>{category.label}</span>
+                <em>{category.count}</em>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="side-card side-ranking">
+        <h2>よく読まれる記事</h2>
+        {rankingPosts.slice(0, 4).map((post, index) => (
+          <a href={`/blog/${post.id}/`}>
+            <span>{index + 1}</span>
+            <strong>{post.data.title}</strong>
+          </a>
+        ))}
+      </section>
+
+      <section class="side-card side-cta">
+        <p>無料</p>
+        <h2>保険・FX・NISAの比較軸をLINEで整理</h2>
+        <a href="/line/x-profile-main/">LINEで受け取る</a>
+      </section>
+    </aside>
+  </div>
 </BaseLayout>
 
 <style>
-  .home-hero {
+  :global(body) {
+    background: #f5f6f7;
+  }
+  .wp-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
-    gap: 44px;
+    grid-template-columns: minmax(0, 1fr) 420px;
+    gap: 32px;
     align-items: center;
-    min-height: 560px;
-    padding: 44px 0 28px;
+    margin: 12px 0 28px;
+    padding: 34px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
   }
-  .home-eyebrow,
-  .section-kicker {
-    margin: 0 0 12px;
-    color: #18714f;
-    font-size: 0.78rem;
+  .wp-kicker,
+  .wp-section-head p {
+    margin: 0 0 10px;
+    color: #d97706;
+    font-size: .78rem;
     font-weight: 900;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    letter-spacing: .08em;
   }
-  .home-hero h1 {
+  .wp-hero h1 {
     margin: 0;
-    color: #17352a;
-    font-size: clamp(2.15rem, 4.5vw, 4.25rem);
-    line-height: 1.18;
+    color: #111827;
+    font-size: clamp(2.05rem, 4vw, 3.45rem);
+    line-height: 1.22;
     letter-spacing: 0;
   }
-  .home-lead {
-    max-width: 640px;
-    margin: 22px 0 0;
-    color: #41564e;
-    font-size: 1.02rem;
+  .wp-lead {
+    max-width: 720px;
+    margin: 18px 0 0;
+    color: #4b5563;
+    font-size: 1rem;
     line-height: 2;
   }
-  .home-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-  .home-btn {
+  .wp-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .wp-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 48px;
+    min-height: 46px;
     padding: 0 22px;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 900;
     text-decoration: none;
-    transition: transform .15s, box-shadow .15s, background .15s;
   }
-  .home-btn:hover { transform: translateY(-1px); text-decoration: none; }
-  .home-btn-primary { background: #0f8a5f; color: #fff; box-shadow: 0 10px 24px rgba(15, 138, 95, .22); }
-  .home-btn-secondary { background: #fff; color: #174638; border: 1px solid #b9d9cd; }
-  .home-note { margin: 14px 0 0; color: #73827d; font-size: 0.78rem; line-height: 1.7; }
-  .home-hero-visual { position: relative; }
-  .home-hero-visual img {
-    width: 100%;
-    height: auto;
-    border-radius: 18px;
-    border: 1px solid #d7e7df;
-    box-shadow: 0 26px 70px rgba(42, 71, 59, .14);
-    background: #fff;
-  }
-  .home-proof-card {
-    position: absolute;
-    display: grid;
-    gap: 2px;
-    min-width: 170px;
-    padding: 13px 16px;
+  .wp-btn:hover { text-decoration: none; }
+  .wp-btn.primary { background: #ef8f00; color: #fff; box-shadow: 0 8px 18px rgba(239,143,0,.22); }
+  .wp-btn.ghost { background: #fff; color: #111827; border: 1px solid #d1d5db; }
+  .wp-btn.line { background: #06c755; color: #fff; }
+  .wp-hero-panel {
+    border: 1px solid #e5e7eb;
     border-radius: 8px;
-    background: rgba(255,255,255,.94);
-    border: 1px solid #d7e7df;
-    box-shadow: 0 14px 35px rgba(30, 70, 52, .16);
+    background: #fafafa;
+    padding: 14px;
   }
-  .home-proof-card strong { color: #123f31; font-size: 0.95rem; }
-  .home-proof-card span { color: #62746d; font-size: 0.76rem; }
-  .home-proof-card-a { left: -18px; bottom: 60px; }
-  .home-proof-card-b { right: -14px; top: 58px; }
-
-  .trust-strip {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    overflow: hidden;
-    border: 1px solid #d7e7df;
-    border-radius: 12px;
-    background: #d7e7df;
-    margin: 10px 0 56px;
+  .wp-hero-panel > p {
+    margin: 0 0 10px;
+    font-size: .82rem;
+    font-weight: 900;
+    color: #111827;
   }
-  .trust-strip div { background: #fff; padding: 20px 18px; }
-  .trust-strip strong { display: block; color: #123f31; font-size: 1.12rem; }
-  .trust-strip span { display: block; color: #66756f; font-size: 0.82rem; margin-top: 4px; }
-
-  .home-section { padding: 58px 0; }
-  .section-copy { max-width: 720px; margin-bottom: 26px; }
-  .section-copy h2,
-  .section-headline h2,
-  .home-final h2 {
-    margin: 0;
-    color: #17352a;
-    font-size: clamp(1.65rem, 3vw, 2.45rem);
-    line-height: 1.35;
-  }
-  .section-copy p:not(.section-kicker),
-  .home-final p:not(.section-kicker) { color: #53675f; line-height: 1.9; }
-  .hoken-focus {
-    margin-inline: calc(50% - 50vw);
-    padding-inline: max(28px, calc(50vw - 590px));
-    background: linear-gradient(180deg, #f2fbf5 0%, #ffffff 100%);
-    border-top: 1px solid #dceee4;
-    border-bottom: 1px solid #dceee4;
-  }
-  .hoken-grid,
-  .latest-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-  .hoken-card,
-  .latest-card a,
-  .issue-card {
+  .wp-hero-panel a {
     display: block;
-    height: 100%;
-    background: #fff;
-    border: 1px solid #dce8e2;
-    border-radius: 10px;
-    overflow: hidden;
     color: inherit;
     text-decoration: none;
-    box-shadow: 0 10px 30px rgba(42, 71, 59, .06);
-    transition: transform .15s, box-shadow .15s;
   }
-  .hoken-card:hover,
-  .latest-card a:hover,
-  .issue-card:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(42, 71, 59, .11); text-decoration: none; }
-  .hoken-card img,
-  .latest-card img,
-  .issue-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #edf7f1; }
-  .hoken-card span,
-  .issue-card span { display: inline-flex; margin: 15px 16px 8px; color: #0f8a5f; font-size: .78rem; font-weight: 900; }
-  .hoken-card strong,
-  .issue-card strong { display: block; padding: 0 16px 18px; color: #17352a; line-height: 1.55; }
-
-  .section-headline { text-align: center; margin-bottom: 28px; }
-  .section-headline.with-link { display: flex; align-items: end; justify-content: space-between; text-align: left; gap: 16px; }
-  .section-headline.with-link a { color: #0f8a5f; font-weight: 900; }
-  .issue-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .latest-card { list-style: none; }
-  .latest-body { padding: 16px; }
-  .category-pill { display: inline-flex; border-radius: 999px; padding: 3px 10px; font-size: .72rem; font-weight: 900; }
-  .tone-green { background: #dff5e9; color: #0e6a49; }
-  .tone-blue { background: #e0efff; color: #1d5e95; }
-  .tone-amber { background: #fff0c2; color: #8a5b00; }
-  .tone-yellow { background: #fff7d8; color: #856000; }
-  .tone-red { background: #ffe3de; color: #9c3425; }
-  .tone-gray { background: #edf1ef; color: #54615c; }
-  .latest-body h3 { margin: 10px 0 8px; color: #17352a; font-size: 1rem; line-height: 1.55; }
-  .latest-body p {
+  .wp-hero-panel img,
+  .featured-card img,
+  .post-row img,
+  .ranking-item img {
+    width: 100%;
+    object-fit: cover;
+    background: #eef2f7;
+  }
+  .wp-hero-panel img {
+    aspect-ratio: 16/9;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+  }
+  .wp-hero-panel strong {
+    display: block;
+    margin-top: 12px;
+    color: #111827;
+    line-height: 1.55;
+  }
+  .wp-hero-panel span {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    min-height: 3.4em;
-    margin: 0 0 12px;
-    color: #64736d;
+    margin-top: 6px;
+    color: #6b7280;
     font-size: .86rem;
     line-height: 1.7;
   }
-  .latest-body time { color: #8b9994; font-size: .76rem; }
-  .home-final {
-    margin: 58px 0 20px;
+  .wp-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 28px;
+    align-items: start;
+  }
+  .wp-section,
+  .side-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+  .wp-section {
+    margin-bottom: 24px;
+    padding: 24px;
+  }
+  .wp-section-head {
+    margin-bottom: 18px;
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 12px;
+  }
+  .wp-section-head h2,
+  .cta-box h2,
+  .side-card h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 1.35rem;
+    line-height: 1.45;
+  }
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .featured-card,
+  .ranking-item,
+  .post-row {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .featured-card a,
+  .ranking-item a,
+  .post-row a {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+  .featured-card img {
+    aspect-ratio: 16/9;
+  }
+  .featured-body {
+    padding: 14px;
+  }
+  .cat {
+    display: inline-flex;
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: .72rem;
+    font-weight: 900;
+  }
+  .cat-green { background: #dcfce7; color: #166534; }
+  .cat-red { background: #fee2e2; color: #991b1b; }
+  .cat-blue { background: #dbeafe; color: #1d4ed8; }
+  .cat-amber { background: #fef3c7; color: #92400e; }
+  .cat-yellow { background: #fef9c3; color: #854d0e; }
+  .cat-gray { background: #f3f4f6; color: #374151; }
+  .featured-card h3,
+  .ranking-item h3,
+  .post-row h3 {
+    margin: 9px 0 7px;
+    color: #111827;
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+  .featured-card p,
+  .post-row p,
+  .cta-box p {
+    color: #6b7280;
+    font-size: .88rem;
+    line-height: 1.75;
+  }
+  .featured-card p,
+  .post-row p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
+  }
+  .ranking-list {
+    display: grid;
+    gap: 12px;
+  }
+  .ranking-item a {
+    display: grid;
+    grid-template-columns: 42px 132px minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    padding: 12px;
+  }
+  .rank-num {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #ef8f00;
+    color: #fff;
+    font-weight: 900;
+  }
+  .ranking-item img {
+    width: 132px;
+    height: 82px;
+    border-radius: 6px;
+  }
+  .cta-box {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 22px;
-    padding: 32px;
-    border-radius: 12px;
-    background: #17352a;
+    gap: 20px;
+    background: #fff8e8;
+    border-color: #f7d48b;
+  }
+  .post-list {
+    display: grid;
+    gap: 14px;
+  }
+  .post-row a {
+    display: grid;
+    grid-template-columns: 176px minmax(0, 1fr);
+    gap: 16px;
+    padding: 12px;
+  }
+  .post-row img {
+    width: 176px;
+    height: 104px;
+    border-radius: 6px;
+  }
+  .post-row time {
+    display: inline-block;
+    margin-top: 8px;
+    color: #9ca3af;
+    font-size: .76rem;
+  }
+  .wp-sidebar {
+    position: sticky;
+    top: 82px;
+    display: grid;
+    gap: 18px;
+  }
+  .side-card {
+    padding: 20px;
+  }
+  .profile {
+    text-align: center;
+  }
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: #111827;
     color: #fff;
+    font-weight: 900;
+    font-size: 1.4rem;
   }
-  .home-final .section-kicker { color: #f7cf62; }
-  .home-final h2 { color: #fff; }
-  .home-final p:not(.section-kicker) { color: #d9e9e2; margin-bottom: 0; }
-
-  @media (max-width: 900px) {
-    .home-hero { grid-template-columns: 1fr; min-height: auto; }
-    .home-hero-visual { max-width: 620px; }
-    .trust-strip { grid-template-columns: repeat(2, 1fr); }
-    .hoken-grid, .latest-grid { grid-template-columns: repeat(2, 1fr); }
-    .issue-grid { grid-template-columns: repeat(2, 1fr); }
+  .profile p {
+    color: #6b7280;
+    font-size: .88rem;
+    line-height: 1.8;
+    text-align: left;
   }
-  @media (max-width: 620px) {
-    .home-hero { padding-top: 24px; gap: 28px; }
-    .home-actions, .home-btn { width: 100%; }
-    .home-proof-card { position: static; margin-top: 10px; }
-    .trust-strip, .hoken-grid, .latest-grid, .issue-grid { grid-template-columns: 1fr; }
-    .section-headline.with-link, .home-final { display: block; }
-    .section-headline.with-link a { display: inline-block; margin-top: 10px; }
-    .home-final .home-btn { margin-top: 20px; }
+  .profile a,
+  .side-cta a {
+    display: block;
+    margin-top: 14px;
+    padding: 11px 14px;
+    border-radius: 6px;
+    background: #111827;
+    color: #fff;
+    font-weight: 900;
+    text-decoration: none;
+  }
+  .category-list {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+  }
+  .category-list li + li {
+    border-top: 1px solid #f3f4f6;
+  }
+  .category-list a {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    color: #111827;
+    text-decoration: none;
+    font-weight: 800;
+  }
+  .category-list em {
+    color: #9ca3af;
+    font-style: normal;
+  }
+  .side-ranking {
+    display: grid;
+    gap: 12px;
+  }
+  .side-ranking a {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 10px;
+    color: #111827;
+    text-decoration: none;
+  }
+  .side-ranking span {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ef8f00;
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 900;
+  }
+  .side-ranking strong {
+    font-size: .88rem;
+    line-height: 1.55;
+  }
+  .side-cta {
+    background: #ecfdf5;
+    border-color: #bbf7d0;
+  }
+  .side-cta p {
+    display: inline-flex;
+    margin: 0 0 8px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: #06c755;
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 900;
+  }
+  .side-cta a {
+    background: #06c755;
+  }
+  @media (max-width: 980px) {
+    .wp-hero,
+    .wp-layout {
+      grid-template-columns: 1fr;
+    }
+    .wp-sidebar {
+      position: static;
+    }
+  }
+  @media (max-width: 640px) {
+    .wp-hero,
+    .wp-section {
+      padding: 18px;
+    }
+    .featured-grid,
+    .post-row a,
+    .ranking-item a {
+      grid-template-columns: 1fr;
+    }
+    .ranking-item img,
+    .post-row img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16/9;
+    }
+    .cta-box {
+      display: block;
+    }
+    .cta-box .wp-btn {
+      width: 100%;
+      margin-top: 12px;
+    }
   }
 </style>
