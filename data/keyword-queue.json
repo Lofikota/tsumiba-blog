@@ -174,9 +174,10 @@
     "type": "guide",
     "category": "保険相談",
     "notes": "40代家族向け保険見直し。子育て・住宅ローンとの掛け合わせ。保険見直しラボ・保険ガーデンへ誘導。",
-    "status": "pending",
+    "status": "published",
     "priority": 2,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-05-22T04:55:34.828Z"
   },
   {
     "slug": "fx-tokudan-jouken",
