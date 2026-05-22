@@ -106,14 +106,14 @@ const tocHeadings = headings.filter(h => h.depth === 2);
       <span style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.8rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:4px;">{category}</span>
     </div>
 
-    <h1 style="font-size:1.6rem;font-weight:700;line-height:1.4;margin-bottom:0.75rem;">{title}</h1>
+    <h1 style="font-size:clamp(1.75rem, 4vw, 2.45rem);font-weight:900;line-height:1.35;margin-bottom:0.75rem;color:#17352a;">{title}</h1>
 
     <div style="font-size:0.8rem;color:var(--color-text-muted);margin-bottom:1.25rem;">
       <time datetime={pubDate.toISOString()}>公開：{dateStr}</time>
       {updatedDate && <span style="margin-left:0.75rem;"><time datetime={updatedDate.toISOString()}>更新：{updatedStr}</time></span>}
     </div>
 
-    {heroImage && <img src={heroImage} alt={title} decoding="async" fetchpriority="high" style="width:100%;border-radius:var(--radius);margin-bottom:1.5rem;" />}
+    <img src={heroImage ?? ogImage} alt={title} decoding="async" fetchpriority="high" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;margin-bottom:1.5rem;border:1px solid #d7e7df;background:#f2fbf5;box-shadow:0 14px 38px rgba(42,71,59,.08);" />
 
     {tocHeadings.length > 2 && (
       <nav class="toc" aria-label="目次">
@@ -208,14 +208,14 @@ const tocHeadings = headings.filter(h => h.depth === 2);
   .toc {
     margin: 1.5rem 0;
     padding: 1.1rem 1.25rem 1.25rem;
-    background: #EFF6FF;
-    border: 1px solid #BFDBFE;
+    background: #f2fbf5;
+    border: 1px solid #d7e7df;
     border-radius: 10px;
   }
   .toc-title {
     font-size: 0.82rem;
     font-weight: 800;
-    color: #1d4ed8;
+    color: #0f8a5f;
     letter-spacing: 0.06em;
     margin: 0 0 0.85rem;
     display: flex;
@@ -227,7 +227,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     display: inline-block;
     width: 14px;
     height: 14px;
-    background: #2563eb;
+    background: #0f8a5f;
     border-radius: 3px;
     flex-shrink: 0;
   }
@@ -245,7 +245,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     align-items: baseline;
     gap: 0.6rem;
     font-size: 0.88rem;
-    color: #1e40af;
+    color: #174638;
     text-decoration: none;
     line-height: 1.55;
     padding: 0.3rem 0.5rem;
@@ -260,7 +260,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     flex-shrink: 0;
     width: 1.4rem;
     height: 1.4rem;
-    background: #2563eb;
+    background: #0f8a5f;
     color: #fff;
     border-radius: 50%;
     font-size: 0.7rem;
@@ -351,7 +351,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     height: 60px;
     border-radius: 50%;
     overflow: hidden;
-    border: 2px solid #dbeafe;
+    border: 2px solid #dff5e9;
   }
   .author-box-avatar svg { display: block; }
   .author-box-label {
@@ -377,9 +377,9 @@ const tocHeadings = headings.filter(h => h.depth === 2);
   .line-cta {
     margin-top: 2rem;
     padding: 1.2rem 1.25rem;
-    border: 1px solid #cfe2ff;
+    border: 1px solid #d7e7df;
     border-radius: var(--radius);
-    background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+    background: linear-gradient(180deg, #f2fbf5 0%, #ffffff 100%);
   }
   .line-cta h2 {
     font-size: 1.1rem;

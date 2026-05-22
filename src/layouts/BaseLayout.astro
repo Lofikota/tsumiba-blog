@@ -40,7 +40,7 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
   <meta name="description" content={description} />
   <meta name="robots" content={robots} />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta name="theme-color" content="#2563eb" />
+  <meta name="theme-color" content="#0f8a5f" />
   <link rel="canonical" href={canonicalUrl} />
   <link rel="alternate" type="application/rss+xml" title={`${siteName} RSS`} href={new URL('/rss.xml', siteUrl)} />
 
@@ -103,11 +103,12 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
 <style is:global>
   /* ─── Design Tokens（記事ページ共通） ─── */
   :root {
-    --ink:    #0A0A0A; --paper:  #F6F3EC;
-    --navy:   #0B1942; --amber:  #B8780E;
-    --amber-warm: #E8940F; --amber-pale: #FEF3D0;
-    --gray:   #6B6560; --border: #D9D4CA;
-    --cream:  #FBF8F2; --white:  #FFFFFF;
+    --ink:    #17352A; --paper:  #F4FBF6;
+    --navy:   #17352A; --amber:  #D8A822;
+    --amber-warm: #F0C85A; --amber-pale: #FFF4C7;
+    --green: #0F8A5F; --green-soft: #DFF5E9;
+    --gray:   #65756F; --border: #D7E7DF;
+    --cream:  #FBF8EF; --white:  #FFFFFF;
     --serif: "Noto Serif JP", "Hiragino Mincho ProN", serif;
     --sans:  "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
   }
@@ -116,7 +117,7 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
   /* ─── Announcement bar ─── */
   .bl-announce {
     background: var(--amber-pale);
-    border-bottom: 1px solid #E8D4A0;
+    border-top: 1px solid #E8D4A0;
     padding: 8px 20px;
     font-size: 11.5px; color: #6B4A0A;
     text-align: center; font-weight: 500;
@@ -125,9 +126,10 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
 
   /* ─── Header ─── */
   .bl-header {
-    background: var(--white);
-    border-bottom: 3px solid var(--ink);
+    background: rgba(255,255,255,.96);
+    border-bottom: 1px solid var(--border);
     position: sticky; top: 0; z-index: 60;
+    backdrop-filter: blur(10px);
   }
   .bl-header-inner {
     max-width: 1080px; margin: 0 auto; padding: 0 28px;
@@ -136,7 +138,6 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
   }
   .bl-brand {
     display: inline-flex; align-items: center; gap: 9px;
-    border-right: 1px solid var(--border);
     padding-right: 20px; margin-right: 6px;
     text-decoration: none;
   }
@@ -151,13 +152,13 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
     color: var(--ink); opacity: .75;
     text-decoration: none; transition: opacity .15s;
   }
-  .bl-nav a:hover { opacity: 1; }
+  .bl-nav a:hover { opacity: 1; color: var(--green); text-decoration: none; }
   .bl-header-right {
     display: flex; flex-direction: column;
     align-items: flex-end; line-height: 1.25;
   }
   .bl-header-pr { font-size: 10px; color: var(--gray); letter-spacing: .05em; }
-  .bl-header-about { font-size: 11px; color: var(--amber); font-weight: 600; }
+  .bl-header-about { font-size: 11px; color: var(--green); font-weight: 600; }
 
   /* ─── Main content ─── */
   .bl-main { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
@@ -165,7 +166,7 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
 
   /* ─── Footer ─── */
   .bl-footer {
-    background: #0F1A3A; color: #C7D2FE;
+    background: #17352A; color: #D9E9E2;
     padding: 36px 28px 20px; text-align: center; font-size: 12px;
   }
   .bl-footer-brand {
@@ -177,7 +178,7 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
     display: flex; gap: 18px; justify-content: center;
     margin: 10px 0; flex-wrap: wrap;
   }
-  .bl-footer-nav a { color: #C7D2FE; font-size: 12px; text-decoration: none; }
+  .bl-footer-nav a { color: #D9E9E2; font-size: 12px; text-decoration: none; }
   .bl-footer-nav a:hover { color: #fff; }
   .bl-footer-copy { color: #9CA3AF; font-size: 11px; margin-top: 8px; }
 
@@ -195,19 +196,19 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
       <a class="bl-brand" href="/">
         <!-- Bar-chart + trend logo -->
         <svg width="26" height="26" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-          <rect x="4"  y="22" width="6" height="14" rx="1" fill="#0B1942"/>
-          <rect x="13" y="16" width="6" height="20" rx="1" fill="#0B1942"/>
-          <rect x="22" y="10" width="6" height="26" rx="1" fill="#0B1942"/>
-          <path d="M6 22 L16 14 L24 18 L36 6" stroke="#B8780E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M30 6 L36 6 L36 12" stroke="#B8780E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="4"  y="22" width="6" height="14" rx="1" fill="#17352A"/>
+          <rect x="13" y="16" width="6" height="20" rx="1" fill="#17352A"/>
+          <rect x="22" y="10" width="6" height="26" rx="1" fill="#17352A"/>
+          <path d="M6 22 L16 14 L24 18 L36 6" stroke="#0F8A5F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M30 6 L36 6 L36 12" stroke="#0F8A5F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span class="bl-brand-text">田中蓮のマネーブログ</span>
       </a>
       <nav class="bl-nav">
         <a href="/#articles">記事一覧</a>
+        <a href="/#hoken">保険相談</a>
         <a href="/#themes">テーマ</a>
-        <a href="/#reasons">このブログについて</a>
-        <a href="/#faq">よくある質問</a>
+        <a href="/line/x-profile-main/">LINE</a>
       </nav>
     </div>
   </header>

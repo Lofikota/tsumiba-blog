@@ -1,1339 +1,354 @@
 ---
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-const siteUrl = 'https://ren-money.com';
 
-const websiteJsonLd = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "田中蓮のマネーブログ",
-  "url": siteUrl,
-  "description": "借金200万→副業月20万→資産500万。お金の知識で人生を立て直した体験談ベースのメディア。NISA・副業・節税・FXを初心者向けに解説。",
-  "publisher": {
-    "@type": "Person",
-    "name": "田中蓮",
-    "url": `${siteUrl}/about/`
-  },
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": { "@type": "EntryPoint", "urlTemplate": `${siteUrl}/blog/?q={search_term_string}` },
-    "query-input": "required name=search_term_string"
-  }
-});
-
-const personJsonLd = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "田中蓮",
-  "url": `${siteUrl}/about/`,
-  "description": "32歳IT会社員。借金200万円から副業・投資で資産500万円を達成。35歳FIREを目指して発信中。",
-  "knowsAbout": ["FX", "NISA", "副業", "節税", "投資", "保険"],
-  "mainEntityOfPage": `${siteUrl}/about/`
-});
 const allPosts = (await getCollection('blog')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
-type CatStyle = { cls: string; bg: string };
-const catStyle: Record<string, CatStyle> = {
-  'NISA・投資': { cls: 'cat-invest',  bg: 'linear-gradient(135deg,#DBEAFE,#93C5FD)' },
-  '副業・節税': { cls: 'cat-income',  bg: 'linear-gradient(135deg,#D4EDDA,#86EFAC)' },
-  'お得情報':   { cls: 'cat-savings', bg: 'linear-gradient(135deg,#FEF3C7,#FDE68A)' },
-  'FX・外貨':   { cls: 'cat-debt',    bg: 'linear-gradient(135deg,#FFE4E6,#FCA5A5)' },
+const featuredPosts = allPosts.slice(0, 6);
+const hokenPosts = allPosts.filter((post) => post.data.category.includes('保険')).slice(0, 3);
+
+const categoryTone: Record<string, string> = {
+  '保険': 'tone-green',
+  '保険相談': 'tone-green',
+  'NISA・投資': 'tone-blue',
+  '投資・資産運用': 'tone-blue',
+  '副業・節税': 'tone-amber',
+  'FX・外貨': 'tone-red',
+  'お得情報': 'tone-yellow',
+  'クレジットカード': 'tone-yellow',
+  '家計・節約': 'tone-green',
 };
 ---
-<!doctype html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>田中蓮のマネーブログ | 副業・NISA・節税でFIREを目指す32歳のリアル体験談。</title>
-  <meta name="description" content="借金200万→副業月20万→資産500万。お金の知識で人生を立て直した体験談ベースのメディア。NISA・副業・節税を初心者向けにわかりやすく解説。"/>
-  <meta name="robots" content="index,follow"/>
-  <link rel="canonical" href={`${siteUrl}/`}/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@700;900&display=swap" rel="stylesheet"/>
 
-  <style is:global>
-  /* ═══════════════════════════════════════
-     DESIGN TOKENS — 田中蓮のマネーブログ (Blue)
-  ═══════════════════════════════════════ */
-  :root {
-    --c-blue:     #2563EB;
-    --c-blue-d:   #1D4ED8;
-    --c-blue-dd:  #1E3A8A;
-    --c-blue-50:  #EFF6FF;
-    --c-blue-100: #DBEAFE;
-    --c-ink:      #1F2937;
-    --c-gray:     #6B7280;
-    --c-gray-l:   #F3F4F6;
-    --c-yellow:   #FBBF24;
-    --c-green:    #16A34A;
-    --c-red:      #DC2626;
-    --c-white:    #FFFFFF;
-    --c-border:   #E5E7EB;
-    --sh-card:    0 2px 8px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.04);
-    --r-md:       10px;
-    --r-pill:     999px;
-    --sans: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
-    --serif: "Noto Serif JP", "Hiragino Mincho ProN", serif;
-  }
+<BaseLayout
+  title="田中蓮のマネーブログ"
+  description="30代会社員の目線で、保険・家計・NISA・副業・FXを無理なく整理する個人ブログ。無料相談やサービス選びの前に、注意点と選び方をわかりやすく確認できます。"
+  image="/images/ren-consultation-hero.svg"
+  wide={true}
+>
+  <section class="home-hero">
+    <div class="home-hero-copy">
+      <p class="home-eyebrow">PRを含む個人マネーブログ</p>
+      <h1>保険・家計・投資の迷いを、<br />会社員目線でやさしく整理。</h1>
+      <p class="home-lead">
+        いきなり申し込みをすすめるのではなく、まずは「何を比べるべきか」「どこに注意するか」を整理します。
+        30代会社員の田中蓮が、保険相談・NISA・副業・FXを初心者向けにまとめています。
+      </p>
+      <div class="home-actions">
+        <a class="home-btn home-btn-primary" href="/blog/hoken-soudan-muryou-hikaku/">無料保険相談を比較する</a>
+        <a class="home-btn home-btn-secondary" href="/blog/">記事一覧を見る</a>
+      </div>
+      <p class="home-note">投資・保険・副業にはリスクや個人差があります。最終判断は公式情報を確認してください。</p>
+    </div>
+    <div class="home-hero-visual" aria-label="家計相談のイメージ画像">
+      <img src="/images/ren-consultation-hero.svg" alt="家計や保険を相談する会社員のイメージ" width="640" height="520" />
+      <div class="home-proof-card home-proof-card-a">
+        <strong>相談前に整理</strong>
+        <span>保険料・保障・家計</span>
+      </div>
+      <div class="home-proof-card home-proof-card-b">
+        <strong>PR明記</strong>
+        <span>広告と注意点を分けて掲載</span>
+      </div>
+    </div>
+  </section>
 
-  /* ── Reset ── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: var(--sans);
-    color: var(--c-ink);
-    background: var(--c-white);
-    font-size: 15px;
-    line-height: 1.75;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
-  img { max-width: 100%; display: block; }
-  a   { color: inherit; text-decoration: none; }
-  button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  <section class="trust-strip" aria-label="ブログの特徴">
+    <div>
+      <strong>無料相談</strong>
+      <span>相談料0円の窓口を比較</span>
+    </div>
+    <div>
+      <strong>30代会社員</strong>
+      <span>生活目線で判断</span>
+    </div>
+    <div>
+      <strong>注意点も掲載</strong>
+      <span>即決をすすめない構成</span>
+    </div>
+    <div>
+      <strong>LINE導線</strong>
+      <span>迷った内容を後で整理</span>
+    </div>
+  </section>
 
-  /* ── Layout ── */
-  .container        { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
-  .container--narrow{ max-width: 780px;  margin: 0 auto; padding: 0 28px; }
-  .section          { padding: 64px 0; }
-  .section--tint    { background: var(--c-blue-50); }
-  .section--white   { background: var(--c-white); }
+  <section class="home-section hoken-focus" id="hoken">
+    <div class="section-copy">
+      <p class="section-kicker">Insurance Guide</p>
+      <h2>保険相談は「どこが良いか」より、<br />先に比べ方を決める。</h2>
+      <p>
+        参考サイトのような安心感は残しつつ、個人ブログとして「中立に整理する」「強引に売らない」雰囲気に寄せました。
+        店舗・オンライン・FPとの相性など、申し込む前に見るべき観点から読めます。
+      </p>
+    </div>
+    <div class="hoken-grid">
+      {hokenPosts.map((post) => (
+        <a class="hoken-card" href={`/blog/${post.id}/`}>
+          <img src={post.data.heroImage ?? `/og/${post.id}.svg`} alt="" width="360" height="200" loading="lazy" />
+          <span>{post.data.category}</span>
+          <strong>{post.data.title}</strong>
+        </a>
+      ))}
+    </div>
+  </section>
 
-  /* ── Section heading ── */
-  .section-label {
-    display: inline-block;
-    font-size: 11px; font-weight: 700; letter-spacing: .16em;
-    text-transform: uppercase; color: var(--c-blue);
-    margin-bottom: 8px;
-  }
-  .section-title {
-    font-size: clamp(20px, 3vw, 28px);
-    font-weight: 900; line-height: 1.4;
-    color: var(--c-ink);
-    margin-bottom: 10px;
-  }
-  .section-sub { font-size: 13.5px; color: var(--c-gray); line-height: 1.8; }
-  .section-head { text-align: center; margin-bottom: 40px; }
+  <section class="home-section issue-section" id="themes">
+    <div class="section-headline">
+      <p class="section-kicker">What You Can Read</p>
+      <h2>今の悩みから選べる4テーマ</h2>
+    </div>
+    <div class="issue-grid">
+      <a class="issue-card" href="/blog/hoken-soudan-muryou-hikaku/">
+        <img src="/images/ren-insurance-consult.svg" alt="保険相談のイメージ" width="280" height="170" loading="lazy" />
+        <span>保険相談</span>
+        <strong>毎月の保険料や保障内容を見直したい</strong>
+      </a>
+      <a class="issue-card" href="/blog/nisa-hajimekata/">
+        <img src="/images/ren-investment-desk.svg" alt="資産形成のイメージ" width="280" height="170" loading="lazy" />
+        <span>資産形成</span>
+        <strong>NISA・iDeCoを何から始めるか知りたい</strong>
+      </a>
+      <a class="issue-card" href="/blog/fukugyo-zeikin/">
+        <img src="/images/ren-work-desk.svg" alt="副業と家計整理のイメージ" width="280" height="170" loading="lazy" />
+        <span>副業・節税</span>
+        <strong>会社員のまま収入の柱を増やしたい</strong>
+      </a>
+      <a class="issue-card" href="/blog/fx-kouza-hikaku/">
+        <img src="/og/fx-kouza-hikaku.svg" alt="FX比較のイメージ" width="280" height="170" loading="lazy" />
+        <span>FX・外貨</span>
+        <strong>リスクを理解した上で口座を比較したい</strong>
+      </a>
+    </div>
+  </section>
 
-  /* ── Buttons ── */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 14px 26px; border-radius: var(--r-md);
-    font-weight: 700; font-size: 15px; letter-spacing: .02em;
-    transition: filter .15s, transform .1s;
-    white-space: nowrap;
-  }
-  .btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
-  .btn-primary { background: var(--c-blue); color: #fff; }
-  .btn-outline  {
-    background: transparent; color: #fff;
-    border: 2px solid rgba(255,255,255,.6);
-  }
-  .btn-outline:hover { background: rgba(255,255,255,.12); }
-  .btn-lg { padding: 16px 32px; font-size: 16px; border-radius: 12px; }
-  .arrow  { font-size: 18px; }
+  <section class="home-section latest-section" id="articles">
+    <div class="section-headline with-link">
+      <div>
+        <p class="section-kicker">Latest Articles</p>
+        <h2>新着記事</h2>
+      </div>
+      <a href="/blog/">すべての記事を見る</a>
+    </div>
+    <div class="latest-grid">
+      {featuredPosts.map((post) => {
+        const tone = categoryTone[post.data.category] ?? 'tone-gray';
+        const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        return (
+          <article class="latest-card">
+            <a href={`/blog/${post.id}/`}>
+              <img src={post.data.heroImage ?? `/thumbnails/${post.id}.svg`} alt="" width="320" height="190" loading="lazy" />
+              <div class="latest-body">
+                <span class={`category-pill ${tone}`}>{post.data.category}</span>
+                <h3>{post.data.title}</h3>
+                <p>{post.data.description}</p>
+                <time datetime={post.data.pubDate.toISOString()}>{dateStr}</time>
+              </div>
+            </a>
+          </article>
+        );
+      })}
+    </div>
+  </section>
 
-  /* ═══════════════════════════════════════
-     ANNOUNCE BAR
-  ═══════════════════════════════════════ */
-  .announce-bar {
-    background: var(--c-blue-100);
-    border-bottom: 1px solid #BFDBFE;
-    padding: 9px 24px;
-    font-size: 11.5px; color: #1E40AF;
-    text-align: center; font-weight: 500;
-  }
+  <section class="home-final">
+    <div>
+      <p class="section-kicker">Before You Decide</p>
+      <h2>申し込む前に、条件と注意点を一緒に確認する。</h2>
+      <p>無料相談・口座開設・カード申込は、先に比較軸を決めるだけで失敗しにくくなります。</p>
+    </div>
+    <a class="home-btn home-btn-primary" href="/blog/">比較記事から読む</a>
+  </section>
+</BaseLayout>
 
-  /* ═══════════════════════════════════════
-     HEADER
-  ═══════════════════════════════════════ */
-  .site-header {
-    background: var(--c-white);
-    border-bottom: 1px solid var(--c-border);
-    position: sticky; top: 0; z-index: 60;
-    box-shadow: 0 1px 4px rgba(0,0,0,.06);
-  }
-  .header-inner {
-    display: flex; align-items: center;
-    justify-content: space-between;
-    height: 60px;
-  }
-  .brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; }
-  .brand-text { font-weight: 700; font-size: 15px; color: var(--c-ink); letter-spacing: .02em; }
-  .nav { display: flex; gap: 24px; }
-  .nav-link { font-size: 13px; font-weight: 500; color: var(--c-ink); opacity: .7; transition: opacity .15s; }
-  .nav-link:hover { opacity: 1; color: var(--c-blue); }
-
-  /* ═══════════════════════════════════════
-     HERO
-  ═══════════════════════════════════════ */
-  .hero {
-    background:
-      radial-gradient(circle at 18% 18%, rgba(59,130,246,.28) 0, rgba(59,130,246,0) 34%),
-      linear-gradient(160deg, #1a3a7a 0%, #2563EB 100%);
-    color: #fff;
-    overflow: hidden;
-    padding: 48px 0 60px;
-    position: relative;
-  }
-  .hero::before {
-    content: '';
-    position: absolute; inset: 0;
-    background-image: radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);
-    background-size: 28px 28px;
-    pointer-events: none;
-  }
-  .hero-inner {
-    position: relative;
+<style>
+  .home-hero {
     display: grid;
-    grid-template-columns: 1.05fr .95fr;
-    gap: 40px;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
+    gap: 44px;
     align-items: center;
+    min-height: 560px;
+    padding: 44px 0 28px;
   }
-  .hero-eyebrow {
-    font-size: 11px; font-weight: 700; letter-spacing: .18em;
-    text-transform: uppercase; color: var(--c-yellow);
-    margin-bottom: 20px;
-    text-shadow: 0 1px 12px rgba(0,0,0,.18);
-    animation: fadeUp .5s ease forwards;
+  .home-eyebrow,
+  .section-kicker {
+    margin: 0 0 12px;
+    color: #18714f;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
-  .hero-h1 {
-    font-size: clamp(30px, 4vw, 48px);
-    font-weight: 900; line-height: 1.3;
-    margin-bottom: 20px;
-    max-width: 680px;
-    text-shadow: 0 2px 18px rgba(0,0,0,.22);
-    animation: fadeUp .6s ease .1s both;
+  .home-hero h1 {
+    margin: 0;
+    color: #17352a;
+    font-size: clamp(2.15rem, 4.5vw, 4.25rem);
+    line-height: 1.18;
+    letter-spacing: 0;
   }
-  .hero-h1 strong {
-    color: #FBBF24;
-    text-shadow: 0 2px 16px rgba(0,0,0,.28);
+  .home-lead {
+    max-width: 640px;
+    margin: 22px 0 0;
+    color: #41564e;
+    font-size: 1.02rem;
+    line-height: 2;
   }
-  .hero-lead {
-    font-size: 15px; line-height: 1.95; color: rgba(255,255,255,.94);
-    margin-bottom: 28px;
-    text-shadow: 0 1px 10px rgba(0,0,0,.18);
-    animation: fadeUp .6s ease .2s both;
+  .home-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .home-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 22px;
+    border-radius: 8px;
+    font-weight: 900;
+    text-decoration: none;
+    transition: transform .15s, box-shadow .15s, background .15s;
   }
-  .hero-disclaimer { display: block; font-size: 11px; color: rgba(255,255,255,.78); margin-top: 8px; }
-  .hero-cta-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 32px; animation: fadeUp .6s ease .3s both; }
-  .hero .btn-primary {
+  .home-btn:hover { transform: translateY(-1px); text-decoration: none; }
+  .home-btn-primary { background: #0f8a5f; color: #fff; box-shadow: 0 10px 24px rgba(15, 138, 95, .22); }
+  .home-btn-secondary { background: #fff; color: #174638; border: 1px solid #b9d9cd; }
+  .home-note { margin: 14px 0 0; color: #73827d; font-size: 0.78rem; line-height: 1.7; }
+  .home-hero-visual { position: relative; }
+  .home-hero-visual img {
+    width: 100%;
+    height: auto;
+    border-radius: 18px;
+    border: 1px solid #d7e7df;
+    box-shadow: 0 26px 70px rgba(42, 71, 59, .14);
     background: #fff;
-    color: #163D91;
-    box-shadow: 0 4px 0 rgba(15,23,42,.26), 0 10px 28px rgba(15,23,42,.18);
   }
-  .hero .btn-outline {
-    background: rgba(15,23,42,.14);
-    border-color: rgba(255,255,255,.78);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
+  .home-proof-card {
+    position: absolute;
+    display: grid;
+    gap: 2px;
+    min-width: 170px;
+    padding: 13px 16px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.94);
+    border: 1px solid #d7e7df;
+    box-shadow: 0 14px 35px rgba(30, 70, 52, .16);
   }
-  .hero-stats {
-    display: flex; gap: 0;
-    border-top: 1px solid rgba(255,255,255,.34);
-    padding-top: 24px;
-    animation: fadeUp .6s ease .4s both;
-  }
-  .hero-stat {
-    flex: 1; text-align: center; padding: 0 16px;
-    border-right: 1px solid rgba(255,255,255,.30);
-  }
-  .hero-stat:last-child { border-right: none; }
-  .hero-stat-num   { display: block; font-size: 26px; font-weight: 900; color: var(--c-yellow); }
-  .hero-stat-label { display: block; font-size: 11px; color: rgba(255,255,255,.86); line-height: 1.5; margin-top: 3px; }
+  .home-proof-card strong { color: #123f31; font-size: 0.95rem; }
+  .home-proof-card span { color: #62746d; font-size: 0.76rem; }
+  .home-proof-card-a { left: -18px; bottom: 60px; }
+  .home-proof-card-b { right: -14px; top: 58px; }
 
-  .hero-art {
-    background: rgba(18,54,139,.72);
-    border: 1px solid rgba(255,255,255,.34);
-    border-radius: 16px;
-    padding: 28px 24px;
-    backdrop-filter: blur(2px);
-    box-shadow: 0 24px 60px rgba(15,23,42,.22), inset 0 1px 0 rgba(255,255,255,.14);
-    animation: fadeUp .7s ease .2s both;
-  }
-  .hero-tl-heading {
-    font-size: 10px; font-weight: 700; letter-spacing: .18em;
-    text-transform: uppercase; color: rgba(255,255,255,.72);
-    margin-bottom: 18px;
-  }
-  /* vertical timeline layout */
-  .hero-tl-row { display: flex; gap: 14px; }
-  .hero-tl-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-  .hero-tl-icon {
-    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .hero-tl-icon--red   { background: rgba(239,68,68,.18);  border: 1.5px solid rgba(239,68,68,.55);  color: #FCA5A5; }
-  .hero-tl-icon--amber { background: rgba(251,191,36,.15); border: 1.5px solid rgba(251,191,36,.55); color: #FCD34D; }
-  .hero-tl-icon--green { background: rgba(34,197,94,.18);  border: 1.5px solid rgba(34,197,94,.55);  color: #86EFAC; }
-  .hero-tl-connector { width: 2px; flex: 1; min-height: 12px; background: rgba(255,255,255,.22); margin: 4px 0; }
-  .hero-tl-body { padding: 3px 0 16px; }
-  .hero-tl-year  { font-size: 10.5px; color: rgba(255,255,255,.70); letter-spacing: .06em; font-weight: 700; }
-  .hero-tl-num   { font-size: 23px; font-weight: 900; color: var(--c-yellow); line-height: 1.1; margin: 2px 0 3px; }
-  .hero-tl-desc  { font-size: 12px; color: rgba(255,255,255,.86); }
-  /* mini sparkline */
-  .hero-sparkline { margin-top: 2px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.20); }
-  .hero-spark-lbl { font-size: 9px; color: rgba(255,255,255,.58); letter-spacing: .14em; margin-bottom: 8px; }
-  .hero-spark-years { display: flex; justify-content: space-between; font-size: 9px; color: rgba(255,255,255,.62); margin-top: 4px; padding: 0 2px; }
-  .hero-tl-footer {
-    margin-top: 12px; padding-top: 12px;
-    border-top: 1px solid rgba(255,255,255,.20);
-    font-size: 12px; font-weight: 700; color: var(--c-yellow);
-    text-align: center; letter-spacing: .04em;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ═══════════════════════════════════════
-     SUB-BANNER
-  ═══════════════════════════════════════ */
-  .subbanner {
-    margin: -28px auto 0;
-    background: var(--c-white);
+  .trust-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid #d7e7df;
     border-radius: 12px;
-    border: 1px solid var(--c-blue-100);
-    box-shadow: var(--sh-card);
-    padding: 18px 22px;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 20px;
-    position: relative; z-index: 5;
+    background: #d7e7df;
+    margin: 10px 0 56px;
   }
-  .sb-left  { display: flex; align-items: center; gap: 16px; }
-  .sb-icon  {
-    width: 52px; height: 52px; border-radius: 10px;
-    background: var(--c-blue-50);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  .sb-title { font-size: 15px; font-weight: 700; color: var(--c-ink); }
-  .sb-sub   { font-size: 12px; color: var(--c-gray); margin-top: 2px; }
-  .sb-link  {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--c-blue); color: #fff;
-    padding: 10px 16px; border-radius: var(--r-md);
-    font-weight: 700; font-size: 13px; white-space: nowrap; flex-shrink: 0;
-  }
-  .sb-link:hover { background: var(--c-blue-d); }
+  .trust-strip div { background: #fff; padding: 20px 18px; }
+  .trust-strip strong { display: block; color: #123f31; font-size: 1.12rem; }
+  .trust-strip span { display: block; color: #66756f; font-size: 0.82rem; margin-top: 4px; }
 
-  /* ═══════════════════════════════════════
-     PROBLEM SECTION
-  ═══════════════════════════════════════ */
-  .problem-grid {
-    display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
-    margin-top: 24px;
+  .home-section { padding: 58px 0; }
+  .section-copy { max-width: 720px; margin-bottom: 26px; }
+  .section-copy h2,
+  .section-headline h2,
+  .home-final h2 {
+    margin: 0;
+    color: #17352a;
+    font-size: clamp(1.65rem, 3vw, 2.45rem);
+    line-height: 1.35;
   }
-  .problem-card {
-    background: var(--c-white); border: 1px solid var(--c-border);
-    border-radius: 12px; padding: 24px 20px;
-    border-top: 3px solid var(--c-blue);
+  .section-copy p:not(.section-kicker),
+  .home-final p:not(.section-kicker) { color: #53675f; line-height: 1.9; }
+  .hoken-focus {
+    margin-inline: calc(50% - 50vw);
+    padding-inline: max(28px, calc(50vw - 590px));
+    background: linear-gradient(180deg, #f2fbf5 0%, #ffffff 100%);
+    border-top: 1px solid #dceee4;
+    border-bottom: 1px solid #dceee4;
   }
-  .problem-num { font-size: 11px; font-weight: 700; color: var(--c-blue); letter-spacing: .1em; margin-bottom: 8px; }
-  .problem-icon { font-size: 28px; margin-bottom: 10px; }
-  .problem-title { font-size: 15px; font-weight: 700; line-height: 1.5; margin-bottom: 8px; }
-  .problem-body  { font-size: 12.5px; color: var(--c-gray); line-height: 1.7; }
+  .hoken-grid,
+  .latest-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .hoken-card,
+  .latest-card a,
+  .issue-card {
+    display: block;
+    height: 100%;
+    background: #fff;
+    border: 1px solid #dce8e2;
+    border-radius: 10px;
+    overflow: hidden;
+    color: inherit;
+    text-decoration: none;
+    box-shadow: 0 10px 30px rgba(42, 71, 59, .06);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .hoken-card:hover,
+  .latest-card a:hover,
+  .issue-card:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(42, 71, 59, .11); text-decoration: none; }
+  .hoken-card img,
+  .latest-card img,
+  .issue-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #edf7f1; }
+  .hoken-card span,
+  .issue-card span { display: inline-flex; margin: 15px 16px 8px; color: #0f8a5f; font-size: .78rem; font-weight: 900; }
+  .hoken-card strong,
+  .issue-card strong { display: block; padding: 0 16px 18px; color: #17352a; line-height: 1.55; }
 
-  /* ═══════════════════════════════════════
-     MANGA / 4コマ
-  ═══════════════════════════════════════ */
-  .manga-img-wrap { margin-top: 28px; border-radius: 12px; overflow: hidden; box-shadow: var(--sh-card); }
-  .manga-strip-img { width: 100%; height: auto; display: block; }
-
-  /* ═══════════════════════════════════════
-     ACHIEVEMENT BAR
-  ═══════════════════════════════════════ */
-  .achievement-bar {
-    background: var(--c-blue-dd); color: #fff; padding: 28px 0;
+  .section-headline { text-align: center; margin-bottom: 28px; }
+  .section-headline.with-link { display: flex; align-items: end; justify-content: space-between; text-align: left; gap: 16px; }
+  .section-headline.with-link a { color: #0f8a5f; font-weight: 900; }
+  .issue-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .latest-card { list-style: none; }
+  .latest-body { padding: 16px; }
+  .category-pill { display: inline-flex; border-radius: 999px; padding: 3px 10px; font-size: .72rem; font-weight: 900; }
+  .tone-green { background: #dff5e9; color: #0e6a49; }
+  .tone-blue { background: #e0efff; color: #1d5e95; }
+  .tone-amber { background: #fff0c2; color: #8a5b00; }
+  .tone-yellow { background: #fff7d8; color: #856000; }
+  .tone-red { background: #ffe3de; color: #9c3425; }
+  .tone-gray { background: #edf1ef; color: #54615c; }
+  .latest-body h3 { margin: 10px 0 8px; color: #17352a; font-size: 1rem; line-height: 1.55; }
+  .latest-body p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 3.4em;
+    margin: 0 0 12px;
+    color: #64736d;
+    font-size: .86rem;
+    line-height: 1.7;
   }
-  .achievement-inner {
-    display: flex; justify-content: space-around; align-items: center;
-    flex-wrap: wrap; gap: 16px;
-  }
-  .achievement-item { text-align: center; }
-  .achievement-num   { display: block; font-size: 26px; font-weight: 900; color: var(--c-yellow); }
-  .achievement-label { display: block; font-size: 11px; opacity: .75; margin-top: 3px; line-height: 1.5; }
-
-  /* ═══════════════════════════════════════
-     THEMES (4 cards)
-  ═══════════════════════════════════════ */
-  .themes-grid {
-    display: grid; grid-template-columns: repeat(2,1fr); gap: 16px;
-    margin-top: 24px;
-  }
-  .theme-card {
-    background: var(--c-white); border: 1px solid var(--c-border);
-    border-radius: 12px; padding: 22px 22px 22px 80px;
-    position: relative; min-height: 100px;
-    transition: box-shadow .15s;
-  }
-  .theme-card:hover { box-shadow: var(--sh-card); }
-  .theme-icon-wrap {
-    position: absolute; left: 20px; top: 22px;
-    width: 44px; height: 44px;
-    background: var(--c-blue-50); border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .theme-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-  .theme-body  { font-size: 12.5px; color: var(--c-gray); line-height: 1.7; }
-
-  /* ═══════════════════════════════════════
-     LINE CTA BANNER
-  ═══════════════════════════════════════ */
-  .line-banner {
-    background: #06c755;
-    color: #fff;
-    border-radius: 12px;
-    padding: 18px 22px;
+  .latest-body time { color: #8b9994; font-size: .76rem; }
+  .home-final {
+    margin: 58px 0 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 40px;
-    box-shadow: 0 4px 16px rgba(6,199,85,0.22);
-  }
-  .line-banner-left { display: flex; align-items: center; gap: 14px; }
-  .line-banner-icon {
-    width: 46px; height: 46px;
-    background: rgba(255,255,255,0.2);
+    gap: 22px;
+    padding: 32px;
     border-radius: 12px;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    background: #17352a;
+    color: #fff;
   }
-  .line-banner-title { font-size: 15px; font-weight: 700; margin: 0 0 3px; }
-  .line-banner-sub   { font-size: 12px; opacity: 0.9; margin: 0; }
-  .line-banner-btn {
-    background: #fff; color: #059952;
-    font-weight: 800; font-size: 13px;
-    padding: 10px 18px; border-radius: 8px;
-    white-space: nowrap; flex-shrink: 0;
-    transition: opacity 0.15s;
+  .home-final .section-kicker { color: #f7cf62; }
+  .home-final h2 { color: #fff; }
+  .home-final p:not(.section-kicker) { color: #d9e9e2; margin-bottom: 0; }
+
+  @media (max-width: 900px) {
+    .home-hero { grid-template-columns: 1fr; min-height: auto; }
+    .home-hero-visual { max-width: 620px; }
+    .trust-strip { grid-template-columns: repeat(2, 1fr); }
+    .hoken-grid, .latest-grid { grid-template-columns: repeat(2, 1fr); }
+    .issue-grid { grid-template-columns: repeat(2, 1fr); }
   }
-  .line-banner-btn:hover { opacity: 0.88; text-decoration: none; }
-  @media (max-width: 640px) {
-    .line-banner { flex-direction: column; align-items: flex-start; }
-    .line-banner-btn { width: 100%; text-align: center; }
+  @media (max-width: 620px) {
+    .home-hero { padding-top: 24px; gap: 28px; }
+    .home-actions, .home-btn { width: 100%; }
+    .home-proof-card { position: static; margin-top: 10px; }
+    .trust-strip, .hoken-grid, .latest-grid, .issue-grid { grid-template-columns: 1fr; }
+    .section-headline.with-link, .home-final { display: block; }
+    .section-headline.with-link a { display: inline-block; margin-top: 10px; }
+    .home-final .home-btn { margin-top: 20px; }
   }
-
-  /* ═══════════════════════════════════════
-     ARTICLES
-  ═══════════════════════════════════════ */
-  .articles-grid {
-    display: grid; grid-template-columns: repeat(3,1fr); gap: 18px;
-    margin-top: 24px;
-  }
-  .article-card {
-    background: var(--c-white); border: 1px solid var(--c-border);
-    border-radius: 10px; overflow: hidden;
-    transition: transform .15s, box-shadow .15s;
-  }
-  .article-card:hover { transform: translateY(-2px); box-shadow: var(--sh-card); }
-  .article-thumb {
-    aspect-ratio: 16/10;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .article-body { padding: 14px 16px 16px; }
-  .article-cat  { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 4px; }
-  .cat-invest  { background: #DBEAFE; color: #1E40AF; }
-  .cat-income  { background: #D1FAE5; color: #065F46; }
-  .cat-savings { background: #FEF3C7; color: #92400E; }
-  .cat-debt    { background: #FEE2E2; color: #991B1B; }
-  .article-title {
-    font-size: 14px; font-weight: 700; margin: 8px 0 10px;
-    line-height: 1.55; color: var(--c-ink);
-  }
-  .article-desc { font-size: 12px; color: var(--c-gray); line-height: 1.65; margin: 6px 0 8px; }
-  .article-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--c-gray); }
-
-  /* ═══════════════════════════════════════
-     REASONS
-  ═══════════════════════════════════════ */
-  .reasons-grid {
-    display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
-    margin-top: 24px;
-  }
-  .reason-card {
-    background: var(--c-white); border: 1px solid var(--c-blue-100);
-    border-radius: 12px; padding: 20px 16px;
-    text-align: center; display: flex; flex-direction: column; align-items: center;
-  }
-  .reason-badge {
-    display: inline-block; background: var(--c-blue); color: #fff;
-    font-size: 11px; font-weight: 700;
-    padding: 4px 12px; border-radius: var(--r-pill); margin-bottom: 12px;
-  }
-  .reason-icon-wrap {
-    width: 64px; height: 64px; border-radius: 50%;
-    background: var(--c-blue-50);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 10px; overflow: hidden;
-  }
-  .reason-text { font-size: 12px; line-height: 1.7; color: var(--c-ink); text-align: center; }
-
-  /* ═══════════════════════════════════════
-     COMPARE TABLE
-  ═══════════════════════════════════════ */
-  .compare-wrap {
-    border-radius: 12px; overflow: hidden;
-    border: 1px solid var(--c-border); margin-top: 24px;
-  }
-  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .compare-table thead { background: var(--c-blue); color: #fff; }
-  .compare-table th { padding: 13px 14px; font-weight: 700; text-align: center; }
-  .compare-table th:first-child { text-align: left; }
-  .compare-table td { padding: 12px 14px; border-bottom: 1px solid var(--c-border); vertical-align: middle; }
-  .compare-table tr:last-child td { border-bottom: none; }
-  .compare-table td:first-child { font-weight: 700; background: var(--c-blue-50); color: var(--c-ink); }
-  .compare-table td:not(:first-child) { text-align: center; }
-  .highlight-cell { color: var(--c-blue); font-weight: 700; }
-  .badge-top {
-    display: inline-block; background: #F59E0B; color: #fff;
-    font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 3px;
-    margin-left: 4px; vertical-align: middle; letter-spacing: .03em;
-  }
-  .btn-compare {
-    display: inline-flex; align-items: center; justify-content: center;
-    background: var(--c-blue); color: #fff;
-    padding: 7px 12px; border-radius: 6px;
-    font-size: 12px; font-weight: 700; width: 100%;
-    transition: background .15s;
-  }
-  .btn-compare:hover { background: var(--c-blue-d); }
-
-  /* ═══════════════════════════════════════
-     FAQ
-  ═══════════════════════════════════════ */
-  .faq-list { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-  .faq-item {
-    background: var(--c-white); border: 1px solid var(--c-blue-100);
-    border-radius: 10px; overflow: hidden;
-  }
-  .faq-item summary {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 18px; cursor: pointer;
-    font-size: 13.5px; font-weight: 700; color: var(--c-ink);
-    list-style: none;
-  }
-  .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-q-icon {
-    width: 26px; height: 26px; flex-shrink: 0;
-    background: var(--c-blue); color: #fff;
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 900;
-  }
-  .faq-q-text { flex: 1; }
-  .faq-toggle {
-    width: 24px; height: 24px;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--c-blue-50); color: var(--c-blue);
-    font-size: 18px; font-weight: 700; border-radius: 50%; flex-shrink: 0;
-  }
-  .faq-a { padding: 0 18px 16px 52px; font-size: 12.5px; color: var(--c-gray); line-height: 1.8; }
-
-  /* ═══════════════════════════════════════
-     FINAL CTA
-  ═══════════════════════════════════════ */
-  .finalcta {
-    background: linear-gradient(180deg, #1E3A8A 0%, #2563EB 100%);
-    color: #fff; padding: 64px 28px; text-align: center;
-  }
-  .finalcta-eyebrow {
-    display: inline-block; font-size: 11px; font-weight: 700;
-    letter-spacing: .18em; color: var(--c-yellow);
-    text-transform: uppercase; margin-bottom: 16px;
-  }
-  .finalcta-h { font-size: clamp(22px,3.5vw,32px); font-weight: 900; margin-bottom: 10px; }
-  .finalcta-sub { font-size: 14px; opacity: .85; margin-bottom: 28px; }
-  .finalcta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-  .btn-ghost { background: rgba(255,255,255,.1); color: #fff; border: 2px solid rgba(255,255,255,.5); }
-  .btn-ghost:hover { background: rgba(255,255,255,.2); }
-  .btn-sage  { background: #1E6B45; color: #fff; }
-  .btn-sage:hover { background: #166035; }
-  .btn-navy  { background: var(--c-blue-dd); color: #fff; }
-  .btn-navy:hover { background: #172554; }
-
-  /* ═══════════════════════════════════════
-     FOOTER
-  ═══════════════════════════════════════ */
-  .footer { background: #0F1A3A; color: #C7D2FE; padding-top: 40px; }
-  .footer-grid {
-    display: grid; grid-template-columns: repeat(4,1fr); gap: 24px;
-    padding-bottom: 28px;
-  }
-  .footer-h { color: #fff; font-weight: 700; font-size: 13px; margin-bottom: 10px; }
-  .footer-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
-  .footer-list a:hover { color: #fff; }
-  .footer-bottom {
-    border-top: 1px solid rgba(255,255,255,.1); padding: 16px 0; font-size: 11px;
-  }
-  .footer-bottom-inner { display: flex; align-items: center; justify-content: space-between; }
-  .footer-brand { display: flex; align-items: center; gap: 8px; color: #fff; font-weight: 700; font-size: 13px; }
-  .footer-copy  { color: #9CA3AF; }
-
-  /* Sticky CTA */
-  .sticky-cta {
-    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-    z-index: 100; opacity: 0; pointer-events: none;
-    transition: opacity .3s;
-  }
-
-  /* ═══════════════════════════════════════
-     RESPONSIVE
-  ═══════════════════════════════════════ */
-  @media (max-width: 880px) {
-    .hero-inner { grid-template-columns: 1fr; }
-    .hero-art   { display: none; }
-    .themes-grid, .articles-grid, .reasons-grid { grid-template-columns: 1fr 1fr; }
-    .problem-grid { grid-template-columns: 1fr; }
-    .footer-grid  { grid-template-columns: 1fr 1fr; }
-    .compare-table { font-size: 11px; }
-    .nav { display: none; }
-  }
-  @media (max-width: 540px) {
-    .themes-grid, .articles-grid, .reasons-grid { grid-template-columns: 1fr; }
-    .hero-stats { flex-direction: column; gap: 12px; }
-  }
-  </style>
-
-  <!-- 構造化データ: WebSite + Person -->
-  <script is:inline type="application/ld+json" set:html={websiteJsonLd}></script>
-  <script is:inline type="application/ld+json" set:html={personJsonLd}></script>
-
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17326430733" is:inline></script>
-  <script is:inline>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    window.gtag = window.gtag || gtag;
-    gtag('js', new Date());
-    gtag('config', 'AW-17326430733');
-  </script>
-</head>
-<body>
-
-  <!-- PR開示バー -->
-  <div class="announce-bar">
-    <strong>PR</strong> 当サイトはアフィリエイト広告を含みます。紹介するサービスは実際に調査したものです。
-    投資・副業にはリスクがあり、成果を保証するものではありません。
-  </div>
-
-  <!-- ── HEADER ──────────────────────── -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="/">
-        <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
-          <rect x="4"  y="22" width="6" height="14" rx="1" fill="#0B1942"/>
-          <rect x="13" y="16" width="6" height="20" rx="1" fill="#0B1942"/>
-          <rect x="22" y="10" width="6" height="26" rx="1" fill="#0B1942"/>
-          <path d="M6 22 L16 14 L24 18 L36 6" stroke="#C9861A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M30 6 L36 6 L36 12" stroke="#C9861A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span class="brand-text">田中蓮のマネーブログ</span>
-      </a>
-      <nav class="nav">
-        {[
-          { label: "学ぶ", href: "/blog/" },
-          { label: "稼ぐ", href: "/blog/fukugyo-zeikin/" },
-          { label: "始める", href: "/blog/nisa-hajimekata/" },
-          { label: "FX口座", href: "/blog/fx-kouza-hikaku/" },
-          { label: "投資", href: "/blog/sbi-rakuten-hikaku/" },
-        ].map((item) => (
-          <a href={item.href} class="nav-link">{item.label}</a>
-        ))}
-      </nav>
-    </div>
-  </header>
-
-  <!-- ── HERO ──────────────────────── -->
-  <section class="hero">
-    <div class="container hero-inner">
-      <div>
-        <div class="hero-eyebrow">田中蓮のマネーブログ</div>
-        <h1 class="hero-h1">
-          借金とお金の不安を、<br/>
-          <strong>知識</strong>で立て直す。
-        </h1>
-        <p class="hero-lead">
-          ブログと動画で「学ぶ・実践する・続ける」。<br/>
-          初心者・再出発の方のための無料の総合メディアです。
-          <span class="hero-disclaimer">※当サイトはアフィリエイト広告を含みます。成果を保証するものではありません。</span>
-        </p>
-        <div class="hero-cta-row">
-          <a class="btn btn-primary btn-lg" href="/blog/dmm-fx-review/">
-            DMM FX 詳細レビューを読む <span class="arrow">→</span>
-          </a>
-          <a class="btn btn-outline btn-lg" href="/blog/nisa-hajimekata/">
-            投資の始め方を学ぶ
-          </a>
-        </div>
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="hero-stat-num">200万</span>
-            <span class="hero-stat-label">借金から<br/>スタート</span>
-          </div>
-          <div class="hero-stat">
-            <span class="hero-stat-num">月20万</span>
-            <span class="hero-stat-label">副業収入を<br/>達成</span>
-          </div>
-          <div class="hero-stat">
-            <span class="hero-stat-num">500万</span>
-            <span class="hero-stat-label">資産形成<br/>達成</span>
-          </div>
-        </div>
-      </div>
-      <div class="hero-art">
-        <div class="hero-tl-heading">3年間の軌跡</div>
-
-        <!-- 2021 借金 -->
-        <div class="hero-tl-row">
-          <div class="hero-tl-left">
-            <div class="hero-tl-icon hero-tl-icon--red">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/>
-                <polyline points="16 17 22 17 22 11"/>
-              </svg>
-            </div>
-            <div class="hero-tl-connector"></div>
-          </div>
-          <div class="hero-tl-body">
-            <div class="hero-tl-year">2021年</div>
-            <div class="hero-tl-num">−200万円</div>
-            <div class="hero-tl-desc">借金が膨らみ、将来が見えなかった</div>
-          </div>
-        </div>
-
-        <!-- 2022 副業開始 -->
-        <div class="hero-tl-row">
-          <div class="hero-tl-left">
-            <div class="hero-tl-icon hero-tl-icon--amber">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <rect x="2" y="3" width="20" height="14" rx="2"/>
-                <line x1="8" y1="21" x2="16" y2="21"/>
-                <line x1="12" y1="17" x2="12" y2="21"/>
-              </svg>
-            </div>
-            <div class="hero-tl-connector"></div>
-          </div>
-          <div class="hero-tl-body">
-            <div class="hero-tl-year">2022年</div>
-            <div class="hero-tl-num">月+20万円</div>
-            <div class="hero-tl-desc">副業・ブログで収入の柱を追加</div>
-          </div>
-        </div>
-
-        <!-- 2024 資産形成 -->
-        <div class="hero-tl-row">
-          <div class="hero-tl-left">
-            <div class="hero-tl-icon hero-tl-icon--green">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
-                <polyline points="16 7 22 7 22 13"/>
-              </svg>
-            </div>
-          </div>
-          <div class="hero-tl-body">
-            <div class="hero-tl-year">2024年</div>
-            <div class="hero-tl-num">資産500万円</div>
-            <div class="hero-tl-desc">NISA・投資で着実に積み上げた</div>
-          </div>
-        </div>
-
-        <!-- mini sparkline -->
-        <div class="hero-sparkline">
-          <div class="hero-spark-lbl">FINANCIAL JOURNEY</div>
-          <svg viewBox="0 0 220 48" width="100%" height="48" aria-hidden="true">
-            <defs>
-              <linearGradient id="spkfill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#FBBF24" stop-opacity=".3"/>
-                <stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-            <line x1="0" y1="16" x2="220" y2="16" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
-            <line x1="0" y1="32" x2="220" y2="32" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
-            <path d="M22,44 C55,44 72,32 92,28 C125,22 158,8 198,4 L198,48 L22,48 Z" fill="url(#spkfill)"/>
-            <path d="M22,44 C55,44 72,32 92,28 C125,22 158,8 198,4" stroke="#FBBF24" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <circle cx="22"  cy="44" r="4" fill="#EF4444" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
-            <circle cx="92"  cy="28" r="4" fill="#F59E0B" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
-            <circle cx="198" cy="4"  r="4" fill="#22C55E" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
-          </svg>
-          <div class="hero-spark-years">
-            <span>2021年</span><span>2022年</span><span>2024年</span>
-          </div>
-        </div>
-
-        <div class="hero-tl-footer">▶ 35歳FIREへ、進行中</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Sub-banner -->
-  <div class="container subbanner-wrap">
-    <div class="subbanner">
-      <div class="sb-left">
-        <div class="sb-icon">
-          <svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#0B1942" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
-            <path d="M6 10 Q14 8 22 12 L24 40 Q14 36 6 38 Z" fill="#EEF1F7"/>
-            <path d="M42 10 Q34 8 26 12 L24 40 Q34 36 42 38 Z" fill="#EEF1F7"/>
-            <path d="M24 12 L24 40"/>
-          </svg>
-        </div>
-        <div>
-          <div class="sb-title">学ぶ・知る・行動するを応援する</div>
-          <div class="sb-sub">お金の知識から実践まで、わかりやすくサポートします。</div>
-        </div>
-      </div>
-      <a class="btn btn-navy" href="/blog/">人気の最新記事を読む →</a>
-    </div>
-  </div>
-
-  <!-- ── PROBLEM SECTION ─────────────── -->
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-label">Problem</div>
-        <h2 class="section-title">こんな悩みを<br/>抱えていませんか？</h2>
-        <p class="section-sub">多くの方が、まず「知識の壁」にぶつかります。</p>
-      </div>
-      <div class="problem-grid">
-        <div class="problem-card">
-          <div class="problem-num">01</div>
-          <div class="problem-icon">💸</div>
-          <div class="problem-title">給料だけでは将来が<br/>不安で仕方ない</div>
-          <div class="problem-body">毎月何となく使って、気づけばほとんど残っていない。老後2000万円問題も他人事じゃない。</div>
-        </div>
-        <div class="problem-card" style="animation-delay:.1s">
-          <div class="problem-num">02</div>
-          <div class="problem-icon">📊</div>
-          <div class="problem-title">投資を始めたいけど<br/>怖くて踏み出せない</div>
-          <div class="problem-body">NISAやiDeCoの言葉は知っているのに、損したらどうしようという恐怖が先に来る。</div>
-        </div>
-        <div class="problem-card" style="animation-delay:.2s">
-          <div class="problem-num">03</div>
-          <div class="problem-icon">🔄</div>
-          <div class="problem-title">情報が多すぎて<br/>何から始めればいいか謎</div>
-          <div class="problem-body">YouTube・ブログ・SNS、みんな言うことが違う。正しい情報を選ぶ基準がわからない。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── MANGA STORY ─────────────────── -->
-  <section class="section section--tint">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-label">Story</div>
-        <h2 class="section-title">4コマでわかる<br/>お金の改善ストーリー</h2>
-        <p class="section-sub">借金200万円から資産500万円へ。田中蓮の実話（架空キャラクター）。</p>
-      </div>
-
-      <div class="manga-img-wrap">
-        <img
-          src="/images/yonkoma.png"
-          alt="4コマでわかるお金の改善ストーリー：借金200万円→どん底の毎日→きっかけとの出会い→資産500万円達成！"
-          class="manga-strip-img"
-          width="1081"
-          height="389"
-          loading="lazy"
-        />
-      </div>
-    </div>
-  </section>
-
-  <!-- ── ACHIEVEMENT BAR ─────────────── -->
-  <div class="achievement-bar">
-    <div class="container">
-      <div class="achievement-inner">
-        <div class="achievement-item">
-          <span class="achievement-num">借金→０</span>
-          <span class="achievement-label">借金200万円を完済<br/>知識と節約の力で</span>
-        </div>
-        <div class="achievement-item" style="animation-delay:.12s">
-          <span class="achievement-num">月+20万</span>
-          <span class="achievement-label">副業収入を達成<br/>ブログ・アフィリエイトで</span>
-        </div>
-        <div class="achievement-item" style="animation-delay:.24s">
-          <span class="achievement-num">資産500万</span>
-          <span class="achievement-label">NISA・投資で形成<br/>3年間のコツコツ継続</span>
-        </div>
-        <div class="achievement-item" style="animation-delay:.36s">
-          <span class="achievement-num">35歳FIRE</span>
-          <span class="achievement-label">経済的自由への道<br/>今も進行中</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── THEMES ─────────────────────── -->
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-label">Learn</div>
-        <h2 class="section-title">お金の不安を解消する<br/>4つの学習テーマ</h2>
-        <p class="section-sub">まずは自分に合うテーマから、今日からの一歩を踏み出しましょう。</p>
-      </div>
-      <div class="themes-grid">
-        <div class="theme-card">
-          <div class="theme-icon-wrap">
-            <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-              <rect x="6" y="14" width="36" height="26" rx="3" fill="#B8780E" stroke="#8B5E0A" stroke-width="1.5"/>
-              <path d="M6 14 L34 8 L42 14" fill="#8B5E0A"/>
-              <circle cx="34" cy="27" r="3" fill="#FBBF24" stroke="#8B5E0A"/>
-            </svg>
-          </div>
-          <div class="theme-title">お金の基礎</div>
-          <div class="theme-body">知識ゼロから始めたい方に。家計簿の付け方、収支管理、今日から使える小さな習慣。</div>
-        </div>
-        <div class="theme-card" style="animation-delay:.08s">
-          <div class="theme-icon-wrap">
-            <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-              <rect x="6"  y="28" width="7" height="14" fill="#0B1942"/>
-              <rect x="16" y="20" width="7" height="22" fill="#0B1942"/>
-              <rect x="26" y="12" width="7" height="30" fill="#0B1942"/>
-              <path d="M8 26 L20 18 L28 22 L42 8" stroke="#1E6B45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-              <path d="M36 8 L42 8 L42 14" stroke="#1E6B45" stroke-width="3" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="theme-title">副業</div>
-          <div class="theme-body">在宅でできる副業から始めて、収入の柱を増やす実践的な情報を紹介。</div>
-        </div>
-        <div class="theme-card" style="animation-delay:.16s">
-          <div class="theme-icon-wrap">
-            <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-              <rect x="10" y="6" width="24" height="32" rx="2" fill="#fff" stroke="#0B1942" stroke-width="1.5"/>
-              <path d="M14 14 H30 M14 20 H30 M14 26 H24" stroke="#0B1942" stroke-width="1.5" stroke-linecap="round"/>
-              <circle cx="36" cy="34" r="8" fill="#FBBF24" stroke="#fff" stroke-width="2"/>
-              <text x="36" y="38" text-anchor="middle" font-family="Noto Sans JP" font-weight="900" font-size="10" fill="#7A4A00">¥</text>
-            </svg>
-          </div>
-          <div class="theme-title">資産形成</div>
-          <div class="theme-body">つみたてNISA・iDeCo・投資信託。資産を着実に増やすための情報を発信。</div>
-        </div>
-        <div class="theme-card" style="animation-delay:.24s">
-          <div class="theme-icon-wrap">
-            <svg width="28" height="28" viewBox="0 0 48 48" fill="none" stroke="#0B1942" stroke-width="1.5">
-              <rect x="8" y="10" width="32" height="22" rx="2" fill="#EEF1F7"/>
-              <path d="M4 36 H44 L41 40 H7 Z" fill="#0B1942"/>
-              <rect x="14" y="22" width="3" height="6" fill="#0B1942"/>
-              <rect x="20" y="18" width="3" height="10" fill="#0B1942"/>
-              <rect x="26" y="14" width="3" height="14" fill="#0B1942"/>
-              <path d="M14 24 L22 18 L28 20 L34 14" stroke="#1E6B45" stroke-width="2" fill="none"/>
-            </svg>
-          </div>
-          <div class="theme-title">借金・返済</div>
-          <div class="theme-body">借金の見直し、返し方、相談先など、安心して立て直すための整理済み情報。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── ARTICLES ───────────────────── -->
-  <section class="section section--tint" id="articles">
-    <div class="container">
-      <!-- LINE CTAバナー -->
-      <div class="line-banner">
-        <div class="line-banner-left">
-          <div class="line-banner-icon">
-            <svg width="28" height="28" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-              <rect x="4" y="8" width="40" height="32" rx="8" fill="white" opacity="0.9"/>
-              <path d="M24 16 C14 16 6 22 6 29 C6 34 10 38 16 40 L15 44 L20 41 C21.3 41.3 22.6 41.5 24 41.5 C34 41.5 42 35.5 42 29 C42 22 34 16 24 16Z" fill="#06c755"/>
-              <circle cx="17" cy="29" r="2" fill="white"/>
-              <circle cx="24" cy="29" r="2" fill="white"/>
-              <circle cx="31" cy="29" r="2" fill="white"/>
-            </svg>
-          </div>
-          <div>
-            <p class="line-banner-title">FX・副業・節税の無料情報をLINEで受け取る</p>
-            <p class="line-banner-sub">登録0円・いつでも解除OK。月20万稼いだ方法をまとめてお届け。</p>
-          </div>
-        </div>
-        <a class="line-banner-btn" href="/line/x-profile-main/" rel="noopener">LINEで受け取る →</a>
-      </div>
-
-      <div class="section-head">
-        <div class="section-label">Articles</div>
-        <h2 class="section-title">体験談・解説ベースで<br/>学べる人気記事</h2>
-        <p class="section-sub">リアルな経験から学べる、初心者にも読みやすい記事を集めました。</p>
-      </div>
-      <div class="articles-grid">
-        {allPosts.map((post, i) => {
-          const cs = catStyle[post.data.category] ?? { cls: 'cat-invest', bg: 'linear-gradient(135deg,#DBEAFE,#93C5FD)' };
-          const bg = cs.bg;
-          const cls = cs.cls;
-          const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
-          return (
-            <article class={`article-card reveal`} style={`animation-delay:${i * 0.08}s`}>
-              <a href={`/blog/${post.id}/`} style="display:block;color:inherit;text-decoration:none;">
-                <div class="article-thumb" style={post.data.heroImage ? '' : `background:${bg}`}>
-                  {post.data.heroImage ? (
-                    <img
-                      src={post.data.heroImage}
-                      alt={post.data.title}
-                      width="640"
-                      height="400"
-                      loading="lazy"
-                      style="width:100%;height:100%;object-fit:cover;display:block;"
-                    />
-                  ) : (
-                  <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
-                    {post.data.category === 'NISA・投資' && (
-                      <>
-                        <rect x="90" y="90" width="16" height="80" rx="2" fill="#0B1942" opacity=".6"/>
-                        <rect x="112" y="70" width="16" height="100" rx="2" fill="#0B1942" opacity=".6"/>
-                        <rect x="134" y="48" width="16" height="122" rx="2" fill="#0B1942" opacity=".6"/>
-                        <rect x="156" y="28" width="16" height="142" rx="2" fill="#1E6B45"/>
-                        <path d="M96 88 L118 68 L140 46 L164 28" stroke="#16A34A" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M158 28 L164 28 L164 36" stroke="#16A34A" stroke-width="5" fill="none" stroke-linecap="round"/>
-                        <text x="240" y="120" text-anchor="middle" font-family="Noto Sans JP" font-weight="900" font-size="28" fill="#0B1942" opacity=".12">NISA</text>
-                      </>
-                    )}
-                    {post.data.category === '副業・節税' && (
-                      <>
-                        <rect x="56" y="30" width="188" height="112" rx="5" fill="#1E293B"/>
-                        <rect x="64" y="38" width="172" height="96" fill="#fff"/>
-                        <rect x="82" y="88" width="10" height="38" fill="#1E293B"/>
-                        <rect x="98" y="72" width="10" height="54" fill="#1E293B"/>
-                        <rect x="114" y="56" width="10" height="70" fill="#1E293B"/>
-                        <path d="M84 92 L104 74 L120 60 L140 50" stroke="#16A34A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-                        <rect x="30" y="150" width="260" height="12" rx="2" fill="#0F172A"/>
-                        <circle cx="218" cy="86" r="22" fill="#FBBF24" opacity=".75"/>
-                        <text x="218" y="93" text-anchor="middle" font-family="Noto Sans JP" font-weight="900" font-size="18" fill="#92400E">¥</text>
-                      </>
-                    )}
-                    {post.data.category === 'お得情報' && (
-                      <>
-                        <rect x="60" y="46" width="200" height="114" rx="10" fill="#0B1942"/>
-                        <rect x="60" y="82" width="200" height="34" fill="#162254"/>
-                        <rect x="76" y="108" width="70" height="22" rx="4" fill="rgba(255,255,255,.35)"/>
-                        <rect x="156" y="108" width="48" height="22" rx="4" fill="rgba(255,255,255,.25)"/>
-                        <circle cx="228" cy="64" r="16" fill="#FBBF24" opacity=".7"/>
-                        <circle cx="244" cy="64" r="16" fill="#F97316" opacity=".7"/>
-                        <text x="76" y="68" font-family="Noto Sans JP" font-weight="900" font-size="12" fill="rgba(255,255,255,.55)">CARD</text>
-                      </>
-                    )}
-                    {post.data.category === 'FX・外貨' && (
-                      <>
-                        <line x1="92" y1="40" x2="92" y2="150" stroke="#CBD5E1" stroke-width="1.5"/>
-                        <line x1="132" y1="50" x2="132" y2="155" stroke="#CBD5E1" stroke-width="1.5"/>
-                        <line x1="172" y1="35" x2="172" y2="145" stroke="#CBD5E1" stroke-width="1.5"/>
-                        <line x1="212" y1="65" x2="212" y2="148" stroke="#CBD5E1" stroke-width="1.5"/>
-                        <rect x="80" y="65" width="24" height="55" rx="2" fill="#16A34A"/>
-                        <rect x="120" y="90" width="24" height="42" rx="2" fill="#DC2626"/>
-                        <rect x="160" y="40" width="24" height="65" rx="2" fill="#16A34A"/>
-                        <rect x="200" y="78" width="24" height="44" rx="2" fill="#DC2626"/>
-                        <text x="160" y="175" text-anchor="middle" font-family="Noto Sans JP" font-size="12" fill="#6B6560">為替・FX</text>
-                      </>
-                    )}
-                  </svg>
-                  )}
-                </div>
-                <div class="article-body">
-                  <span class={`article-cat ${cls}`}>{post.data.category}</span>
-                  <h3 class="article-title">{post.data.title}</h3>
-                  {post.data.description && (
-                    <p class="article-desc">{post.data.description}</p>
-                  )}
-                  <div class="article-meta">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B6560" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7 V12 L15 14" stroke-linecap="round"/></svg>
-                    <span>{dateStr}</span>
-                  </div>
-                </div>
-              </a>
-            </article>
-          );
-        })}
-      </div>
-    </div>
-  </section>
-
-  <!-- ── REASONS ───────────────────── -->
-  <section class="section section--tint">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-label">Why Us</div>
-        <h2 class="section-title">このブログが<br/>選ばれる理由</h2>
-      </div>
-      <div class="reasons-grid">
-        <div class="reason-card">
-          <div class="reason-badge">初心者にやさしい</div>
-          <div class="reason-icon-wrap">
-            <svg width="48" height="48" viewBox="0 0 120 120">
-              <defs><clipPath id="rc1"><circle cx="60" cy="60" r="56"/></clipPath></defs>
-              <g clip-path="url(#rc1)">
-                <rect width="120" height="120" fill="#EEF1F7"/>
-                <rect x="50" y="62" width="20" height="20" fill="#F4D5BA"/>
-                <path d="M30 92 Q60 80 90 92 L100 120 L20 120 Z" fill="#fff"/>
-                <path d="M18 120 L30 86 Q42 94 42 110 L60 120 Z" fill="#0B1942"/>
-                <path d="M102 120 L90 86 Q78 94 78 110 L60 120 Z" fill="#0B1942"/>
-                <ellipse cx="60" cy="52" rx="22" ry="26" fill="#F4D5BA"/>
-                <path d="M38 46 Q38 22 60 22 Q82 22 82 46 Q82 38 76 34 Q70 30 60 32 Q50 34 44 40 Q40 44 38 46Z" fill="#1A1A1A"/>
-                <ellipse cx="51" cy="54" rx="2.2" ry="3" fill="#111"/>
-                <ellipse cx="69" cy="54" rx="2.2" ry="3" fill="#111"/>
-                <path d="M55 66 Q60 70 65 66" stroke="#9B5A4A" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-              </g>
-            </svg>
-          </div>
-          <p class="reason-text">専門用語はなるべく使わず、やさしく丁寧に解説します。</p>
-        </div>
-        <div class="reason-card" style="animation-delay:.08s">
-          <div class="reason-badge">実体験ベース</div>
-          <div class="reason-icon-wrap">
-            <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
-              <path d="M16 28 C 6 20, 4 14, 8 10 C 12 6, 16 10, 16 12 C 16 10, 20 6, 24 10 C 28 14, 26 20, 16 28Z" fill="#C0392B"/>
-            </svg>
-          </div>
-          <p class="reason-text">実際に経験したことだけを、誠実にお届けします。</p>
-        </div>
-        <div class="reason-card" style="animation-delay:.16s">
-          <div class="reason-badge">情報の透明性</div>
-          <div class="reason-icon-wrap">
-            <svg width="36" height="36" viewBox="0 0 32 32" fill="none" stroke="#0B1942" stroke-width="2" stroke-linejoin="round">
-              <path d="M8 4 H20 L26 10 V28 H8 Z" fill="#EEF1F7"/>
-              <path d="M20 4 V10 H26"/>
-              <path d="M12 16 H22 M12 20 H22 M12 24 H18" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <p class="reason-text">根拠・写真・データを必ず添えて信頼性を担保します。</p>
-        </div>
-        <div class="reason-card" style="animation-delay:.24s">
-          <div class="reason-badge">行動を後押し</div>
-          <div class="reason-icon-wrap">
-            <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-              <path d="M8 4 V28" stroke="#0B1942" stroke-width="2.4" stroke-linecap="round"/>
-              <path d="M8 6 H24 L20 12 L24 18 H8 Z" fill="#0B1942"/>
-            </svg>
-          </div>
-          <p class="reason-text">今日から始められる小さな一歩をいつも用意しています。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── COMPARE ───────────────────── -->
-  <section class="section" id="compare">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-label">Compare</div>
-        <h2 class="section-title">目的別おすすめ<br/>サービス比較</h2>
-        <p class="section-sub">あなたに合ったサービスを目的別に比較できます。<small style="color:var(--amber)">※PRを含みます</small></p>
-      </div>
-      <div class="compare-wrap">
-        <table class="compare-table">
-          <thead>
-            <tr>
-              <th style="text-align:left">カテゴリ</th>
-              <th>節約・家計向き</th>
-              <th>資産形成向き</th>
-              <th>副収入を増やしたい</th>
-              <th style="width:150px">詳細・比較</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- FX口座: DMM FX(A8.net承認済み ¥40,000/件・最高単価) -->
-            <tr>
-              <td>FX口座</td>
-              <td>JFX（MATRIX TRADER）</td>
-              <td>FXTF</td>
-              <td class="highlight-cell">DMM FX<span class="badge-top">初心者No.1</span></td>
-              <td><a class="btn-compare" href="/go/dmm-fx/">無料で開設 PR</a></td>
-            </tr>
-            <!-- 証券口座: SBI・楽天(A8.net申請中) -->
-            <tr>
-              <td>証券口座</td>
-              <td>SBI証券</td>
-              <td class="highlight-cell">楽天証券<span class="badge-top">人気No.1</span></td>
-              <td>松井証券</td>
-              <td><a class="btn-compare" href="/blog/sbi-rakuten-hikaku/">証券口座を比較</a></td>
-            </tr>
-            <!-- NISA: SBI証券NISAをメイン推し -->
-            <tr>
-              <td>NISA口座</td>
-              <td>つみたてNISA</td>
-              <td class="highlight-cell">SBI証券 NISA<span class="badge-top">おすすめ</span></td>
-              <td>楽天証券 NISA</td>
-              <td><a class="btn-compare" href="/blog/nisa-hajimekata/">始め方を読む</a></td>
-            </tr>
-            <!-- 保険相談: FPに相談(A8.net ¥13,000/件・確定率42%)が最優先 -->
-            <tr>
-              <td>保険相談</td>
-              <td>保険見直しラボ</td>
-              <td>保険の窓口</td>
-              <td class="highlight-cell">FPに無料相談<span class="badge-top">無料◎</span></td>
-              <td><a class="btn-compare" href="/go/fp-soudan/">無料で相談 PR</a></td>
-            </tr>
-            <!-- 副業: ブログ副業が本命（田中蓮の実体験） -->
-            <tr>
-              <td>副業・節税</td>
-              <td>ふるさと納税</td>
-              <td>iDeCo</td>
-              <td class="highlight-cell">ブログ副業<span class="badge-top">蓮おすすめ</span></td>
-              <td><a class="btn-compare" href="/blog/fukugyo-zeikin/">副業×節税を読む</a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── FAQ ──────────────────────── -->
-  <section class="section section--tint">
-    <div class="container--narrow">
-      <div class="section-head">
-        <div class="section-label">FAQ</div>
-        <h2 class="section-title">よくある質問</h2>
-      </div>
-      <div class="faq-list">
-        <details class="faq-item">
-          <summary>
-            <div class="faq-q-icon">Q</div>
-            <span class="faq-q-text">このブログのお金の知識はどこで学べますか？</span>
-            <span class="faq-toggle">+</span>
-          </summary>
-          <div class="faq-a">「学ぶ」カテゴリーから、家計管理・投資・借金返済まで、初心者向けの記事を順番に読み進められます。</div>
-        </details>
-        <details class="faq-item">
-          <summary>
-            <div class="faq-q-icon">Q</div>
-            <span class="faq-q-text">初心者でも理解しやすく書かれていますか？</span>
-            <span class="faq-toggle">+</span>
-          </summary>
-          <div class="faq-a">専門用語にはすべて補足を添え、図解と実例を交えて、ゼロから読めるように構成しています。</div>
-        </details>
-        <details class="faq-item">
-          <summary>
-            <div class="faq-q-icon">Q</div>
-            <span class="faq-q-text">アフィリエイト広告はどのように扱われていますか？</span>
-            <span class="faq-toggle">+</span>
-          </summary>
-          <div class="faq-a">PR表記を必ず明示し、実際に使ったサービスのみを推奨しています。広告主から内容指示を受けることはありません。</div>
-        </details>
-        <details class="faq-item">
-          <summary>
-            <div class="faq-q-icon">Q</div>
-            <span class="faq-q-text">記事の内容はどのように作られていますか？</span>
-            <span class="faq-toggle">+</span>
-          </summary>
-          <div class="faq-a">運営者の実体験と、一次情報・公的データに基づき編集しています。情報の更新日を記事下部に表示しています。</div>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── FINAL CTA ─────────────────── -->
-  <section class="finalcta">
-    <div class="finalcta-inner">
-      <span class="finalcta-eyebrow">Start Today</span>
-      <h2 class="finalcta-h">お金の不安を、<br/>今日から少しずつ減らそう。</h2>
-      <p class="finalcta-sub">知識と行動が、あなたの未来を支えていきます。</p>
-      <div class="finalcta-row">
-        <a class="btn btn-primary btn-lg" href="/blog/">
-          まずは記事で学ぶ <span class="arrow">→</span>
-        </a>
-        <a class="btn btn-ghost btn-lg" href="#compare">
-          サービスを比較する
-        </a>
-        <a class="btn btn-sage btn-lg" href="/line/x-profile-main/">
-          LINEで相談する
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── FOOTER ───────────────────── -->
-  <footer class="footer">
-    <div class="container footer-grid">
-      <div>
-        <div class="footer-h">運営者について</div>
-        <ul class="footer-list">
-          <li><a href="/about">運営者プロフィール</a></li>
-          <li><a href="/about">運営理念</a></li>
-          <li><a href="/about">お問い合わせ</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="footer-h">学ぶカテゴリ</div>
-        <ul class="footer-list">
-          <li><a href="/blog/">お金の基礎</a></li>
-          <li><a href="/blog/">節約・家計</a></li>
-          <li><a href="/blog/">投資・資産形成</a></li>
-          <li><a href="/blog/">借金・返済</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="footer-h">PR・免責</div>
-        <ul class="footer-list">
-          <li><a href="/about">広告掲載基準</a></li>
-          <li><a href="/disclaimer">免責事項</a></li>
-          <li><a href="/privacy">プライバシーポリシー</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="footer-h">LINE相談窓口</div>
-        <ul class="footer-list">
-          <li><a href="/line/x-profile-main/">登録はこちら</a></li>
-          <li><a href="/line/">お知らせ</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div class="container footer-bottom-inner">
-        <div class="footer-brand">
-          <svg width="20" height="20" viewBox="0 0 40 40" fill="none">
-            <rect x="4"  y="22" width="6" height="14" rx="1" fill="#4B6CB7"/>
-            <rect x="13" y="16" width="6" height="20" rx="1" fill="#4B6CB7"/>
-            <rect x="22" y="10" width="6" height="26" rx="1" fill="#4B6CB7"/>
-            <path d="M6 22 L16 14 L24 18 L36 6" stroke="#C9861A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M30 6 L36 6 L36 12" stroke="#C9861A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>田中蓮のマネーブログ</span>
-        </div>
-        <div class="footer-copy">© 2025 田中蓮のマネーブログ. All rights reserved.</div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Sticky CTA (mobile) -->
-  <div class="sticky-cta" id="stickyCta">
-    <a class="btn btn-primary" href="/go/dmm-fx/">
-      DMM FX 無料口座開設 PR →
-    </a>
-  </div>
-
-  <script>
-    // FAQ toggle label
-    document.querySelectorAll('.faq-item').forEach(el => {
-      el.addEventListener('toggle', () => {
-        const t = el.querySelector('.faq-toggle');
-        if (t) t.textContent = el.open ? '×' : '+';
-      });
-    });
-
-    // Scroll with IntersectionObserver
-    const reveals = document.querySelectorAll('.reveal');
-    if ('IntersectionObserver' in window) {
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            io.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.1 });
-      reveals.forEach(el => io.observe(el));
-    } else {
-      reveals.forEach(el => el.classList.add('is-visible'));
-    }
-
-    // Sticky CTA: hide when hero is visible
-    const hero = document.querySelector('.hero');
-    const sticky = document.getElementById('stickyCta');
-    if (hero && sticky) {
-      const heroObs = new IntersectionObserver(([e]) => {
-        sticky.style.opacity = e.isIntersecting ? '0' : '1';
-        sticky.style.pointerEvents = e.isIntersecting ? 'none' : 'auto';
-      }, { threshold: 0.2 });
-      heroObs.observe(hero);
-    }
-  </script>
-
-</body>
-</html>
+</style>

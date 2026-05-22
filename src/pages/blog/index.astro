@@ -7,10 +7,15 @@ const posts = (await getCollection('blog')).sort(
 );
 
 const catColors: Record<string, { bg: string; text: string }> = {
-  'NISA・投資': { bg: '#DBEAFE', text: '#1E40AF' },
+  '保険': { bg: '#DFF5E9', text: '#0E6A49' },
+  '保険相談': { bg: '#DFF5E9', text: '#0E6A49' },
+  'NISA・投資': { bg: '#E0EFFF', text: '#1D5E95' },
   '副業・節税': { bg: '#D1FAE5', text: '#065F46' },
   'お得情報':   { bg: '#FEF3C7', text: '#92400E' },
   'FX・外貨':   { bg: '#FEE2E2', text: '#991B1B' },
+  '投資・資産運用': { bg: '#E0EFFF', text: '#1D5E95' },
+  'クレジットカード': { bg: '#FFF7D8', text: '#856000' },
+  '家計・節約': { bg: '#DFF5E9', text: '#0E6A49' },
 };
 ---
 
@@ -18,8 +23,8 @@ const catColors: Record<string, { bg: string; text: string }> = {
   title="記事一覧"
   description="副業・NISA・節税・FX・クレカなど、お金に関する実体験ベースの記事を読めます。"
 >
-  <div style="margin-bottom:1.25rem;display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
-    <h1 style="font-size:1.5rem;font-weight:700;margin:0;">記事一覧</h1>
+  <div style="margin-bottom:1.5rem;display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
+    <h1 style="font-size:1.8rem;font-weight:900;margin:0;color:#17352a;">記事一覧</h1>
     <p style="font-size:0.875rem;color:var(--color-text-muted);margin:0;">{posts.length}件</p>
   </div>
 
@@ -42,7 +47,7 @@ const catColors: Record<string, { bg: string; text: string }> = {
             width="96"
             height="64"
             loading="lazy"
-            style="width:96px;height:64px;object-fit:cover;border-radius:6px;flex-shrink:0;background:#f1f5f9;"
+            style="width:112px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0;background:#f2fbf5;"
           />
           <div style="min-width:0;flex:1;">
             <div style="margin-bottom:0.3rem;">
@@ -50,7 +55,7 @@ const catColors: Record<string, { bg: string; text: string }> = {
                 {post.data.category}
               </span>
             </div>
-            <h2 style="font-size:0.975rem;font-weight:700;margin:0 0 0.3rem;line-height:1.5;color:#1F2937;">{post.data.title}</h2>
+            <h2 style="font-size:1rem;font-weight:800;margin:0 0 0.3rem;line-height:1.5;color:#17352a;">{post.data.title}</h2>
             <p style="font-size:0.8rem;color:#6B7280;margin:0 0 0.4rem;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{post.data.description}</p>
             <span style="font-size:0.72rem;color:#9CA3AF;">{dateStr}</span>
           </div>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="380" viewBox="0 0 640 380" role="img" aria-label="保険相談のイメージ">
+  <rect width="640" height="380" rx="18" fill="#f2fbf5"/>
+  <rect x="44" y="46" width="552" height="264" rx="18" fill="#fff" stroke="#d7e7df" stroke-width="3"/>
+  <circle cx="176" cy="148" r="48" fill="#f0c9ad"/>
+  <path d="M126 146c6-58 40-86 82-70 26 10 42 34 44 70-32-24-78-26-126 0z" fill="#2b2926"/>
+  <path d="M102 278c26-58 54-86 86-86s60 28 86 86z" fill="#17352a"/>
+  <circle cx="420" cy="148" r="48" fill="#e9bda0"/>
+  <path d="M370 146c8-56 42-80 84-66 24 8 40 30 42 66-34-22-78-24-126 0z" fill="#594032"/>
+  <path d="M346 278c26-58 54-86 86-86s60 28 86 86z" fill="#0f8a5f"/>
+  <rect x="260" y="98" width="126" height="154" rx="12" fill="#f9fcfa" stroke="#d7e7df" stroke-width="3"/>
+  <path d="M288 148h70M288 182h58M288 216h76" stroke="#b8dccb" stroke-width="10" stroke-linecap="round"/>
+  <path d="M286 260l34 34 72-86" fill="none" stroke="#0f8a5f" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="94" y="320" width="452" height="28" rx="14" fill="#f0c85a"/>
+</svg>
