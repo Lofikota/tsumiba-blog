@@ -37,6 +37,7 @@ const dryRun = hasArg('--dry-run');
 const overwrite = hasArg('--overwrite');
 const allMode = hasArg('--all');
 const allCategories = hasArg('--all-categories');
+const onlyNonFx = hasArg('--only-non-fx');
 const limit = Number(getArg('--limit') ?? 999);
 
 const model = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1.5';
@@ -116,6 +117,7 @@ function listTargets() {
       return { slug, filePath, content, data };
     })
     .filter((item) => slugArg || allCategories || isFxArticle(item))
+    .filter((item) => !onlyNonFx || !isFxArticle(item))
     .filter((item) => overwrite || !item.data.heroImage || item.data.heroImage.startsWith('/og/') || item.data.heroImage.startsWith('/thumbnails/'))
     .sort((a, b) => {
       const dateA = Date.parse(a.data.pubDate || '') || 0;
@@ -130,24 +132,75 @@ function promptForArticle({ slug, data }) {
   const title = data.title || slug;
   const description = data.description || '';
 
-  const scene = [
-    'a focused Japanese office worker comparing FX account conditions on a laptop',
-    'currency charts, risk notes, a simple comparison checklist, and a clean desk',
-    'disciplined and cautious mood, modern Japanese work-from-home setting',
-  ].join(', ');
+  const isFx = category === 'FX・外貨' || FX_SLUGS.has(slug) || slug.includes('fx');
+  const categoryScenes = {
+    '保険': {
+      direction: 'Insurance and household fixed-cost review. Show trustworthy consultation and decision support, not sales pressure.',
+      scene: 'a calm Japanese household insurance review scene, insurance papers, family budget notes, laptop checklist, warm daylight, trustworthy consultation mood',
+      avoid: 'FX charts, trading screens, broker visuals, gambling feeling, get-rich-quick mood',
+    },
+    'NISA・投資': {
+      direction: 'Long-term investing and asset-building education. Show patient planning and low-pressure decision support.',
+      scene: 'a Japanese office worker planning long-term investments with a notebook, tablet portfolio chart, simple asset allocation notes, calm morning light',
+      avoid: 'FX trading screens, insurance consultation scenes, credit card closeups, profit guarantees',
+    },
+    '投資・資産運用': {
+      direction: 'Long-term asset management education. Show careful comparison and financial planning.',
+      scene: 'a clean Japanese work desk with portfolio notes, tablet charts, calendar, and investment planning documents, realistic apartment setting',
+      avoid: 'FX speculation visuals, luxury flexing, guaranteed returns, exaggerated money piles',
+    },
+    '副業・節税': {
+      direction: 'Side business and tax preparation for salaried workers. Show practical documentation and action steps.',
+      scene: 'a Japanese office worker organizing receipts, tax forms, laptop spreadsheet, and a checklist after work, practical side-business atmosphere',
+      avoid: 'FX charts, broker screens, insurance sales scenes, luxury flexing',
+    },
+    'クレジットカード': {
+      direction: 'Credit card comparison and everyday value. Show practical card choice, points, and household use cases.',
+      scene: 'a tidy desk with generic credit cards without logos, point statements, smartphone payment screen, and budgeting notebook, premium but realistic',
+      avoid: 'brand logos, readable card numbers, FX charts, insurance consultation scenes, get-rich-quick mood',
+    },
+    'お得情報': {
+      direction: 'Everyday savings and practical money choices. Show useful comparison, not cheap-looking coupon spam.',
+      scene: 'a clean household budgeting scene with smartphone coupons, generic cards, calculator, and a notebook, practical saving mood',
+      avoid: 'FX trading screens, broker logos, gambling feeling, exaggerated money piles',
+    },
+    '家計・節約': {
+      direction: 'Household budgeting and fixed-cost reduction. Show calm planning and easy next steps.',
+      scene: 'a Japanese household budgeting table with bills, notebook, calculator, tea, and a simple checklist, reassuring everyday atmosphere',
+      avoid: 'FX trading screens, broker logos, luxury flexing, get-rich-quick mood',
+    },
+  };
+
+  const fxSpec = {
+    direction: 'FX-focused. Prioritize FX account comparison, DMM FX, JFX, FXTF, beginner risk management, and office-worker decision support.',
+    scene: [
+      'a focused Japanese office worker comparing FX account conditions on a laptop',
+      'currency charts, risk notes, a simple comparison checklist, and a clean desk',
+      'disciplined and cautious mood, modern Japanese work-from-home setting',
+    ].join(', '),
+    avoid: 'tax-saving visuals, NISA visuals, insurance consultation scenes, household budgeting scenes, credit cards, profit guarantees, get-rich-quick mood',
+  };
+
+  const spec = isFx ? fxSpec : (categoryScenes[category] || {
+    direction: 'Personal finance affiliate blog image. Show reader problem-solving, trust, and practical comparison.',
+    scene: 'a realistic Japanese personal finance blog image with a laptop, notebook, documents, and warm natural light',
+    avoid: 'brand logos, watermarks, exaggerated money piles, gambling feeling, get-rich-quick mood, profit guarantees',
+  });
 
   return [
     'Use case: photorealistic-natural',
-    'Asset type: 16:9 hero image for a Japanese FX account comparison affiliate blog article',
-    'Business direction: FX-focused only. Prioritize FX account comparison, DMM FX, JFX, FXTF, beginner risk management, and office-worker decision support.',
+    'Asset type: 16:9 hero image for a Japanese personal finance affiliate blog article',
+    `Business direction: ${spec.direction}`,
+    'Marketing perspective: reader-first problem solving, trustworthy comparison, clear next action, no hard-selling, no exaggerated success imagery.',
+    'Persona perspective: Tanaka Ren, a 30s Japanese IT office worker, explains money decisions from practical lived experience.',
     `Article title for context: ${title}`,
     `Article category: ${category}`,
     description ? `Article description: ${description}` : '',
-    `Scene/backdrop: ${scene}.`,
+    `Scene/backdrop: ${spec.scene}.`,
     'Subject: realistic Japanese 30s office worker or hands-only composition depending on what feels natural; no identifiable celebrity; no brand logos, no broker logos.',
     'Composition: editorial blog cover, strong central visual, clean negative space near the top-left for page layout, professional WordPress-style article thumbnail.',
     'Style: photorealistic, trustworthy, warm daylight, premium but not luxury, practical financial comparison mood, high detail, natural colors.',
-    'Avoid: in-image text, fake UI labels, brand logos, watermarks, exaggerated money piles, gambling feeling, get-rich-quick mood, profit guarantees, luxury flexing, tax-saving visuals, NISA visuals, insurance consultation scenes, household budgeting scenes, credit cards.',
+    `Avoid: in-image text, fake UI labels, brand logos, watermarks, exaggerated money piles, ${spec.avoid}.`,
     'Output: landscape image, no text.'
   ].filter(Boolean).join('\n');
 }
