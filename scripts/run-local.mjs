@@ -146,19 +146,28 @@ const articlePath = path.join(ROOT, `src/content/blog/${pending.slug}.mdx`);
 runNode('internal-links.mjs', [], '内部リンク自動挿入');
 
 // ───────────────────────────────
-// Step 4: 品質チェック
+// Step 4: 記事画像生成
+// ───────────────────────────────
+if (DRY_RUN || !process.env.OPENAI_API_KEY) {
+  console.log('\n[スキップ] 記事画像生成 (OPENAI_API_KEY が未設定またはdry-run)');
+} else {
+  runNode('generate-article-images.mjs', ['--slug', pending.slug], '記事画像生成 (OpenAI Image API)');
+}
+
+// ───────────────────────────────
+// Step 5: 品質チェック
 // ───────────────────────────────
 if (!DRY_RUN && fs.existsSync(articlePath)) {
   runNode('quality-gate.mjs', [articlePath], '品質チェック (TETSU/AKIRA)');
 }
 
 // ───────────────────────────────
-// Step 5: Astro ビルド
+// Step 6: Astro ビルド
 // ───────────────────────────────
 runNpm('build', 'Astro ビルド');
 
 // ───────────────────────────────
-// Step 6: git push
+// Step 7: git push
 // ───────────────────────────────
 if (NO_PUSH) {
   console.log('\n[--no-push] git push をスキップします');
@@ -167,7 +176,7 @@ if (NO_PUSH) {
   if (!DRY_RUN) {
     runGit(['config', 'user.name', 'ren-bot[bot]']);
     runGit(['config', 'user.email', 'bot@ren-money.com']);
-    runGit(['add', 'src/content/blog/', 'data/keyword-queue.json', 'KPI管理/automation-runs/']);
+    runGit(['add', 'src/content/blog/', 'public/images/articles/', 'data/keyword-queue.json', 'KPI管理/automation-runs/']);
 
     const diff = runGit(['diff', '--staged', '--quiet']);
     if (diff === '') {
@@ -186,7 +195,7 @@ if (NO_PUSH) {
 }
 
 // ───────────────────────────────
-// Step 7: X 投稿
+// Step 8: X 投稿
 // ───────────────────────────────
 if (NO_X || !process.env.X_API_KEY) {
   console.log('\n[スキップ] X投稿 (X_API_KEY が未設定またはフラグあり)');
@@ -196,7 +205,7 @@ if (NO_X || !process.env.X_API_KEY) {
 }
 
 // ───────────────────────────────
-// Step 8: LINE 通知
+// Step 9: LINE 通知
 // ───────────────────────────────
 if (NO_LINE || !process.env.LINE_CHANNEL_ACCESS_TOKEN) {
   console.log('\n[スキップ] LINE通知 (LINE_CHANNEL_ACCESS_TOKEN が未設定またはフラグあり)');
