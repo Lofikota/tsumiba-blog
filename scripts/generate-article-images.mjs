@@ -60,6 +60,7 @@ function parseFrontmatter(content) {
     data: {
       title: getString('title'),
       description: getString('description'),
+      pubDate: getString('pubDate'),
       category: getString('category'),
       heroImage: getString('heroImage'),
     },
@@ -95,6 +96,11 @@ function listTargets() {
       return { slug, filePath, content, data };
     })
     .filter((item) => overwrite || !item.data.heroImage || item.data.heroImage.startsWith('/og/') || item.data.heroImage.startsWith('/thumbnails/'))
+    .sort((a, b) => {
+      const dateA = Date.parse(a.data.pubDate || '') || 0;
+      const dateB = Date.parse(b.data.pubDate || '') || 0;
+      return dateB - dateA || a.slug.localeCompare(b.slug);
+    })
     .slice(0, limit);
 }
 
