@@ -13,6 +13,23 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const BLOG_DIR = path.join(ROOT, 'src/content/blog');
 const BASE_URL = '/blog';
+const STOP_TAGS = new Set([
+  'FX',
+  'NISA',
+  'iDeCo',
+  '初心者',
+  'おすすめ',
+  '口座開設',
+  'レビュー',
+  '比較',
+  'ポイント',
+  'リスク',
+  '税金',
+  '節税',
+  'クレカ',
+  '保険',
+  '副業',
+]);
 
 // frontmatter から値を取得
 function parseFrontmatter(content) {
@@ -49,7 +66,7 @@ function buildLinkMap() {
     if (tagsMatch) {
       const tags = tagsMatch[1].split(',').map(t => t.trim().replace(/['"]/g, ''));
       for (const tag of tags) {
-        if (tag.length >= 3 && !map.has(tag)) {
+        if (tag.length >= 3 && !STOP_TAGS.has(tag) && !map.has(tag)) {
           map.set(tag, { url, slug });
         }
       }
