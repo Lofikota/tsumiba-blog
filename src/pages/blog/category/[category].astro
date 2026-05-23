@@ -14,8 +14,9 @@ const categoryName = SLUG_TO_CATEGORY[slug] ?? '';
 const catInfo = CATEGORIES[categoryName];
 
 const allPosts = await getCollection('blog');
+const matchSlugs = catInfo?.matchSlugs ?? [];
 const posts = allPosts
-  .filter(p => p.data.category === categoryName)
+  .filter(p => p.data.category === categoryName || matchSlugs.includes(p.id))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const SITE_URL = 'https://ren-money.com';
@@ -32,14 +33,12 @@ const breadcrumbJsonLd = JSON.stringify({
 });
 
 const catColors: Record<string, { bg: string; text: string }> = {
-  'FX・外貨':     { bg: '#FEE2E2', text: '#991B1B' },
-  'NISA・投資':   { bg: '#DBEAFE', text: '#1E40AF' },
-  '副業・節税':   { bg: '#D1FAE5', text: '#065F46' },
-  '保険':         { bg: '#E0E7FF', text: '#3730A3' },
-  'お得情報':     { bg: '#FEF3C7', text: '#92400E' },
-  '投資・資産運用': { bg: '#DBEAFE', text: '#1E40AF' },
-  'クレジットカード': { bg: '#FEF3C7', text: '#92400E' },
-  '家計・節約':   { bg: '#D1FAE5', text: '#065F46' },
+  'FX口座比較':     { bg: '#FEE2E2', text: '#991B1B' },
+  'FX初心者ガイド': { bg: '#E0F2FE', text: '#075985' },
+  'DMM FX':         { bg: '#FFF7ED', text: '#9A3412' },
+  'JFX':            { bg: '#ECFDF5', text: '#047857' },
+  'FXTF':           { bg: '#EEF2FF', text: '#4338CA' },
+  'FXリスク管理':   { bg: '#FEF3C7', text: '#92400E' },
 };
 const cc = catColors[categoryName] ?? { bg: '#E5E7EB', text: '#374151' };
 ---

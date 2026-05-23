@@ -24,7 +24,7 @@ const {
 } = Astro.props;
 const siteUrl = 'https://ren-money.com';
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
-const siteName = '田中蓮のマネーブログ';
+const siteName = '田中蓮のFX比較ブログ';
 const pageTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 const absoluteImageUrl = new URL(image, siteUrl);
 const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';
@@ -202,12 +202,12 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
           <path d="M6 22 L16 14 L24 18 L36 6" stroke="#0F8A5F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M30 6 L36 6 L36 12" stroke="#0F8A5F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span class="bl-brand-text">田中蓮のマネーブログ</span>
+        <span class="bl-brand-text">田中蓮のFX比較ブログ</span>
       </a>
       <nav class="bl-nav">
-        <a href="/#articles">記事一覧</a>
-        <a href="/#hoken">保険相談</a>
-        <a href="/#themes">テーマ</a>
+        <a href="/#articles">FX口座比較</a>
+        <a href="/blog/dmm-fx-review/">DMM FX</a>
+        <a href="/blog/fx-shoshinsha-guide/">FX初心者</a>
         <a href="/line/x-profile-main/">LINE</a>
       </nav>
     </div>
@@ -228,7 +228,7 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
         <path d="M6 22 L16 14 L24 18 L36 6" stroke="#E8940F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M30 6 L36 6 L36 12" stroke="#E8940F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      田中蓮のマネーブログ
+      田中蓮のFX比較ブログ
     </div>
     <p style="font-size:10px;color:#9CA3AF;margin-bottom:10px;letter-spacing:.06em;">PR・アフィリエイト広告を含みます</p>
     <nav class="bl-footer-nav">

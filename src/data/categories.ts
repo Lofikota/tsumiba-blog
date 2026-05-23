@@ -1,43 +1,39 @@
-export const CATEGORIES: Record<string, { slug: string; label: string; description: string }> = {
-  'FX・外貨': {
+export const CATEGORIES: Record<string, { slug: string; label: string; description: string; matchSlugs?: string[] }> = {
+  'FX口座比較': {
     slug: 'fx',
-    label: 'FX・外貨',
-    description: 'FX口座の選び方・比較・レビュー。初心者が知っておくべきリスクと始め方を解説します。',
+    label: 'FX口座比較',
+    description: 'DMM FX・JFX・FXTF・松井証券FXなど、FX口座の条件、ツール、スプレッド、注意点を比較します。',
+    matchSlugs: ['fx-kouza-hikaku', 'dmm-fx-review', 'jfx-review', 'fxtf-review', 'matsui-fx-review'],
   },
-  'NISA・投資': {
-    slug: 'nisa',
-    label: 'NISA・投資',
-    description: 'つみたてNISA・新NISA・iDeCoの始め方から証券口座比較まで、資産形成の基礎を解説。',
+  'FX初心者ガイド': {
+    slug: 'fx-beginner',
+    label: 'FX初心者ガイド',
+    description: 'FXを始める前に確認したい仕組み、少額スタート、レバレッジ、損失リスクを整理します。',
+    matchSlugs: ['fx-shoshinsha-guide', 'fx-small-start-guide', 'fx-yametoke-reason', 'fx-company-barenai'],
   },
-  '副業・節税': {
-    slug: 'fukugyo',
-    label: '副業・節税',
-    description: '在宅副業・確定申告・節税の実践情報。田中蓮が実際にやってみた方法をまとめています。',
+  'DMM FX': {
+    slug: 'dmm-fx',
+    label: 'DMM FX',
+    description: 'DMM FXの条件、ツール、スプレッド、向いている人、申し込み前の注意点を整理します。',
+    matchSlugs: ['dmm-fx-review'],
   },
-  '保険': {
-    slug: 'hoken',
-    label: '保険',
-    description: '保険の見直し・選び方・FP相談の活用方法。無駄な保険料を減らすための実践情報。',
+  'JFX': {
+    slug: 'jfx',
+    label: 'JFX',
+    description: 'JFXの取引環境、ツール、短期売買との相性、初心者が見るべき注意点を整理します。',
+    matchSlugs: ['jfx-review'],
   },
-  'お得情報': {
-    slug: 'otoku',
-    label: 'お得情報',
-    description: 'クレジットカード・ポイ活・キャンペーン情報。日常のお得を賢く活用する方法。',
+  'FXTF': {
+    slug: 'fxtf',
+    label: 'FXTF',
+    description: 'FXTFの取引単位、ツール、口座条件、比較時に確認したいポイントを整理します。',
+    matchSlugs: ['fxtf-review'],
   },
-  '投資・資産運用': {
-    slug: 'toshi',
-    label: '投資・資産運用',
-    description: '株式投資・投資信託・証券口座の選び方など、資産運用の基礎知識を解説。',
-  },
-  'クレジットカード': {
-    slug: 'credit-card',
-    label: 'クレジットカード',
-    description: 'クレジットカードの選び方・比較・ポイント活用術。',
-  },
-  '家計・節約': {
-    slug: 'kakei',
-    label: '家計・節約',
-    description: '家計管理・節約術・固定費の見直し方法。',
+  'FXリスク管理': {
+    slug: 'fx-risk',
+    label: 'FXリスク管理',
+    description: '会社員がFXを始める前に確認したいレバレッジ、損失管理、税金、勤務先への注意点を整理します。',
+    matchSlugs: ['fx-leverage-risk-guide', 'fx-kakuteishinkoku-guide', 'fx-company-barenai', 'fx-yametoke-reason'],
   },
 };
 

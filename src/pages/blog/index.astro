@@ -2,29 +2,23 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const posts = (await getCollection('blog')).sort(
+const allPosts = (await getCollection('blog')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
+const posts = allPosts.filter((post) => post.data.category === 'FX・外貨' || post.id.includes('fx') || ['dmm-fx-review', 'jfx-review', 'fxtf-review', 'matsui-fx-review'].includes(post.id));
+
 const catColors: Record<string, { bg: string; text: string }> = {
-  '保険': { bg: '#DFF5E9', text: '#0E6A49' },
-  '保険相談': { bg: '#DFF5E9', text: '#0E6A49' },
-  'NISA・投資': { bg: '#E0EFFF', text: '#1D5E95' },
-  '副業・節税': { bg: '#D1FAE5', text: '#065F46' },
-  'お得情報':   { bg: '#FEF3C7', text: '#92400E' },
   'FX・外貨':   { bg: '#FEE2E2', text: '#991B1B' },
-  '投資・資産運用': { bg: '#E0EFFF', text: '#1D5E95' },
-  'クレジットカード': { bg: '#FFF7D8', text: '#856000' },
-  '家計・節約': { bg: '#DFF5E9', text: '#0E6A49' },
 };
 ---
 
 <BaseLayout
-  title="記事一覧"
-  description="副業・NISA・節税・FX・クレカなど、お金に関する実体験ベースの記事を読めます。"
+  title="FX記事一覧"
+  description="DMM FX・JFX・FXTF・松井証券FXなど、FX口座比較と初心者向けリスク管理の記事を読めます。"
 >
   <div style="margin-bottom:1.5rem;display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
-    <h1 style="font-size:1.8rem;font-weight:900;margin:0;color:#17352a;">記事一覧</h1>
+    <h1 style="font-size:1.8rem;font-weight:900;margin:0;color:#17352a;">FX記事一覧</h1>
     <p style="font-size:0.875rem;color:var(--color-text-muted);margin:0;">{posts.length}件</p>
   </div>
 

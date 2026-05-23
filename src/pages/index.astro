@@ -1,125 +1,138 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { CATEGORIES } from '../data/categories';
 
 const allPosts = (await getCollection('blog')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
-const mustReadSlugs = [
-  'hoken-soudan-muryou-hikaku',
-  'hoken-minaoshi-30dai-kaisha-in',
-  'fx-kouza-hikaku',
-  'dmm-fx-review',
-  'nisa-hajimekata',
-  'fukugyo-zeikin',
-];
-
-const rankingSlugs = [
-  'hoken-soudan-muryou-hikaku',
-  'dmm-fx-review',
-  'fx-kouza-hikaku',
-  'hoken-minaoshi-fp-soudan',
-  'nisa-hajimekata',
-];
-
 const postBySlug = new Map(allPosts.map((post) => [post.id, post]));
-const mustReadPosts = mustReadSlugs.map((slug) => postBySlug.get(slug)).filter(Boolean);
-const rankingPosts = rankingSlugs.map((slug) => postBySlug.get(slug)).filter(Boolean);
-const latestPosts = allPosts.slice(0, 8);
+
+const pickPosts = (slugs: string[]) => slugs.map((slug) => postBySlug.get(slug)).filter((post): post is typeof allPosts[number] => Boolean(post));
+
+const moneyRoutePosts = pickPosts([
+  'fx-kouza-hikaku',
+  'dmm-fx-review',
+  'jfx-review',
+  'fxtf-review',
+  'fx-shoshinsha-guide',
+  'fx-small-start-guide',
+]);
+
+const rankingPosts = pickPosts([
+  'dmm-fx-review',
+  'jfx-review',
+  'fxtf-review',
+  'matsui-fx-review',
+  'fx-shoshinsha-guide',
+]);
+
+const latestPosts = allPosts.filter((post) => post.data.category === 'FX・外貨' || post.id.includes('fx')).slice(0, 10);
+const primary = postBySlug.get('fx-kouza-hikaku') ?? latestPosts[0] ?? allPosts[0];
 
 const categoryTone: Record<string, string> = {
-  '保険': 'cat-green',
-  '保険相談': 'cat-green',
-  'FX・外貨': 'cat-red',
-  'NISA・投資': 'cat-blue',
-  '投資・資産運用': 'cat-blue',
-  '副業・節税': 'cat-amber',
-  'お得情報': 'cat-yellow',
-  'クレジットカード': 'cat-yellow',
-  '家計・節約': 'cat-green',
+  'FX・外貨': 'tone-fx',
 };
 
-const categories = [
-  { label: '保険相談', href: '/blog/category/hoken/', count: allPosts.filter((p) => p.data.category.includes('保険')).length },
-  { label: 'FX・外貨', href: '/blog/category/fx/', count: allPosts.filter((p) => p.data.category === 'FX・外貨').length },
-  { label: 'NISA・投資', href: '/blog/category/nisa/', count: allPosts.filter((p) => p.data.category.includes('投資') || p.data.category.includes('NISA')).length },
-  { label: '副業・節税', href: '/blog/category/fukugyo/', count: allPosts.filter((p) => p.data.category === '副業・節税').length },
-  { label: '家計・節約', href: '/blog/category/kakei/', count: allPosts.filter((p) => p.data.category === '家計・節約').length },
+const countBySlugs = (slugs: string[]) => slugs.filter((slug) => postBySlug.has(slug)).length;
+
+const categoryNav = [
+  { name: 'FX口座比較', lead: 'DMM FX・JFX・FXTFを比較', icon: 'FX', href: `/blog/category/${CATEGORIES['FX口座比較'].slug}/`, count: countBySlugs(CATEGORIES['FX口座比較'].matchSlugs ?? []) },
+  { name: 'FX初心者ガイド', lead: '仕組みと始め方を確認', icon: '入', href: `/blog/category/${CATEGORIES['FX初心者ガイド'].slug}/`, count: countBySlugs(CATEGORIES['FX初心者ガイド'].matchSlugs ?? []) },
+  { name: 'DMM FX', lead: '条件とツールを確認', icon: 'D', href: `/blog/category/${CATEGORIES['DMM FX'].slug}/`, count: countBySlugs(CATEGORIES['DMM FX'].matchSlugs ?? []) },
+  { name: 'JFX', lead: '短期売買との相性を確認', icon: 'J', href: `/blog/category/${CATEGORIES['JFX'].slug}/`, count: countBySlugs(CATEGORIES['JFX'].matchSlugs ?? []) },
+  { name: 'FXTF', lead: '少額取引とツールを確認', icon: 'F', href: `/blog/category/${CATEGORIES['FXTF'].slug}/`, count: countBySlugs(CATEGORIES['FXTF'].matchSlugs ?? []) },
+  { name: 'FXリスク管理', lead: '損失・税金・会社員の注意点', icon: '守', href: `/blog/category/${CATEGORIES['FXリスク管理'].slug}/`, count: countBySlugs(CATEGORIES['FXリスク管理'].matchSlugs ?? []) },
 ];
 
-const primary = postBySlug.get('hoken-soudan-muryou-hikaku') ?? allPosts[0];
+const conversionBoxes = [
+  {
+    label: 'FX口座比較',
+    title: 'まず3社の違いを見たい',
+    body: 'DMM FX、JFX、FXTFの取引単位、ツール、スプレッド、向いている人を比較。',
+    href: '/blog/fx-kouza-hikaku/',
+  },
+  {
+    label: 'DMM FX',
+    title: '王道口座から確認したい',
+    body: 'DMM FXの特徴、注意点、初心者が申し込み前に見るべき条件を整理。',
+    href: '/blog/dmm-fx-review/',
+  },
+  {
+    label: 'LINE',
+    title: '自分に合う順番で読みたい',
+    body: 'FX口座比較、初心者ガイド、リスク管理の記事を迷わず読める順番で案内。',
+    href: '/line/x-profile-main/',
+  },
+];
+
+const formatDate = (date: Date) => date.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
+const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/${post.id}.svg`;
 ---
 
 <BaseLayout
-  title="田中蓮のマネーブログ"
-  description="保険相談・FX・NISA・副業を、30代会社員の目線で比較する収益ブログ。申し込み前に条件・注意点・向き不向きを整理できます。"
-  image="/og/hoken-soudan-muryou-hikaku.svg"
+  title="会社員向けFX口座比較ブログ"
+  description="DMM FX・JFX・FXTFを申し込む前に、スプレッド、取引単位、ツール、リスク、向いている人を会社員目線で整理するFX特化ブログです。"
+  image="/og/fx-kouza-hikaku.svg"
   wide={true}
 >
-  <section class="wp-hero">
-    <div>
-      <p class="wp-kicker">30代会社員向けの金融・保険アフィリエイトブログ</p>
-      <h1>保険相談・FX・NISAを<br />申し込む前に比較するブログ</h1>
-      <p class="wp-lead">
-        公式サイトを見る前に、条件・注意点・向いている人を整理。
-        収益導線は置きつつ、即決させない比較型の記事で信頼を取りにいきます。
+  <section class="site-hero">
+    <div class="hero-copy">
+      <p class="eyebrow">会社員向けFX口座比較ブログ</p>
+      <h1>DMM FX・JFX・FXTFを<br />申し込む前に比較。</h1>
+      <p class="hero-lead">
+        スプレッド、取引単位、ツール、リスク、向いている人を整理。
+        会社員がFX口座を選ぶ前に、条件と注意点を落ち着いて確認できるブログです。
       </p>
-      <div class="wp-hero-actions">
-        <a class="wp-btn primary" href="/blog/hoken-soudan-muryou-hikaku/">無料保険相談を比較する</a>
-        <a class="wp-btn ghost" href="/blog/fx-kouza-hikaku/">FX口座を比較する</a>
+      <div class="hero-buttons">
+        <a class="btn btn-main" href="/blog/fx-kouza-hikaku/">FX口座を比較する</a>
+        <a class="btn btn-sub" href="/blog/dmm-fx-review/">DMM FXのレビューを見る</a>
       </div>
+      <ul class="trust-row" aria-label="ブログの方針">
+        <li>PR表記あり</li>
+        <li>注意点も記載</li>
+        <li>30代会社員目線</li>
+      </ul>
     </div>
-    <div class="wp-hero-panel">
-      <p>まず読むべき記事</p>
-      <a href={`/blog/${primary.id}/`}>
-        <img src={primary.data.heroImage ?? `/og/${primary.id}.svg`} alt="" width="420" height="236" />
-        <strong>{primary.data.title}</strong>
-        <span>{primary.data.description}</span>
-      </a>
-    </div>
+
+    <a class="hero-feature" href={`/blog/${primary.id}/`}>
+      <span class="feature-label">最初に読むなら</span>
+      <img src={imageFor(primary)} alt="" width="620" height="360" />
+      <div class="feature-body">
+        <span class={`cat ${categoryTone[primary.data.category] ?? 'tone-gray'}`}>{primary.data.category}</span>
+        <h2>{primary.data.title}</h2>
+        <p>{primary.data.description}</p>
+      </div>
+    </a>
   </section>
 
-  <div class="wp-layout">
-    <main class="wp-main">
-      <section class="wp-section">
-        <div class="wp-section-head">
-          <p>START HERE</p>
-          <h2>まず読むべき記事</h2>
-        </div>
-        <div class="featured-grid">
-          {mustReadPosts.map((post) => {
-            const tone = categoryTone[post.data.category] ?? 'cat-gray';
-            return (
-              <article class="featured-card">
-                <a href={`/blog/${post.id}/`}>
-                  <img src={post.data.heroImage ?? `/thumbnails/${post.id}.svg`} alt="" width="360" height="210" loading="lazy" />
-                  <div class="featured-body">
-                    <span class={`cat ${tone}`}>{post.data.category}</span>
-                    <h3>{post.data.title}</h3>
-                    <p>{post.data.description}</p>
-                  </div>
-                </a>
-              </article>
-            );
-          })}
-        </div>
-      </section>
+  <nav class="category-strip" aria-label="主要カテゴリ">
+    {categoryNav.map((category) => (
+      <a href={category.href}>
+        <span>{category.icon}</span>
+        <strong>{category.name}</strong>
+        <em>{category.lead}</em>
+      </a>
+    ))}
+  </nav>
 
-      <section class="wp-section">
-        <div class="wp-section-head">
-          <p>RANKING</p>
-          <h2>収益導線に近い人気記事</h2>
+  <div class="page-grid">
+    <main class="content-stack">
+      <section class="section-block" id="articles">
+        <div class="section-title">
+          <p>START HERE</p>
+          <h2>まず読むべきFX記事</h2>
         </div>
-        <div class="ranking-list">
-          {rankingPosts.map((post, index) => (
-            <article class="ranking-item">
+        <div class="lead-grid">
+          {moneyRoutePosts.map((post, index) => (
+            <article class:list={['lead-card', index === 0 && 'lead-card-large']}>
               <a href={`/blog/${post.id}/`}>
-                <span class="rank-num">{index + 1}</span>
-                <img src={post.data.heroImage ?? `/thumbnails/${post.id}.svg`} alt="" width="132" height="82" loading="lazy" />
-                <div>
-                  <span class={`cat ${categoryTone[post.data.category] ?? 'cat-gray'}`}>{post.data.category}</span>
+                <img src={imageFor(post)} alt="" width="420" height="236" loading={index === 0 ? undefined : 'lazy'} />
+                <div class="lead-card-body">
+                  <span class={`cat ${categoryTone[post.data.category] ?? 'tone-gray'}`}>{post.data.category}</span>
                   <h3>{post.data.title}</h3>
+                  <p>{post.data.description}</p>
                 </div>
               </a>
             </article>
@@ -127,65 +140,114 @@ const primary = postBySlug.get('hoken-soudan-muryou-hikaku') ?? allPosts[0];
         </div>
       </section>
 
-      <section class="wp-section cta-box">
-        <div>
-          <p class="wp-kicker">LINE FUNNEL</p>
-          <h2>記事で迷った人をLINEへ回収する</h2>
-          <p>保険・FX・NISAのどれから見るべきか、登録後にテーマ別で整理できます。売り込みより先に、比較軸を渡す導線です。</p>
+      <section class="section-block">
+        <div class="section-title">
+          <p>CONVERSION ROUTE</p>
+          <h2>申し込み前の迷い別入口</h2>
         </div>
-        <a class="wp-btn line" href="/line/x-profile-main/">LINEで受け取る</a>
+        <div class="route-grid">
+          {conversionBoxes.map((box) => (
+            <a class="route-card" href={box.href}>
+              <span>{box.label}</span>
+              <strong>{box.title}</strong>
+              <p>{box.body}</p>
+            </a>
+          ))}
+        </div>
       </section>
 
-      <section class="wp-section">
-        <div class="wp-section-head">
+      <section class="section-block">
+        <div class="section-title">
+          <p>RANKING</p>
+          <h2>FX口座・初心者記事ランキング</h2>
+        </div>
+        <div class="ranking-list">
+          {rankingPosts.map((post, index) => (
+            <article class="ranking-item">
+              <a href={`/blog/${post.id}/`}>
+                <span class="rank">{index + 1}</span>
+                <img src={imageFor(post)} alt="" width="168" height="96" loading="lazy" />
+                <div>
+                  <span class={`cat ${categoryTone[post.data.category] ?? 'tone-gray'}`}>{post.data.category}</span>
+                  <h3>{post.data.title}</h3>
+                  <p>{post.data.description}</p>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="line-band">
+        <div>
+          <p>無料LINE</p>
+          <h2>FX口座選びで迷ったら</h2>
+          <span>DMM FX・JFX・FXTFの比較軸と、初心者が申し込み前に見るべきリスクを整理して送ります。</span>
+        </div>
+        <a href="/line/x-profile-main/">LINEでFX比較軸を受け取る</a>
+      </section>
+
+      <section class="section-block">
+        <div class="section-title">
           <p>NEW POSTS</p>
           <h2>新着記事</h2>
         </div>
-        <div class="post-list">
-          {latestPosts.map((post) => {
-            const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
-            return (
-              <article class="post-row">
-                <a href={`/blog/${post.id}/`}>
-                  <img src={post.data.heroImage ?? `/thumbnails/${post.id}.svg`} alt="" width="176" height="104" loading="lazy" />
-                  <div>
-                    <span class={`cat ${categoryTone[post.data.category] ?? 'cat-gray'}`}>{post.data.category}</span>
-                    <h3>{post.data.title}</h3>
-                    <p>{post.data.description}</p>
-                    <time datetime={post.data.pubDate.toISOString()}>{dateStr}</time>
-                  </div>
-                </a>
-              </article>
-            );
-          })}
+        <div class="new-list">
+          {latestPosts.map((post) => (
+            <article class="new-row">
+              <a href={`/blog/${post.id}/`}>
+                <img src={imageFor(post)} alt="" width="190" height="108" loading="lazy" />
+                <div>
+                  <span class={`cat ${categoryTone[post.data.category] ?? 'tone-gray'}`}>{post.data.category}</span>
+                  <h3>{post.data.title}</h3>
+                  <p>{post.data.description}</p>
+                  <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+                </div>
+              </a>
+            </article>
+          ))}
         </div>
       </section>
     </main>
 
-    <aside class="wp-sidebar">
-      <section class="side-card profile">
-        <div class="avatar">蓮</div>
-        <h2>田中 蓮</h2>
-        <p>30代IT会社員。保険・FX・NISA・副業を、会社員目線で比較。広告導線はPRとして明記し、注意点もセットで整理します。</p>
+    <aside class="sidebar">
+      <section class="side-card profile-card">
+        <div class="profile-top">
+          <div class="profile-photo">蓮</div>
+          <div>
+            <p>運営者</p>
+            <h2>田中 蓮</h2>
+          </div>
+        </div>
+        <p class="profile-text">
+          30代IT会社員。FX口座の条件・ツール・スプレッド・リスクを会社員目線で比較。広告導線はPRとして明記し、初心者が申し込み前に確認すべき注意点まで整理します。
+        </p>
         <a href="/about/">プロフィールを見る</a>
       </section>
 
       <section class="side-card">
         <h2>カテゴリー</h2>
-        <ul class="category-list">
-          {categories.map((category) => (
-            <li>
-              <a href={category.href}>
-                <span>{category.label}</span>
-                <em>{category.count}</em>
-              </a>
-            </li>
+        <div class="side-category-list">
+          {categoryNav.map((category) => (
+            <a href={category.href}>
+              <span>{category.name}</span>
+              <em>{category.count}</em>
+            </a>
           ))}
-        </ul>
+        </div>
+      </section>
+
+      <section class="side-card hot-card">
+        <h2>今の主導線</h2>
+        <ol>
+          <li><a href="/blog/fx-kouza-hikaku/">FX口座比較を見る</a></li>
+          <li><a href="/blog/dmm-fx-review/">DMM FXの条件を見る</a></li>
+          <li><a href="/blog/fx-shoshinsha-guide/">FX初心者ガイドを見る</a></li>
+        </ol>
       </section>
 
       <section class="side-card side-ranking">
-        <h2>よく読まれる記事</h2>
+        <h2>人気記事</h2>
         {rankingPosts.slice(0, 4).map((post, index) => (
           <a href={`/blog/${post.id}/`}>
             <span>{index + 1}</span>
@@ -194,10 +256,11 @@ const primary = postBySlug.get('hoken-soudan-muryou-hikaku') ?? allPosts[0];
         ))}
       </section>
 
-      <section class="side-card side-cta">
+      <section class="side-card side-line">
         <p>無料</p>
-        <h2>保険・FX・NISAの比較軸をLINEで整理</h2>
-        <a href="/line/x-profile-main/">LINEで受け取る</a>
+        <h2>FX比較で迷う人向け</h2>
+        <span>口座比較、DMM FXレビュー、リスク管理を読む順番で整理します。</span>
+        <a href="/line/x-profile-main/">LINEでFX比較軸を受け取る</a>
       </section>
     </aside>
   </div>
@@ -205,254 +268,433 @@ const primary = postBySlug.get('hoken-soudan-muryou-hikaku') ?? allPosts[0];
 
 <style>
   :global(body) {
-    background: #f5f6f7;
+    background:
+      linear-gradient(180deg, #fffaf0 0, #f6f7f2 280px, #f3f5f2 100%);
+    color: #17211b;
   }
-  .wp-hero {
+  .site-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 420px;
-    gap: 32px;
-    align-items: center;
-    margin: 12px 0 28px;
-    padding: 34px;
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    grid-template-columns: minmax(0, 1fr) 430px;
+    gap: 28px;
+    align-items: stretch;
+    margin: 10px 0 22px;
   }
-  .wp-kicker,
-  .wp-section-head p {
+  .hero-copy,
+  .hero-feature,
+  .section-block,
+  .side-card,
+  .category-strip,
+  .line-band {
+    border: 1px solid #ded7c7;
+    background: #fffdfa;
+    box-shadow: 0 14px 34px rgba(61, 46, 20, .08);
+  }
+  .hero-copy {
+    padding: clamp(26px, 4vw, 46px);
+    border-radius: 6px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.94), rgba(255,250,239,.92)),
+      radial-gradient(circle at top right, rgba(232, 143, 34, .18), transparent 42%);
+  }
+  .eyebrow,
+  .section-title p,
+  .line-band p {
     margin: 0 0 10px;
-    color: #d97706;
-    font-size: .78rem;
+    color: #b66313;
+    font-size: .76rem;
     font-weight: 900;
     letter-spacing: .08em;
   }
-  .wp-hero h1 {
+  .hero-copy h1 {
     margin: 0;
-    color: #111827;
-    font-size: clamp(2.05rem, 4vw, 3.45rem);
-    line-height: 1.22;
+    color: #17211b;
+    font-size: clamp(2.25rem, 4.8vw, 4rem);
+    line-height: 1.18;
     letter-spacing: 0;
   }
-  .wp-lead {
-    max-width: 720px;
-    margin: 18px 0 0;
-    color: #4b5563;
+  .hero-lead {
+    max-width: 710px;
+    margin: 20px 0 0;
+    color: #536158;
     font-size: 1rem;
     line-height: 2;
   }
-  .wp-hero-actions {
+  .hero-buttons {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: 26px;
   }
-  .wp-btn {
+  .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 46px;
+    min-height: 48px;
     padding: 0 22px;
-    border-radius: 6px;
+    border-radius: 4px;
     font-weight: 900;
     text-decoration: none;
   }
-  .wp-btn:hover { text-decoration: none; }
-  .wp-btn.primary { background: #ef8f00; color: #fff; box-shadow: 0 8px 18px rgba(239,143,0,.22); }
-  .wp-btn.ghost { background: #fff; color: #111827; border: 1px solid #d1d5db; }
-  .wp-btn.line { background: #06c755; color: #fff; }
-  .wp-hero-panel {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: #fafafa;
-    padding: 14px;
+  .btn:hover { text-decoration: none; }
+  .btn-main {
+    background: #e87913;
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(232, 121, 19, .24);
   }
-  .wp-hero-panel > p {
-    margin: 0 0 10px;
-    font-size: .82rem;
-    font-weight: 900;
-    color: #111827;
+  .btn-sub {
+    background: #17211b;
+    color: #fff;
   }
-  .wp-hero-panel a {
-    display: block;
+  .trust-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 22px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .trust-row li {
+    border: 1px solid #e5d8bf;
+    background: #fff7e8;
+    color: #77552b;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: .78rem;
+    font-weight: 800;
+  }
+  .hero-feature {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 6px;
     color: inherit;
     text-decoration: none;
   }
-  .wp-hero-panel img,
-  .featured-card img,
-  .post-row img,
-  .ranking-item img {
+  .hero-feature:hover,
+  .lead-card a:hover,
+  .ranking-item a:hover,
+  .new-row a:hover,
+  .route-card:hover {
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+  .feature-label {
+    display: block;
+    padding: 12px 16px;
+    background: #17211b;
+    color: #fff;
+    font-size: .82rem;
+    font-weight: 900;
+  }
+  .hero-feature img,
+  .lead-card img,
+  .ranking-item img,
+  .new-row img {
     width: 100%;
     object-fit: cover;
-    background: #eef2f7;
+    background: #f0eee7;
   }
-  .wp-hero-panel img {
+  .hero-feature img {
     aspect-ratio: 16/9;
-    border-radius: 6px;
-    border: 1px solid #e5e7eb;
   }
-  .wp-hero-panel strong {
-    display: block;
-    margin-top: 12px;
-    color: #111827;
+  .feature-body {
+    padding: 18px;
+  }
+  .feature-body h2,
+  .lead-card h3,
+  .ranking-item h3,
+  .new-row h3,
+  .section-title h2,
+  .line-band h2,
+  .side-card h2 {
+    margin: 0;
+    color: #17211b;
+    letter-spacing: 0;
+  }
+  .feature-body h2 {
+    margin-top: 10px;
+    font-size: 1.12rem;
     line-height: 1.55;
   }
-  .wp-hero-panel span {
+  .feature-body p,
+  .lead-card p,
+  .ranking-item p,
+  .new-row p,
+  .route-card p,
+  .line-band span,
+  .profile-text,
+  .side-line span {
+    color: #657168;
+    line-height: 1.75;
+  }
+  .feature-body p {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    margin-top: 6px;
-    color: #6b7280;
-    font-size: .86rem;
-    line-height: 1.7;
+    margin: 8px 0 0;
+    font-size: .9rem;
   }
-  .wp-layout {
+  .category-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin-bottom: 26px;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #ded7c7;
+  }
+  .category-strip a {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    column-gap: 12px;
+    align-items: center;
+    padding: 16px;
+    background: #fffdfa;
+    color: inherit;
+    text-decoration: none;
+  }
+  .category-strip span {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #f1e4c8;
+    color: #7a4211;
+    font-weight: 900;
+  }
+  .category-strip strong {
+    font-size: .98rem;
+    line-height: 1.2;
+  }
+  .category-strip em {
+    display: block;
+    grid-column: 2;
+    margin-top: 3px;
+    color: #6d786f;
+    font-size: .78rem;
+    font-style: normal;
+  }
+  .page-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 320px;
     gap: 28px;
     align-items: start;
   }
-  .wp-section,
-  .side-card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+  .content-stack {
+    min-width: 0;
   }
-  .wp-section {
+  .section-block {
     margin-bottom: 24px;
     padding: 24px;
+    border-radius: 6px;
   }
-  .wp-section-head {
+  .section-title {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
     margin-bottom: 18px;
-    border-bottom: 2px solid #f3f4f6;
     padding-bottom: 12px;
+    border-bottom: 3px solid #efe7d6;
   }
-  .wp-section-head h2,
-  .cta-box h2,
-  .side-card h2 {
-    margin: 0;
-    color: #111827;
-    font-size: 1.35rem;
+  .section-title h2,
+  .line-band h2 {
+    font-size: 1.45rem;
     line-height: 1.45;
   }
-  .featured-grid {
+  .lead-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
   }
-  .featured-card,
-  .ranking-item,
-  .post-row {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+  .lead-card {
+    border: 1px solid #e4ddcf;
+    border-radius: 6px;
     overflow: hidden;
     background: #fff;
   }
-  .featured-card a,
+  .lead-card-large {
+    grid-row: span 2;
+  }
+  .lead-card a,
   .ranking-item a,
-  .post-row a {
+  .new-row a {
     display: block;
     color: inherit;
     text-decoration: none;
+    transition: transform .15s ease;
   }
-  .featured-card img {
+  .lead-card img {
     aspect-ratio: 16/9;
   }
-  .featured-body {
-    padding: 14px;
+  .lead-card-large img {
+    aspect-ratio: 16/10;
+  }
+  .lead-card-body {
+    padding: 16px;
   }
   .cat {
     display: inline-flex;
+    align-items: center;
+    min-height: 24px;
     border-radius: 999px;
-    padding: 3px 9px;
+    padding: 2px 10px;
     font-size: .72rem;
     font-weight: 900;
   }
-  .cat-green { background: #dcfce7; color: #166534; }
-  .cat-red { background: #fee2e2; color: #991b1b; }
-  .cat-blue { background: #dbeafe; color: #1d4ed8; }
-  .cat-amber { background: #fef3c7; color: #92400e; }
-  .cat-yellow { background: #fef9c3; color: #854d0e; }
-  .cat-gray { background: #f3f4f6; color: #374151; }
-  .featured-card h3,
-  .ranking-item h3,
-  .post-row h3 {
-    margin: 9px 0 7px;
-    color: #111827;
-    font-size: 1rem;
-    line-height: 1.55;
+  .tone-hoken { background: #dff3e6; color: #11613a; }
+  .tone-fx { background: #ffe1d7; color: #9c2f13; }
+  .tone-nisa { background: #dceafa; color: #1d4c86; }
+  .tone-tax { background: #fff0c8; color: #84520a; }
+  .tone-card { background: #fff4b8; color: #755500; }
+  .tone-gray { background: #ececec; color: #444; }
+  .lead-card h3 {
+    margin-top: 10px;
+    font-size: 1.04rem;
+    line-height: 1.58;
   }
-  .featured-card p,
-  .post-row p,
-  .cta-box p {
-    color: #6b7280;
-    font-size: .88rem;
-    line-height: 1.75;
+  .lead-card-large h3 {
+    font-size: 1.24rem;
   }
-  .featured-card p,
-  .post-row p {
+  .lead-card p,
+  .new-row p,
+  .ranking-item p {
     display: -webkit-box;
-    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    margin: 0;
+    margin: 8px 0 0;
+    font-size: .88rem;
   }
-  .ranking-list {
+  .lead-card p {
+    -webkit-line-clamp: 2;
+  }
+  .route-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .route-card {
+    min-height: 170px;
+    padding: 18px;
+    border: 1px solid #e1d8c6;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #fffdf9, #fff8ea);
+    color: inherit;
+    text-decoration: none;
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .route-card span {
+    display: inline-flex;
+    margin-bottom: 12px;
+    color: #b66313;
+    font-size: .76rem;
+    font-weight: 900;
+  }
+  .route-card strong {
+    display: block;
+    color: #17211b;
+    font-size: 1.05rem;
+    line-height: 1.45;
+  }
+  .route-card p {
+    margin: 8px 0 0;
+    font-size: .86rem;
+  }
+  .ranking-list,
+  .new-list {
     display: grid;
     gap: 12px;
   }
+  .ranking-item,
+  .new-row {
+    border: 1px solid #e4ddcf;
+    border-radius: 6px;
+    background: #fff;
+    overflow: hidden;
+  }
   .ranking-item a {
     display: grid;
-    grid-template-columns: 42px 132px minmax(0, 1fr);
+    grid-template-columns: 42px 168px minmax(0, 1fr);
     gap: 14px;
     align-items: center;
     padding: 12px;
   }
-  .rank-num {
+  .rank {
     display: grid;
     place-items: center;
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: #ef8f00;
+    background: #e87913;
     color: #fff;
     font-weight: 900;
   }
   .ranking-item img {
-    width: 132px;
-    height: 82px;
-    border-radius: 6px;
+    width: 168px;
+    height: 96px;
+    border-radius: 4px;
   }
-  .cta-box {
+  .ranking-item h3,
+  .new-row h3 {
+    margin-top: 8px;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .ranking-item p {
+    -webkit-line-clamp: 1;
+  }
+  .line-band {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    background: #fff8e8;
-    border-color: #f7d48b;
+    align-items: center;
+    gap: 22px;
+    margin-bottom: 24px;
+    padding: 24px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #e9fff1, #fffdfa);
   }
-  .post-list {
-    display: grid;
-    gap: 14px;
+  .line-band span {
+    display: block;
+    margin-top: 8px;
+    font-size: .92rem;
   }
-  .post-row a {
+  .line-band a {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 20px;
+    border-radius: 4px;
+    background: #06c755;
+    color: #fff;
+    font-weight: 900;
+    text-decoration: none;
+  }
+  .new-row a {
     display: grid;
-    grid-template-columns: 176px minmax(0, 1fr);
+    grid-template-columns: 190px minmax(0, 1fr);
     gap: 16px;
     padding: 12px;
   }
-  .post-row img {
-    width: 176px;
-    height: 104px;
-    border-radius: 6px;
+  .new-row img {
+    width: 190px;
+    height: 108px;
+    border-radius: 4px;
   }
-  .post-row time {
+  .new-row p {
+    -webkit-line-clamp: 2;
+  }
+  .new-row time {
     display: inline-block;
     margin-top: 8px;
-    color: #9ca3af;
+    color: #928676;
     font-size: .76rem;
+    font-weight: 700;
   }
-  .wp-sidebar {
+  .sidebar {
     position: sticky;
     top: 82px;
     display: grid;
@@ -460,58 +702,77 @@ const primary = postBySlug.get('hoken-soudan-muryou-hikaku') ?? allPosts[0];
   }
   .side-card {
     padding: 20px;
+    border-radius: 6px;
   }
-  .profile {
-    text-align: center;
+  .profile-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
   }
-  .avatar {
+  .profile-photo {
     display: grid;
     place-items: center;
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 12px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    background: #111827;
+    background: linear-gradient(135deg, #17211b, #36543f);
     color: #fff;
+    font-size: 1.35rem;
     font-weight: 900;
-    font-size: 1.4rem;
   }
-  .profile p {
-    color: #6b7280;
+  .profile-top p {
+    margin: 0 0 2px;
+    color: #b66313;
+    font-size: .72rem;
+    font-weight: 900;
+  }
+  .profile-text {
+    margin: 14px 0 0;
     font-size: .88rem;
-    line-height: 1.8;
-    text-align: left;
   }
-  .profile a,
-  .side-cta a {
+  .profile-card a,
+  .side-line a {
     display: block;
     margin-top: 14px;
     padding: 11px 14px;
-    border-radius: 6px;
-    background: #111827;
+    border-radius: 4px;
+    background: #17211b;
     color: #fff;
+    font-weight: 900;
+    text-align: center;
+    text-decoration: none;
+  }
+  .side-category-list {
+    display: grid;
+    margin-top: 12px;
+  }
+  .side-category-list a {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid #eee4d4;
+    color: #17211b;
     font-weight: 900;
     text-decoration: none;
   }
-  .category-list {
-    list-style: none;
-    margin: 14px 0 0;
-    padding: 0;
-  }
-  .category-list li + li {
-    border-top: 1px solid #f3f4f6;
-  }
-  .category-list a {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    color: #111827;
-    text-decoration: none;
-    font-weight: 800;
-  }
-  .category-list em {
-    color: #9ca3af;
+  .side-category-list em {
+    color: #958775;
     font-style: normal;
+  }
+  .hot-card {
+    background: #fff8ea;
+  }
+  .hot-card ol {
+    margin: 12px 0 0;
+    padding-left: 20px;
+  }
+  .hot-card li + li {
+    margin-top: 8px;
+  }
+  .hot-card a {
+    color: #17211b;
+    font-weight: 900;
   }
   .side-ranking {
     display: grid;
@@ -521,7 +782,7 @@ const primary = postBySlug.get('hoken-soudan-muryou-hikaku') ?? allPosts[0];
     display: grid;
     grid-template-columns: 28px minmax(0, 1fr);
     gap: 10px;
-    color: #111827;
+    color: #17211b;
     text-decoration: none;
   }
   .side-ranking span {
@@ -530,7 +791,7 @@ const primary = postBySlug.get('hoken-soudan-muryou-hikaku') ?? allPosts[0];
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: #ef8f00;
+    background: #e87913;
     color: #fff;
     font-size: .78rem;
     font-weight: 900;
@@ -539,11 +800,10 @@ const primary = postBySlug.get('hoken-soudan-muryou-hikaku') ?? allPosts[0];
     font-size: .88rem;
     line-height: 1.55;
   }
-  .side-cta {
-    background: #ecfdf5;
-    border-color: #bbf7d0;
+  .side-line {
+    background: #eafff1;
   }
-  .side-cta p {
+  .side-line p {
     display: inline-flex;
     margin: 0 0 8px;
     padding: 2px 9px;
@@ -553,40 +813,61 @@ const primary = postBySlug.get('hoken-soudan-muryou-hikaku') ?? allPosts[0];
     font-size: .72rem;
     font-weight: 900;
   }
-  .side-cta a {
+  .side-line span {
+    display: block;
+    margin-top: 8px;
+    font-size: .86rem;
+  }
+  .side-line a {
     background: #06c755;
   }
-  @media (max-width: 980px) {
-    .wp-hero,
-    .wp-layout {
+  @media (max-width: 1020px) {
+    .site-hero,
+    .page-grid {
       grid-template-columns: 1fr;
     }
-    .wp-sidebar {
+    .sidebar {
       position: static;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
-  @media (max-width: 640px) {
-    .wp-hero,
-    .wp-section {
-      padding: 18px;
+  @media (max-width: 760px) {
+    .category-strip,
+    .lead-grid,
+    .route-grid,
+    .sidebar {
+      grid-template-columns: 1fr;
     }
-    .featured-grid,
-    .post-row a,
-    .ranking-item a {
+    .ranking-item a,
+    .new-row a {
       grid-template-columns: 1fr;
     }
     .ranking-item img,
-    .post-row img {
+    .new-row img {
       width: 100%;
       height: auto;
       aspect-ratio: 16/9;
     }
-    .cta-box {
+    .line-band {
       display: block;
     }
-    .cta-box .wp-btn {
+    .line-band a {
       width: 100%;
-      margin-top: 12px;
+      margin-top: 14px;
+    }
+  }
+  @media (max-width: 520px) {
+    .hero-copy,
+    .section-block,
+    .line-band,
+    .side-card {
+      padding: 18px;
+    }
+    .hero-buttons .btn {
+      width: 100%;
+    }
+    .category-strip a {
+      padding: 14px;
     }
   }
 </style>
