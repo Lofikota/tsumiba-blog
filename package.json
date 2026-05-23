@@ -1,7 +1,7 @@
 {
   "name": "ren-blog",
   "version": "1.0.0",
-  "description": "田中蓮の金融・副業ブログ",
+  "description": "田中蓮のFX口座比較ブログ",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

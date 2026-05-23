@@ -3,9 +3,10 @@
  * OpenAI Image APIで記事用のヒーロー画像を生成し、MDXのheroImageへ反映する。
  *
  * Usage:
- *   node scripts/generate-article-images.mjs --slug hoken-soudan-muryou-hikaku
+ *   node scripts/generate-article-images.mjs --slug fx-kouza-hikaku
  *   node scripts/generate-article-images.mjs --all --limit 5
  *   node scripts/generate-article-images.mjs --slug fx-kouza-hikaku --dry-run
+ *   node scripts/generate-article-images.mjs --all --all-categories
  *
  * Required:
  *   OPENAI_API_KEY
@@ -35,6 +36,7 @@ const slugArg = getArg('--slug');
 const dryRun = hasArg('--dry-run');
 const overwrite = hasArg('--overwrite');
 const allMode = hasArg('--all');
+const allCategories = hasArg('--all-categories');
 const limit = Number(getArg('--limit') ?? 999);
 
 const model = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1.5';
@@ -44,6 +46,24 @@ const quality = process.env.OPENAI_IMAGE_QUALITY || 'high';
 if (!slugArg && !allMode) {
   console.error('Usage: node scripts/generate-article-images.mjs --slug <slug> または --all');
   process.exit(1);
+}
+
+const FX_SLUGS = new Set([
+  'fx-kouza-hikaku',
+  'dmm-fx-review',
+  'jfx-review',
+  'fxtf-review',
+  'matsui-fx-review',
+  'fx-shoshinsha-guide',
+  'fx-small-start-guide',
+  'fx-leverage-risk-guide',
+  'fx-kakuteishinkoku-guide',
+  'fx-company-barenai',
+  'fx-yametoke-reason',
+]);
+
+function isFxArticle(item) {
+  return item.data.category === 'FX・外貨' || FX_SLUGS.has(item.slug) || item.slug.includes('fx');
 }
 
 function parseFrontmatter(content) {
@@ -95,6 +115,7 @@ function listTargets() {
       const { data } = parseFrontmatter(content);
       return { slug, filePath, content, data };
     })
+    .filter((item) => slugArg || allCategories || isFxArticle(item))
     .filter((item) => overwrite || !item.data.heroImage || item.data.heroImage.startsWith('/og/') || item.data.heroImage.startsWith('/thumbnails/'))
     .sort((a, b) => {
       const dateA = Date.parse(a.data.pubDate || '') || 0;
@@ -105,32 +126,28 @@ function listTargets() {
 }
 
 function promptForArticle({ slug, data }) {
-  const category = data.category || '金融';
+  const category = data.category || 'FX・外貨';
   const title = data.title || slug;
   const description = data.description || '';
 
-  const categoryScene = {
-    '保険': 'a calm insurance and household budget consultation scene at a bright Japanese dining table, documents neatly arranged, warm trustworthy atmosphere',
-    'FX・外貨': 'a focused Japanese office worker reviewing currency charts and risk notes on a laptop, modern desk, disciplined and cautious mood',
-    'NISA・投資': 'a Japanese office worker planning long-term investing with a notebook, tablet, and simple chart visuals, calm morning light',
-    '投資・資産運用': 'a clean personal finance planning desk with portfolio notes, tablet charts, and coffee, realistic Japanese apartment setting',
-    '副業・節税': 'a Japanese office worker organizing receipts, tax forms, and a laptop after work, practical side-business atmosphere',
-    'クレジットカード': 'a tidy desk with credit cards, point statements, smartphone payment screen, and budgeting notebook, premium but realistic',
-    'お得情報': 'a clean household budgeting scene with smartphone coupons, cards, and a notebook, practical saving mood',
-    '家計・節約': 'a Japanese household budgeting table with bills, notebook, calculator, and tea, reassuring everyday atmosphere',
-  }[category] || 'a realistic Japanese personal finance blog image with a laptop, notebook, documents, and warm natural light';
+  const scene = [
+    'a focused Japanese office worker comparing FX account conditions on a laptop',
+    'currency charts, risk notes, a simple comparison checklist, and a clean desk',
+    'disciplined and cautious mood, modern Japanese work-from-home setting',
+  ].join(', ');
 
   return [
     'Use case: photorealistic-natural',
-    'Asset type: 16:9 hero image for a Japanese personal finance affiliate blog article',
+    'Asset type: 16:9 hero image for a Japanese FX account comparison affiliate blog article',
+    'Business direction: FX-focused only. Prioritize FX account comparison, DMM FX, JFX, FXTF, beginner risk management, and office-worker decision support.',
     `Article title for context: ${title}`,
     `Article category: ${category}`,
     description ? `Article description: ${description}` : '',
-    `Scene/backdrop: ${categoryScene}.`,
-    'Subject: realistic Japanese 30s office worker or hands-only composition depending on what feels natural; no identifiable celebrity; no brand logos.',
+    `Scene/backdrop: ${scene}.`,
+    'Subject: realistic Japanese 30s office worker or hands-only composition depending on what feels natural; no identifiable celebrity; no brand logos, no broker logos.',
     'Composition: editorial blog cover, strong central visual, clean negative space near the top-left for page layout, professional WordPress-style article thumbnail.',
-    'Style: photorealistic, trustworthy, warm daylight, premium but not luxury, practical household finance mood, high detail, natural colors.',
-    'Avoid: in-image text, fake UI labels, brand logos, watermarks, exaggerated money piles, gambling feeling, get-rich-quick mood, medical/legal document claims.',
+    'Style: photorealistic, trustworthy, warm daylight, premium but not luxury, practical financial comparison mood, high detail, natural colors.',
+    'Avoid: in-image text, fake UI labels, brand logos, watermarks, exaggerated money piles, gambling feeling, get-rich-quick mood, profit guarantees, luxury flexing, tax-saving visuals, NISA visuals, insurance consultation scenes, household budgeting scenes, credit cards.',
     'Output: landscape image, no text.'
   ].filter(Boolean).join('\n');
 }
@@ -188,7 +205,7 @@ if (targets.length === 0) {
   process.exit(0);
 }
 
-console.log(`対象: ${targets.length}件 / model=${model} / size=${size} / quality=${quality}`);
+console.log(`対象: ${targets.length}件 / scope=${allCategories ? 'all-categories' : 'fx-only'} / model=${model} / size=${size} / quality=${quality}`);
 
 for (const target of targets) {
   const imagePath = `/images/articles/${target.slug}.png`;
