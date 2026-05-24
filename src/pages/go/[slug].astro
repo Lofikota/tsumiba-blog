@@ -22,9 +22,6 @@ const fallbackByCategory: Partial<Record<AffiliateLink['category'], string>> = {
 };
 const isPending = link.status === 'pending';
 const destinationUrl = isPending ? fallbackByCategory[link.category] ?? '/line/blog-main/' : link.destinationUrl;
-const destinationJson = JSON.stringify(destinationUrl);
-const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';
-const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_SEND_TO ?? '';
 ---
 
 <!doctype html>
@@ -36,40 +33,7 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <title>{isPending ? '確認済みの導線へ移動します' : `${link.name} 公式サイトへ移動します`}</title>
     <meta name="description" content={isPending ? '現在使える導線へ移動します。' : `${link.name} の公式サイトへ移動します。`} />
-    {googleTagId && (
-      <>
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}></script>
-        <script is:inline define:vars={{ destinationJson, googleTagId, googleAdsConversionSendTo }}>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          window.gtag = window.gtag || gtag;
-          gtag('js', new Date());
-          gtag('config', googleTagId);
-
-          const destination = JSON.parse(destinationJson);
-          const finish = () => window.location.replace(destination);
-
-          if (googleAdsConversionSendTo) {
-            let finished = false;
-            const done = () => {
-              if (finished) return;
-              finished = true;
-              finish();
-            };
-            gtag('event', 'conversion', {
-              send_to: googleAdsConversionSendTo,
-              value: 1.0,
-              currency: 'JPY',
-              event_callback: done,
-              event_timeout: 1200,
-            });
-            window.setTimeout(done, 1200);
-          } else {
-            window.setTimeout(finish, 900);
-          }
-        </script>
-      </>
-    )}
+    <meta http-equiv="refresh" content={`1;url=${destinationUrl}`} />
   </head>
   <body>
     <main class="go-page">
