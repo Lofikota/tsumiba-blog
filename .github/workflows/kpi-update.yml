@@ -1,0 +1,68 @@
+name: KPI週次データ入力
+
+on:
+  workflow_dispatch:
+    inputs:
+      x_followers:
+        description: 'Xフォロワー数（現在値）'
+        type: number
+        required: true
+      tweet_count:
+        description: 'X投稿数（今週の合計）'
+        type: number
+        required: true
+      line_followers:
+        description: 'LINEフォロワー数（未取得なら 0）'
+        type: number
+        default: 0
+      gsc_clicks:
+        description: 'GSCクリック数（週計）'
+        type: number
+        default: 0
+      gsc_impressions:
+        description: 'GSCインプレッション数（週計）'
+        type: number
+        default: 0
+      gsc_position:
+        description: 'GSC平均掲載順位（小数可）'
+        type: number
+        default: 0
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: kpi-snapshots.json を更新
+        env:
+          INPUT_X_FOLLOWERS: ${{ inputs.x_followers }}
+          INPUT_TWEET_COUNT: ${{ inputs.tweet_count }}
+          INPUT_LINE_FOLLOWERS: ${{ inputs.line_followers }}
+          INPUT_GSC_CLICKS: ${{ inputs.gsc_clicks }}
+          INPUT_GSC_IMPRESSIONS: ${{ inputs.gsc_impressions }}
+          INPUT_GSC_POSITION: ${{ inputs.gsc_position }}
+        run: node scripts/kpi-update.mjs
+
+      - name: コミット・プッシュ
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/kpi-snapshots.json
+          if git diff --staged --quiet; then
+            echo "変更なし"
+          else
+            git commit -m "data: KPIデータ更新 $(date +'%Y-%m-%d') [skip ci]"
+            git push
+          fi

@@ -1,0 +1,67 @@
+---
+interface Props {
+  active: 'dashboard' | 'articles' | 'revenue';
+}
+const { active } = Astro.props;
+const tabs = [
+  { id: 'dashboard', label: 'ダッシュボード', href: '/admin/' },
+  { id: 'articles',  label: '記事管理',       href: '/admin/blog/' },
+  { id: 'revenue',   label: '収益トラッカー', href: '/admin/revenue/' },
+];
+---
+<nav class="admin-nav">
+  <span class="admin-nav-logo">⌘ ren-money.com</span>
+  <div class="admin-nav-tabs">
+    {tabs.map(t => (
+      <a href={t.href} class={`admin-nav-tab${active === t.id ? ' active' : ''}`}>{t.label}</a>
+    ))}
+  </div>
+  <a href="https://github.com/Lofikota/ren-blog-/actions" target="_blank" rel="noopener" class="admin-nav-gh">GitHub Actions →</a>
+</nav>
+
+<style>
+.admin-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .75rem 1rem;
+  background: #0f172a;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+}
+.admin-nav-logo {
+  color: #f59e0b;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+.admin-nav-tabs {
+  display: flex;
+  gap: .25rem;
+  flex: 1;
+}
+.admin-nav-tab {
+  padding: .35rem .85rem;
+  font-size: .8rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background .15s, color .15s;
+}
+.admin-nav-tab:hover { background: rgba(255,255,255,.08); color: #f8fafc; }
+.admin-nav-tab.active { background: #2563eb; color: #fff; }
+.admin-nav-gh {
+  font-size: .72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.admin-nav-gh:hover { color: #94a3b8; }
+@media (max-width: 640px) {
+  .admin-nav { flex-wrap: wrap; }
+  .admin-nav-gh { display: none; }
+}
+</style>

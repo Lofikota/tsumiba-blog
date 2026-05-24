@@ -1,0 +1,63 @@
+name: ASP収益データ入力
+
+on:
+  workflow_dispatch:
+    inputs:
+      month:
+        description: '対象月（YYYY-MM 形式）'
+        type: string
+        required: true
+      total_revenue:
+        description: '月次合計収益（円）'
+        type: number
+        required: true
+      fx_revenue:
+        description: 'FX系収益（円）'
+        type: number
+        default: 0
+      insurance_revenue:
+        description: '保険系収益（円）'
+        type: number
+        default: 0
+      notes:
+        description: 'メモ（任意）'
+        type: string
+        default: ''
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: revenue-log.json を更新
+        env:
+          INPUT_MONTH: ${{ inputs.month }}
+          INPUT_TOTAL: ${{ inputs.total_revenue }}
+          INPUT_FX: ${{ inputs.fx_revenue }}
+          INPUT_INSURANCE: ${{ inputs.insurance_revenue }}
+          INPUT_NOTES: ${{ inputs.notes }}
+        run: node scripts/revenue-update.mjs
+
+      - name: コミット・プッシュ
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/revenue-log.json
+          if git diff --staged --quiet; then
+            echo "変更なし"
+          else
+            git commit -m "data: 収益データ更新 $INPUT_MONTH [skip ci]"
+            git push
+          fi

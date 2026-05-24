@@ -1,0 +1,252 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdminNav from '../../../components/AdminNav.astro';
+import revenueLog from '../../../../data/revenue-log.json';
+
+const ANNUAL_GOAL = 100_000_000; // 1億円
+
+// 月次サマリーを時系列順に整列
+const log = [...revenueLog].sort((a, b) => a.month.localeCompare(b.month));
+const latest = log[log.length - 1] ?? null;
+const prevMonth = log[log.length - 2] ?? null;
+
+// 年間累計
+const yearStr = new Date().getFullYear().toString();
+const yearTotal = log
+  .filter(d => d.month.startsWith(yearStr))
+  .reduce((sum, d) => sum + (d.total ?? 0), 0);
+const goalProgress = Math.min(100, Math.round(yearTotal / ANNUAL_GOAL * 100 * 10) / 10);
+
+// 先月比
+const monthDiff = latest && prevMonth ? (latest.total ?? 0) - (prevMonth.total ?? 0) : null;
+
+// カテゴリ別集計（最新月）
+const categoryTotals: Record<string, number> = {};
+if (latest?.entries) {
+  for (const e of latest.entries) {
+    categoryTotals[e.category] = (categoryTotals[e.category] ?? 0) + (e.revenue ?? 0);
+  }
+}
+
+// Chart.js 用データ
+const chartMonths   = JSON.stringify(log.map(d => d.month.slice(5))); // MM
+const chartTotals   = JSON.stringify(log.map(d => d.total ?? 0));
+const chartFx       = JSON.stringify(log.map(d =>
+  d.entries?.filter(e => e.category === 'FX').reduce((s, e) => s + (e.revenue ?? 0), 0) ?? 0));
+const chartInsurance = JSON.stringify(log.map(d =>
+  d.entries?.filter(e => e.category === '保険').reduce((s, e) => s + (e.revenue ?? 0), 0) ?? 0));
+
+function yen(n: number) {
+  return n.toLocaleString('ja-JP') + '円';
+}
+---
+
+<BaseLayout
+  title="収益トラッカー | ren-money.com 管理"
+  description="月次ASP収益を案件別・カテゴリ別に管理するダッシュボード。"
+  robots="noindex,nofollow"
+  wide
+>
+  <AdminNav active="revenue" />
+
+  <section class="rev-header">
+    <div>
+      <p class="rev-kicker">ASP REVENUE TRACKER</p>
+      <h1>収益トラッカー</h1>
+    </div>
+    <a href="https://github.com/Lofikota/ren-blog-/actions/workflows/revenue-update.yml"
+       target="_blank" rel="noopener" class="rev-input-btn">
+      + 今月の収益を入力する →
+    </a>
+  </section>
+
+  <!-- サマリーカード -->
+  <section class="rev-cards">
+    <div class="rev-card primary">
+      <span>今月の収益</span>
+      <strong>{yen(latest?.total ?? 0)}</strong>
+      {monthDiff !== null && (
+        <em class={monthDiff >= 0 ? 'up' : 'down'}>
+          {monthDiff >= 0 ? `+${yen(monthDiff)}` : yen(monthDiff)} 先月比
+        </em>
+      )}
+    </div>
+    <div class="rev-card">
+      <span>{yearStr}年 累計</span>
+      <strong>{yen(yearTotal)}</strong>
+      <small>{log.filter(d => d.month.startsWith(yearStr)).length}ヶ月分</small>
+    </div>
+    <div class="rev-card">
+      <span>年間目標達成率</span>
+      <strong>{goalProgress}%</strong>
+      <small>目標: {yen(ANNUAL_GOAL)}</small>
+    </div>
+    {Object.entries(categoryTotals).map(([cat, total]) => (
+      <div class="rev-card">
+        <span>{cat}（今月）</span>
+        <strong>{yen(total)}</strong>
+      </div>
+    ))}
+  </section>
+
+  <!-- 年間目標プログレスバー -->
+  <div class="rev-progress-wrap">
+    <div class="rev-progress-labels">
+      <span>年間目標進捗 {goalProgress}%</span>
+      <span>{yen(yearTotal)} / {yen(ANNUAL_GOAL)}</span>
+    </div>
+    <div class="rev-progress-bar">
+      <div class="rev-progress-fill" style={`width:${goalProgress}%`}></div>
+    </div>
+  </div>
+
+  <!-- 収益推移グラフ -->
+  <div class="rev-chart-wrap">
+    <p class="rev-chart-title">月次収益推移（円）</p>
+    <canvas id="chart-revenue" height="80"></canvas>
+  </div>
+
+  <!-- 案件別テーブル（最新月） -->
+  {latest && (
+    <section class="rev-table-wrap">
+      <div class="rev-table-head">
+        <div><p>CAMPAIGN BREAKDOWN</p><h2>案件別内訳 — {latest.month}</h2></div>
+        {latest.notes && <span class="rev-notes">{latest.notes}</span>}
+      </div>
+      <table class="rev-table">
+        <thead>
+          <tr><th>カテゴリ</th><th>ASP</th><th>案件</th><th>クリック</th><th>収益</th></tr>
+        </thead>
+        <tbody>
+          {latest.entries?.map(e => (
+            <tr class={e.revenue > 0 ? 'active' : ''}>
+              <td><span class={`rev-cat ${e.category === 'FX' ? 'fx' : 'ins'}`}>{e.category}</span></td>
+              <td>{e.asp}</td>
+              <td>{e.product}</td>
+              <td class="num">{(e.clicks ?? 0).toLocaleString()}</td>
+              <td class="num rev-yen">{yen(e.revenue ?? 0)}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr><td colspan="4"><strong>合計</strong></td><td class="num rev-total">{yen(latest.total ?? 0)}</td></tr>
+        </tfoot>
+      </table>
+    </section>
+  )}
+
+  <!-- 月次ログ一覧 -->
+  <section class="rev-log-wrap">
+    <p class="rev-kicker" style="margin-bottom:.6rem">MONTHLY LOG</p>
+    <div class="rev-log">
+      {log.reverse().map(d => (
+        <div class="rev-log-row">
+          <span class="rev-log-month">{d.month}</span>
+          <div class="rev-log-bar-wrap">
+            <div class="rev-log-bar" style={`width:${ANNUAL_GOAL > 0 ? Math.min(100, (d.total ?? 0) / (ANNUAL_GOAL / 12) * 100) : 0}%`}></div>
+          </div>
+          <span class="rev-log-total">{yen(d.total ?? 0)}</span>
+          {d.notes && <span class="rev-log-notes">{d.notes}</span>}
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Chart.js -->
+  <script define:vars={{ chartMonths, chartTotals, chartFx, chartInsurance }}>
+    (function() {
+      const months    = JSON.parse(chartMonths);
+      const totals    = JSON.parse(chartTotals);
+      const fx        = JSON.parse(chartFx);
+      const insurance = JSON.parse(chartInsurance);
+
+      function loadChartJs(cb) {
+        if (window.Chart) { cb(); return; }
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js';
+        s.onload = cb;
+        document.head.appendChild(s);
+      }
+
+      loadChartJs(() => {
+        const el = document.getElementById('chart-revenue');
+        if (!el) return;
+        new Chart(el, {
+          type: 'bar',
+          data: {
+            labels: months,
+            datasets: [
+              { label: 'FX', data: fx, backgroundColor: '#2563eb', borderRadius: 4 },
+              { label: '保険', data: insurance, backgroundColor: '#16a34a', borderRadius: 4 },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: { position: 'top', labels: { font: { size: 11 } } },
+              tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('ja-JP')}円` } },
+            },
+            scales: {
+              x: { stacked: true, ticks: { font: { size: 11 } }, grid: { display: false } },
+              y: { stacked: true, beginAtZero: true, ticks: { font: { size: 11 }, callback: v => `${Number(v).toLocaleString('ja-JP')}円` } },
+            },
+          },
+        });
+      });
+    })();
+  </script>
+
+  <style>
+    .rev-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;gap:1rem}
+    .rev-kicker{color:#64748b;font-size:.7rem;font-weight:800;letter-spacing:.1em;margin:0 0 .2rem}
+    .rev-header h1{margin:0;font-size:1.6rem;color:#0f172a;line-height:1.2}
+    .rev-input-btn{display:inline-flex;align-items:center;gap:.4rem;background:#2563eb;color:#fff;font-size:.82rem;font-weight:800;padding:.5rem 1rem;border-radius:8px;text-decoration:none;white-space:nowrap}
+    .rev-input-btn:hover{background:#1d4ed8}
+    /* サマリーカード */
+    .rev-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;margin-bottom:1rem}
+    .rev-card{background:#fff;border:1px solid #d8dee9;border-radius:10px;padding:1rem;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+    .rev-card.primary{border-color:#2563eb;background:#eff6ff}
+    .rev-card span{display:block;color:#64748b;font-size:.72rem;font-weight:700;margin-bottom:.3rem}
+    .rev-card strong{display:block;color:#0f172a;font-size:1.5rem;font-weight:800;line-height:1.1}
+    .rev-card small{display:block;color:#94a3b8;font-size:.65rem;margin-top:.2rem}
+    .rev-card em{display:inline-block;font-style:normal;font-size:.72rem;font-weight:800;border-radius:999px;padding:.1rem .4rem;margin-top:.3rem}
+    .rev-card em.up{background:#dcfce7;color:#16a34a}
+    .rev-card em.down{background:#fee2e2;color:#dc2626}
+    /* プログレスバー */
+    .rev-progress-wrap{margin-bottom:1rem}
+    .rev-progress-labels{display:flex;justify-content:space-between;font-size:.75rem;color:#64748b;margin-bottom:.3rem}
+    .rev-progress-bar{height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden}
+    .rev-progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#16a34a);border-radius:999px;transition:width .5s}
+    /* グラフ */
+    .rev-chart-wrap{background:#fff;border:1px solid #d8dee9;border-radius:10px;padding:1rem;margin-bottom:1rem;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+    .rev-chart-title{margin:0 0 .75rem;font-size:.72rem;font-weight:800;color:#64748b;letter-spacing:.08em}
+    /* テーブル */
+    .rev-table-wrap{background:#fff;border:1px solid #d8dee9;border-radius:10px;padding:1rem;margin-bottom:1rem;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+    .rev-table-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:.85rem}
+    .rev-table-head p{margin:0;color:#64748b;font-size:.7rem;font-weight:800;letter-spacing:.08em}
+    .rev-table-head h2{margin:0;color:#0f172a;font-size:1rem}
+    .rev-notes{color:#64748b;font-size:.78rem}
+    .rev-table{width:100%;border-collapse:collapse;font-size:.84rem}
+    .rev-table th{padding:.45rem .6rem;text-align:left;font-size:.7rem;font-weight:800;color:#64748b;border-bottom:2px solid #e2e8f0;white-space:nowrap}
+    .rev-table td{padding:.45rem .6rem;border-bottom:1px solid #f1f5f9;color:#334155}
+    .rev-table tr.active td{background:#f0fdf4}
+    .rev-table tfoot td{border-top:2px solid #e2e8f0;border-bottom:none;padding-top:.6rem}
+    .rev-cat{display:inline-block;border-radius:999px;padding:.1rem .45rem;font-size:.68rem;font-weight:800}
+    .rev-cat.fx{background:#dbeafe;color:#1d4ed8}
+    .rev-cat.ins{background:#dcfce7;color:#15803d}
+    .num{text-align:right;font-variant-numeric:tabular-nums}
+    .rev-yen{color:#374151}
+    .rev-total{color:#0f172a;font-size:.92rem;font-weight:800}
+    /* 月次ログ */
+    .rev-log-wrap{background:#fff;border:1px solid #d8dee9;border-radius:10px;padding:1rem;margin-bottom:1rem}
+    .rev-log{display:grid;gap:.4rem}
+    .rev-log-row{display:grid;grid-template-columns:80px 1fr 100px auto;align-items:center;gap:.65rem}
+    .rev-log-month{font-size:.78rem;font-weight:700;color:#475569}
+    .rev-log-bar-wrap{background:#e2e8f0;border-radius:999px;height:6px;overflow:hidden}
+    .rev-log-bar{height:100%;background:#2563eb;border-radius:999px;min-width:2px}
+    .rev-log-total{text-align:right;font-size:.78rem;font-weight:800;color:#0f172a}
+    .rev-log-notes{font-size:.72rem;color:#94a3b8}
+    @media(max-width:640px){.rev-header{flex-direction:column;align-items:flex-start}.rev-log-row{grid-template-columns:70px 1fr 80px}}
+  </style>
+</BaseLayout>

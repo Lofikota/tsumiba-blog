@@ -1,0 +1,18 @@
+[
+  {
+    "month": "2026-05",
+    "entries": [
+      { "category": "FX", "asp": "アクセストレード", "product": "DMM FX", "clicks": 0, "revenue": 0 },
+      { "category": "FX", "asp": "アクセストレード", "product": "JFX", "clicks": 0, "revenue": 0 },
+      { "category": "FX", "asp": "アクセストレード", "product": "FXTF", "clicks": 0, "revenue": 0 },
+      { "category": "FX", "asp": "アクセストレード", "product": "FOREX.com", "clicks": 0, "revenue": 0 },
+      { "category": "FX", "asp": "アクセストレード", "product": "GMOクリック証券FX", "clicks": 0, "revenue": 0 },
+      { "category": "保険", "asp": "A8.net", "product": "保険見直し本舗", "clicks": 0, "revenue": 0 },
+      { "category": "保険", "asp": "A8.net", "product": "FPに相談", "clicks": 0, "revenue": 0 },
+      { "category": "保険", "asp": "A8.net", "product": "保険ガーデン", "clicks": 0, "revenue": 0 },
+      { "category": "保険", "asp": "A8.net", "product": "保険見直しラボ", "clicks": 0, "revenue": 0 }
+    ],
+    "total": 0,
+    "notes": ""
+  }
+]
