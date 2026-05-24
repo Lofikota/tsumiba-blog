@@ -84,7 +84,7 @@ export const lineRefs: LineRef[] = [
     source: 'blog',
     intent: 'fx',
     headline: '口座を開く前に3分だけ確認してほしいこと',
-    description: 'DMM FX → JFX → FXTFの順で、比較ポイント、初心者が見落としやすい条件、開設後に最初にやることを整理して届けます。「開いてから気づいた」をなくすためのチェックリストです。',
+    description: 'JFX → FXTFの順で、比較ポイント、初心者が見落としやすい条件、開設後に最初にやることを整理して届けます。DMM FXはリンク確認後に再開します。',
   },
   {
     ref: 'lp-manga-main',
@@ -100,15 +100,15 @@ export const lineRefs: LineRef[] = [
     source: 'lp',
     intent: 'fx',
     headline: 'FX口座を作る前に3分だけ確認するLINE',
-    description: '特典額だけで選んで失敗しないように、DMM FX → JFX → FXTFの順で条件、リスク、見るポイントを整理して届けます。',
+    description: '特典額だけで選んで失敗しないように、JFX → FXTFの順で条件、リスク、見るポイントを整理して届けます。DMM FXはリンク確認後に再開します。',
   },
   {
     ref: 'campaign-dmm-fx',
     label: '案件 DMM FX',
     source: 'campaign',
     intent: 'campaign',
-    headline: 'DMM FXの条件を先に整理するLINE',
-    description: '最初の比較先として、口座開設条件、スプレッド、初心者が迷いやすい点を短く整理します。',
+    headline: 'DMM FXはリンク確認中です',
+    description: 'DMM FXはASPリンク確認中のため、今は条件だけ整理します。申し込み導線は確認済みのJFX・FXTFを優先します。',
   },
   {
     ref: 'campaign-jfx',

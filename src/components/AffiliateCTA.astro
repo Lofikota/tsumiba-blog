@@ -14,7 +14,10 @@ interface Props {
 }
 
 const { href, product, text = '公式サイトで確認する', label = 'PR', color = 'blue', note, badge, compact = false, external = true } = Astro.props;
-const ctaHref = product ? getAffiliatePath(product) : href ?? '#';
+const isStoppedDmmFx = product === 'dmm-fx';
+const ctaHref = isStoppedDmmFx ? getAffiliatePath('jfx') : product ? getAffiliatePath(product) : href ?? '#';
+const ctaText = isStoppedDmmFx ? 'JFXの公式条件を確認する（DMM FXはリンク確認中）' : text;
+const ctaLabel = isStoppedDmmFx ? 'dmm-fx:reroute-jfx' : product ?? href ?? text;
 
 const colorMap: Record<string, string> = {
   blue:   'background:#2563EB;',
@@ -31,12 +34,12 @@ const bg = colorMap[color] ?? colorMap.blue;
   <a href={ctaHref} {...(external ? { target: '_blank', rel: 'noopener noreferrer sponsored nofollow' } : {})}
      data-google-event="affiliate_click"
      data-google-category="affiliate"
-     data-google-label={product ?? href ?? text}
+     data-google-label={ctaLabel}
      class={`acta-btn${compact ? ' acta-btn-compact' : ''}`} style={bg}>
     <span class="acta-arrow">→</span>
-    {text}
+    {ctaText}
   </a>
-  <p class={`acta-sub${compact ? ' acta-sub-compact' : ''}`}><span class={`acta-pr${compact ? ' acta-pr-compact' : ''}`}>{label}</span> 公式サイトへ移動します</p>
+  <p class={`acta-sub${compact ? ' acta-sub-compact' : ''}`}><span class={`acta-pr${compact ? ' acta-pr-compact' : ''}`}>{label}</span> {isStoppedDmmFx ? '確認済みの公式サイトへ移動します' : '公式サイトへ移動します'}</p>
 </div>
 
 <style>

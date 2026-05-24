@@ -5,8 +5,8 @@ interface Props {
 }
 
 const {
-  heading = '迷ったらこの順番で確認',
-  lead = 'FX口座は1社だけで決めず、まず大手・取引機能・コストの順に見比べると失敗しにくいです。',
+  heading = '今は確認済みリンクから優先',
+  lead = 'DMM FXはASPリンク確認中のため、現時点ではJFXとFXTFを優先して比較してください。',
 } = Astro.props;
 ---
 
@@ -15,20 +15,20 @@ const {
   <h2>{heading}</h2>
   <p class="fx-priority-lead">{lead}</p>
   <div class="fx-priority-grid">
-    <a href="/go/dmm-fx/" class="fx-priority-card fx-priority-main" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-dmm-fx">
+    <a href="/go/jfx/" class="fx-priority-card fx-priority-main" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-jfx">
       <span class="fx-priority-rank">1</span>
-      <strong>DMM FX</strong>
-      <small>まず最初の比較先。大手・アプリ・サポート重視。</small>
-    </a>
-    <a href="/go/jfx/" class="fx-priority-card" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-jfx">
-      <span class="fx-priority-rank">2</span>
       <strong>JFX</strong>
       <small>MT4・取引機能・短期売買の使いやすさ重視。</small>
     </a>
     <a href="/go/fxtf/" class="fx-priority-card" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-fxtf">
-      <span class="fx-priority-rank">3</span>
+      <span class="fx-priority-rank">2</span>
       <strong>FXTF</strong>
       <small>スプレッドと手数料を細かく確認したい人向け。</small>
+    </a>
+    <a href="/blog/dmm-fx-review/" class="fx-priority-card fx-priority-muted" data-google-event="internal_click" data-google-category="article" data-google-label="fx-priority-dmm-fx-review">
+      <span class="fx-priority-rank">確認中</span>
+      <strong>DMM FX</strong>
+      <small>A8リンク停止確認済み。新リンク取得まではレビュー記事で条件だけ確認。</small>
     </a>
   </div>
   <p class="fx-priority-note">FXは元本割れや預け入れた資金を上回る損失が発生するリスクがあります。申込前に必ず公式条件を確認してください。</p>
@@ -81,11 +81,15 @@ const {
     border-color: #2563eb;
     box-shadow: 0 8px 22px rgba(37, 99, 235, 0.14);
   }
+  .fx-priority-muted {
+    background: #f8fafc;
+  }
   .fx-priority-rank {
     display: inline-grid;
     place-items: center;
-    width: 26px;
+    min-width: 26px;
     height: 26px;
+    padding: 0 8px;
     border-radius: 999px;
     background: #2563eb;
     color: #fff;

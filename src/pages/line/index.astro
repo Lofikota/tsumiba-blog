@@ -6,7 +6,7 @@ const addUrl = getLineAddUrl('direct-line-page');
 const featuredRefs: LineRef[] = ['blog-main', 'blog-tax-basic', 'blog-fx-roundup', 'blog-nisa-mistake']
   .map((ref) => getLineRef(ref))
   .filter((ref): ref is LineRef => Boolean(ref));
-const campaignRefs: LineRef[] = ['campaign-dmm-fx', 'campaign-jfx', 'campaign-fxtf']
+const campaignRefs: LineRef[] = ['campaign-jfx', 'campaign-fxtf', 'campaign-dmm-fx']
   .map((ref) => getLineRef(ref))
   .filter((ref): ref is LineRef => Boolean(ref));
 ---
@@ -71,7 +71,7 @@ const campaignRefs: LineRef[] = ['campaign-dmm-fx', 'campaign-jfx', 'campaign-fx
 
   <section class="line-section">
     <h2>案件別の入口</h2>
-    <p class="line-section-lead">FXはまずDMM FX、次にJFX、最後にFXTFの順で確認します。迷った人を高単価の使えるASP導線へ戻す設計です。</p>
+    <p class="line-section-lead">FXは確認済みのJFX、次にFXTFを優先します。DMM FXはASPリンク確認後に再開します。</p>
     <div class="line-topic-list">
       {campaignRefs.map((ref) => (
         <article class="line-topic-card">
