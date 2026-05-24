@@ -5,13 +5,16 @@ on:
     branches: [main]
     paths:
       - 'src/content/blog/**/*.mdx'
+  schedule:
+    - cron: '0 22 * * *'   # 毎日 07:00 JST — 画像なし記事を拾う
+  workflow_dispatch:         # GitHub UI から手動実行も可
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 concurrency:
   group: article-image-gen
-  cancel-in-progress: true   # 連続pushは最新だけ実行
+  cancel-in-progress: true
 
 jobs:
   generate:
@@ -21,7 +24,7 @@ jobs:
       contents: write
 
     steps:
-      - name: チェックアウト（差分取得のため2コミット分）
+      - name: チェックアウト
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
@@ -35,8 +38,10 @@ jobs:
       - name: 依存関係インストール
         run: npm ci
 
-      - name: 変更された記事のslugを抽出
+      # ── push トリガー：変更されたslugだけ処理 ──────────
+      - name: 変更された記事のslugを抽出（pushのみ）
         id: slugs
+        if: github.event_name == 'push'
         run: |
           SLUGS=$(git diff --name-only HEAD~1 HEAD -- 'src/content/blog/*.mdx' \
             | sed 's|src/content/blog/||; s|\.mdx$||' \
@@ -45,8 +50,8 @@ jobs:
           echo "list=$SLUGS" >> $GITHUB_OUTPUT
           echo "変更スラッグ: $SLUGS"
 
-      - name: 画像生成（slug単位・失敗しても続行）
-        if: steps.slugs.outputs.list != ''
+      - name: 画像生成（push — slug単位）
+        if: github.event_name == 'push' && steps.slugs.outputs.list != ''
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -58,6 +63,16 @@ jobs:
               echo "::warning:: ${slug} の画像生成に失敗しました（スキップ）"
           done
 
+      # ── schedule / 手動：heroImageなし記事を全件処理 ────
+      - name: 画像生成（定時/手動 — 未生成記事を全件）
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          node scripts/generate-article-images.mjs --all --all-categories --limit 10
+
+      # ── 共通：生成結果をコミット・プッシュ ─────────────
       - name: 生成した画像とheroImage更新をコミット・プッシュ
         run: |
           git config user.name "github-actions[bot]"
