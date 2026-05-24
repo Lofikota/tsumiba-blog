@@ -24,8 +24,8 @@ const rankingPosts = pickPosts([
   'dmm-fx-review',
   'jfx-review',
   'fxtf-review',
-  'matsui-fx-review',
   'fx-shoshinsha-guide',
+  'fx-small-start-guide',
 ]);
 
 const latestPosts = allPosts.filter((post) => post.data.category === 'FX・外貨' || post.id.includes('fx')).slice(0, 10);
