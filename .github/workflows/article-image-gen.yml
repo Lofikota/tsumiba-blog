@@ -26,8 +26,8 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 concurrency:
-  group: article-image-gen
-  cancel-in-progress: true
+  group: article-image-gen-${{ github.event_name }}
+  cancel-in-progress: false
 
 jobs:
   generate:
