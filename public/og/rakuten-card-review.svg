@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#B45309"/>
+  <!-- 右側アクセント -->
+  <rect x="900" y="0" width="300" height="630" fill="#F59E0B" opacity="0.4"/>
+  <circle cx="1050" cy="315" r="220" fill="#F59E0B" opacity="0.25"/>
+  <!-- ヘッダーライン -->
+  <rect x="0" y="0" width="1200" height="8" fill="#F59E0B"/>
+  <!-- 絵文字 -->
+  <text x="140" y="250" font-family="'Segoe UI Emoji',sans-serif" font-size="120" text-anchor="middle">🎁</text>
+  <!-- カテゴリバッジ -->
+  <rect x="60" y="290" width="128" height="48" rx="24" fill="rgba(255,255,255,0.18)"/>
+  <text x="124" y="323" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="26" fill="#FFFFFF" text-anchor="middle">お得情報</text>
+  <!-- タイトル -->
+  <text x="60" y="350" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="64" fill="#FFFFFF">楽天カードの評判・メリット・デメリット完全解</text>
+  <text x="60" y="430" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="64" fill="#FFFFFF">説【2026年版】ポイント還元率と注意点を正</text>
+  <!-- フッター -->
+  <text x="60" y="580" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="500" font-size="28" fill="rgba(255,255,255,0.65)">田中蓮のマネーブログ | ren-money.com</text>
+</svg>

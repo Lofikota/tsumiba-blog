@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#EA580C"/>
+  <!-- 右側アクセント -->
+  <rect x="900" y="0" width="300" height="630" fill="#FB923C" opacity="0.4"/>
+  <circle cx="1050" cy="315" r="220" fill="#FB923C" opacity="0.25"/>
+  <!-- ヘッダーライン -->
+  <rect x="0" y="0" width="1200" height="8" fill="#FB923C"/>
+  <!-- 絵文字 -->
+  <text x="140" y="250" font-family="'Segoe UI Emoji',sans-serif" font-size="120" text-anchor="middle">💱</text>
+  <!-- カテゴリバッジ -->
+  <rect x="60" y="290" width="150" height="48" rx="24" fill="rgba(255,255,255,0.18)"/>
+  <text x="135" y="323" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="26" fill="#FFFFFF" text-anchor="middle">FX・外貨</text>
+  <!-- タイトル -->
+  <text x="60" y="350" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="64" fill="#FFFFFF">FX副業が会社にバレる理由と防ぐ3つの対策【</text>
+  <text x="60" y="430" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="64" fill="#FFFFFF">2026年最新】</text>
+  <!-- フッター -->
+  <text x="60" y="580" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="500" font-size="28" fill="rgba(255,255,255,0.65)">田中蓮のマネーブログ | ren-money.com</text>
+</svg>

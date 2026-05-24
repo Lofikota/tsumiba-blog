@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#475569"/>
+  <!-- 右側アクセント -->
+  <rect x="900" y="0" width="300" height="630" fill="#64748B" opacity="0.4"/>
+  <circle cx="1050" cy="315" r="220" fill="#64748B" opacity="0.25"/>
+  <!-- ヘッダーライン -->
+  <rect x="0" y="0" width="1200" height="8" fill="#64748B"/>
+  <!-- 絵文字 -->
+  <text x="140" y="250" font-family="'Segoe UI Emoji',sans-serif" font-size="120" text-anchor="middle">📝</text>
+  <!-- カテゴリバッジ -->
+  <rect x="60" y="290" width="84" height="48" rx="24" fill="rgba(255,255,255,0.18)"/>
+  <text x="102" y="323" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="26" fill="#FFFFFF" text-anchor="middle">記事</text>
+  <!-- タイトル -->
+  <text x="60" y="350" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="64" fill="#FFFFFF">保険 見直し 40代 家族｜子育て・住宅ロー</text>
+  <text x="60" y="430" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="64" fill="#FFFFFF">ンと掛け合わせた最適化ガイド</text>
+  <!-- フッター -->
+  <text x="60" y="580" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="500" font-size="28" fill="rgba(255,255,255,0.65)">田中蓮のマネーブログ | ren-money.com</text>
+</svg>
