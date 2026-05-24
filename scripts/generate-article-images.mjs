@@ -118,7 +118,13 @@ function listTargets() {
     })
     .filter((item) => slugArg || allCategories || isFxArticle(item))
     .filter((item) => !onlyNonFx || !isFxArticle(item))
-    .filter((item) => overwrite || !item.data.heroImage || item.data.heroImage.startsWith('/og/') || item.data.heroImage.startsWith('/thumbnails/'))
+    .filter((item) => {
+      if (overwrite) return true;
+      if (!item.data.heroImage) return true;
+      if (item.data.heroImage.startsWith('/og/') || item.data.heroImage.startsWith('/thumbnails/')) return true;
+      // heroImageが設定済みでも実ファイルがなければ生成対象にする
+      return !fs.existsSync(path.join(ROOT, 'public', item.data.heroImage));
+    })
     .sort((a, b) => {
       const dateA = Date.parse(a.data.pubDate || '') || 0;
       const dateB = Date.parse(b.data.pubDate || '') || 0;
