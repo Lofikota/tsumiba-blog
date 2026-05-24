@@ -7,7 +7,20 @@ on:
       - 'src/content/blog/**/*.mdx'
   schedule:
     - cron: '0 22 * * *'   # 毎日 07:00 JST — 画像なし記事を拾う
-  workflow_dispatch:         # GitHub UI から手動実行も可
+  workflow_dispatch:
+    inputs:
+      overwrite:
+        description: '既存画像を上書き再生成する'
+        type: boolean
+        default: false
+      limit:
+        description: '最大生成件数（デフォルト: 36 = 全件）'
+        type: number
+        default: 36
+      slug:
+        description: '特定記事のみ生成する場合はslugを入力（空白 = 全記事）'
+        type: string
+        default: ''
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -19,7 +32,7 @@ concurrency:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 60
     permissions:
       contents: write
 
@@ -63,14 +76,35 @@ jobs:
               echo "::warning:: ${slug} の画像生成に失敗しました（スキップ）"
           done
 
-      # ── schedule / 手動：heroImageなし記事を全件処理 ────
-      - name: 画像生成（定時/手動 — 未生成記事を全件）
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+      # ── schedule：heroImageなし記事を全件処理 ──────────
+      - name: 画像生成（定時 — 未生成記事を全件）
+        if: github.event_name == 'schedule'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           node scripts/generate-article-images.mjs --all --all-categories --limit 10
+
+      # ── 手動：入力パラメータに応じて生成 ──────────────
+      - name: 画像生成（手動）
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          INPUT_SLUG: ${{ inputs.slug }}
+          INPUT_OVERWRITE: ${{ inputs.overwrite }}
+          INPUT_LIMIT: ${{ inputs.limit }}
+        run: |
+          ARGS="--all --all-categories"
+          if [ -n "$INPUT_SLUG" ]; then
+            ARGS="--slug $INPUT_SLUG"
+          fi
+          if [ "$INPUT_OVERWRITE" = "true" ]; then
+            ARGS="$ARGS --overwrite"
+          fi
+          ARGS="$ARGS --limit $INPUT_LIMIT"
+          echo "実行コマンド: node scripts/generate-article-images.mjs $ARGS"
+          node scripts/generate-article-images.mjs $ARGS
 
       # ── 共通：生成結果をコミット・プッシュ ─────────────
       - name: 生成した画像とheroImage更新をコミット・プッシュ
