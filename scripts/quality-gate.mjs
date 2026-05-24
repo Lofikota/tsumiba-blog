@@ -4,6 +4,33 @@
  * 戻り値: { ok: boolean, errors: string[], warnings: string[] }
  */
 
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.join(__dirname, '..');
+
+// affiliateLinks.ts から live(affiliate) slugセットを構築
+function buildAffiliateSlugs() {
+  try {
+    const code = fs.readFileSync(path.join(ROOT, 'src/data/affiliateLinks.ts'), 'utf-8');
+    const slugs = new Set();
+    const blockRe = /\{[^{}]+slug:\s*'([^']+)'[^{}]+\}/gs;
+    let m;
+    while ((m = blockRe.exec(code)) !== null) {
+      const block = m[0];
+      const slug   = block.match(/slug:\s*'([^']+)'/)?.[1];
+      const status = block.match(/status:\s*'([^']+)'/)?.[1];
+      if (slug && status === 'affiliate') slugs.add(slug);
+    }
+    return slugs;
+  } catch { return new Set(); }
+}
+
+const AFFILIATE_SLUGS = buildAffiliateSlugs();
+
 // 単純文字列マッチ（前後の文脈に関係なく禁止）
 const BANNED_EXPRESSIONS = [
   '確実に儲かる', '絶対に損しない', '必ず増える',
@@ -82,6 +109,17 @@ export function checkArticle(content, slug) {
     content.includes('valuecommerce');
   if (!hasAffiliateLink) {
     warnings.push('アフィリエイトリンクが見当たらない（AffiliateCTAコンポーネントまたはASPリンクを確認してください）');
+  }
+
+  // pending/未登録 affiliateリンクが使われていないかチェック（収益ゼロ防止）
+  const productRe = /product="([^"]+)"/g;
+  let pm;
+  while ((pm = productRe.exec(content)) !== null) {
+    const p = pm[1];
+    if (!AFFILIATE_SLUGS.has(p)) {
+      errors.push(`product="${p}" は未承認(pending)または未登録のアフィリエイトリンクです。` +
+        ` affiliateLinks.tsでstatus:'affiliate'になっているslugに変更してください。`);
+    }
   }
 
   // heroImage存在チェック
