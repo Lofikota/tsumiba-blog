@@ -40,9 +40,9 @@ const allCategories = hasArg('--all-categories');
 const onlyNonFx = hasArg('--only-non-fx');
 const limit = Number(getArg('--limit') ?? 999);
 
-const model = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1.5';
-const size = process.env.OPENAI_IMAGE_SIZE || '1536x1024';
-const quality = process.env.OPENAI_IMAGE_QUALITY || 'high';
+const model = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
+const size = process.env.OPENAI_IMAGE_SIZE || '1024x1024';
+const quality = process.env.OPENAI_IMAGE_QUALITY || 'standard';
 
 if (!slugArg && !allMode) {
   console.error('Usage: node scripts/generate-article-images.mjs --slug <slug> または --all');
