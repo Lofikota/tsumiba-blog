@@ -127,7 +127,57 @@ function listTargets() {
     .slice(0, limit);
 }
 
-function promptForArticle({ slug, data }) {
+// Claudeでビジュアルシーンを動的生成する（失敗時はnullを返してフォールバックへ）
+async function generateSceneWithClaude({ title, description, category }) {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return null;
+
+  const system = `You are a visual art director for a Japanese personal finance blog.
+Blog persona: Tanaka Ren, a 32-year-old Japanese IT office worker who overcame 2M yen debt.
+Task: given an article title and description, write a specific scene description for a photorealistic 16:9 hero image.`;
+
+  const user = `Article title: ${title}
+Description: ${description || '(none)'}
+Category: ${category}
+
+Write a specific, vivid scene description (2-3 sentences, English only).
+Rules:
+- Reflect the SPECIFIC topic of this article — not a generic "man at laptop" shot
+- Include concrete props, environment, or action directly tied to the article content
+- Subject: realistic Japanese 30s office worker or hands-only composition; no brand logos; no celebrities
+- Mood: trustworthy, warm daylight, practical, premium but not luxury
+- No text in image, no exaggerated money piles
+
+Reply with ONLY the scene description. No explanation, no bullet points.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 200,
+        system,
+        messages: [{ role: 'user', content: user }],
+      }),
+    });
+    if (!res.ok) {
+      console.warn(`  [Claude] scene generation failed: ${res.status}`);
+      return null;
+    }
+    const json = await res.json();
+    return json.content?.[0]?.text?.trim() || null;
+  } catch (e) {
+    console.warn(`  [Claude] scene generation error: ${e.message}`);
+    return null;
+  }
+}
+
+async function promptForArticle({ slug, data }) {
   const category = data.category || 'FX・外貨';
   const title = data.title || slug;
   const description = data.description || '';
@@ -187,6 +237,13 @@ function promptForArticle({ slug, data }) {
     avoid: 'brand logos, watermarks, exaggerated money piles, gambling feeling, get-rich-quick mood, profit guarantees',
   });
 
+  // Claudeで記事固有のシーンを生成（失敗時は固定シーンにフォールバック）
+  const claudeScene = await generateSceneWithClaude({ title, description, category });
+  if (claudeScene) {
+    console.log(`  [Claude scene] ${claudeScene.slice(0, 100)}${claudeScene.length > 100 ? '...' : ''}`);
+  }
+  const scene = claudeScene || spec.scene;
+
   return [
     'Use case: photorealistic-natural',
     'Asset type: 16:9 hero image for a Japanese personal finance affiliate blog article',
@@ -196,7 +253,7 @@ function promptForArticle({ slug, data }) {
     `Article title for context: ${title}`,
     `Article category: ${category}`,
     description ? `Article description: ${description}` : '',
-    `Scene/backdrop: ${spec.scene}.`,
+    `Scene/backdrop: ${scene}.`,
     'Subject: realistic Japanese 30s office worker or hands-only composition depending on what feels natural; no identifiable celebrity; no brand logos, no broker logos.',
     'Composition: editorial blog cover, strong central visual, clean negative space near the top-left for page layout, professional WordPress-style article thumbnail.',
     'Style: photorealistic, trustworthy, warm daylight, premium but not luxury, practical financial comparison mood, high detail, natural colors.',
@@ -263,7 +320,7 @@ console.log(`対象: ${targets.length}件 / scope=${allCategories ? 'all-categor
 for (const target of targets) {
   const imagePath = `/images/articles/${target.slug}.png`;
   const outputPath = path.join(ROOT, 'public', imagePath);
-  const prompt = promptForArticle(target);
+  const prompt = await promptForArticle(target);
 
   if (dryRun) {
     console.log(`\n--- ${target.slug} ---\n${prompt}\n=> ${imagePath}`);
