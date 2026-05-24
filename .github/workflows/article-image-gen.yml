@@ -1,0 +1,71 @@
+name: 記事ヒーロー画像 自動生成
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/blog/**/*.mdx'
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+concurrency:
+  group: article-image-gen
+  cancel-in-progress: true   # 連続pushは最新だけ実行
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: チェックアウト（差分取得のため2コミット分）
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 依存関係インストール
+        run: npm ci
+
+      - name: 変更された記事のslugを抽出
+        id: slugs
+        run: |
+          SLUGS=$(git diff --name-only HEAD~1 HEAD -- 'src/content/blog/*.mdx' \
+            | sed 's|src/content/blog/||; s|\.mdx$||' \
+            | tr '\n' ' ' \
+            | xargs)
+          echo "list=$SLUGS" >> $GITHUB_OUTPUT
+          echo "変更スラッグ: $SLUGS"
+
+      - name: 画像生成（slug単位・失敗しても続行）
+        if: steps.slugs.outputs.list != ''
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLUGS: ${{ steps.slugs.outputs.list }}
+        run: |
+          for slug in $SLUGS; do
+            echo "--- $slug ---"
+            node scripts/generate-article-images.mjs --slug "$slug" || \
+              echo "::warning:: ${slug} の画像生成に失敗しました（スキップ）"
+          done
+
+      - name: 生成した画像とheroImage更新をコミット・プッシュ
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/images/articles/ src/content/blog/
+          if git diff --staged --quiet; then
+            echo "新規画像なし（すでに存在 or 生成スキップ）"
+          else
+            git commit -m "chore: ヒーロー画像を自動生成 [skip ci]"
+            git push
+          fi
