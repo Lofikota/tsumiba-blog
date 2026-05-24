@@ -95,6 +95,15 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
             link_url: anchor.getAttribute('href') || '',
             page_path: window.location.pathname,
           });
+          if (googleAdsConversionSendTo && ['affiliate_click', 'line_click', 'line_add_click'].includes(eventName)) {
+            window.gtag('event', 'conversion', {
+              send_to: googleAdsConversionSendTo,
+              event_category: anchor.getAttribute('data-google-category') || 'engagement',
+              event_label: label,
+              link_url: anchor.getAttribute('href') || '',
+              page_path: window.location.pathname,
+            });
+          }
         }, true);
       </script>
     </>

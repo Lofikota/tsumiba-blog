@@ -17,6 +17,7 @@ const featuredPosts: CollectionEntry<'blog'>[] = featuredSlugs
   .map((slug) => allPosts.find((post) => post.id === slug))
   .filter((post): post is CollectionEntry<'blog'> => Boolean(post));
 const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';
+const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_SEND_TO ?? '';
 type CatStyle = { cls: string; bg: string };
 const catStyle: Record<string, CatStyle> = {
   'NISA・投資': { cls: 'cat-invest',  bg: 'linear-gradient(135deg,#DBEAFE,#93C5FD)' },
@@ -42,7 +43,7 @@ const catStyle: Record<string, CatStyle> = {
   {googleTagId && (
     <>
       <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}></script>
-      <script is:inline define:vars={{ googleTagId }}>
+      <script is:inline define:vars={{ googleTagId, googleAdsConversionSendTo }}>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         window.gtag = window.gtag || gtag;
@@ -63,6 +64,16 @@ const catStyle: Record<string, CatStyle> = {
             page_path: window.location.pathname,
             lp_variant: 'money_anxiety_to_line_v1',
           });
+          if (googleAdsConversionSendTo && ['affiliate_click', 'line_click', 'line_add_click', 'lp_line_cta_click'].includes(eventName)) {
+            window.gtag('event', 'conversion', {
+              send_to: googleAdsConversionSendTo,
+              event_category: anchor.getAttribute('data-google-category') || 'engagement',
+              event_label: label,
+              link_url: anchor.getAttribute('href') || '',
+              page_path: window.location.pathname,
+              lp_variant: 'money_anxiety_to_line_v1',
+            });
+          }
         }, true);
       </script>
     </>
