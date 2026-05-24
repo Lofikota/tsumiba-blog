@@ -1,0 +1,118 @@
+---
+interface Props {
+  heading?: string;
+  lead?: string;
+}
+
+const {
+  heading = '迷ったらこの順番で確認',
+  lead = 'FX口座は1社だけで決めず、まず大手・取引機能・コストの順に見比べると失敗しにくいです。',
+} = Astro.props;
+---
+
+<section class="fx-priority" aria-label="FX口座の優先確認リンク">
+  <p class="fx-priority-kicker">PR</p>
+  <h2>{heading}</h2>
+  <p class="fx-priority-lead">{lead}</p>
+  <div class="fx-priority-grid">
+    <a href="/go/dmm-fx/" class="fx-priority-card fx-priority-main" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-dmm-fx">
+      <span class="fx-priority-rank">1</span>
+      <strong>DMM FX</strong>
+      <small>まず最初の比較先。大手・アプリ・サポート重視。</small>
+    </a>
+    <a href="/go/jfx/" class="fx-priority-card" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-jfx">
+      <span class="fx-priority-rank">2</span>
+      <strong>JFX</strong>
+      <small>MT4・取引機能・短期売買の使いやすさ重視。</small>
+    </a>
+    <a href="/go/fxtf/" class="fx-priority-card" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-fxtf">
+      <span class="fx-priority-rank">3</span>
+      <strong>FXTF</strong>
+      <small>スプレッドと手数料を細かく確認したい人向け。</small>
+    </a>
+  </div>
+  <p class="fx-priority-note">FXは元本割れや預け入れた資金を上回る損失が発生するリスクがあります。申込前に必ず公式条件を確認してください。</p>
+</section>
+
+<style>
+  .fx-priority {
+    margin: 1.75rem 0 2rem;
+    padding: 18px;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    background: #eff6ff;
+  }
+  .fx-priority-kicker {
+    margin: 0 0 6px;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .fx-priority h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    line-height: 1.45;
+  }
+  .fx-priority-lead {
+    margin: 0 0 14px;
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .fx-priority-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .fx-priority-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 8px;
+    align-items: center;
+    min-height: 112px;
+    padding: 13px;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    background: #fff;
+    color: #0f172a;
+    text-decoration: none;
+  }
+  .fx-priority-main {
+    border-color: #2563eb;
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.14);
+  }
+  .fx-priority-rank {
+    display: inline-grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .fx-priority-card strong {
+    font-size: 15px;
+  }
+  .fx-priority-card small {
+    grid-column: 1 / -1;
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .fx-priority-note {
+    margin: 12px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  @media (max-width: 720px) {
+    .fx-priority-grid {
+      grid-template-columns: 1fr;
+    }
+    .fx-priority-card {
+      min-height: auto;
+    }
+  }
+</style>

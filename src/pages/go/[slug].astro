@@ -13,7 +13,16 @@ interface Props {
 }
 
 const { link } = Astro.props;
-const destinationJson = JSON.stringify(link.destinationUrl);
+const fallbackByCategory: Partial<Record<AffiliateLink['category'], string>> = {
+  FX: '/go/dmm-fx/',
+  クレカ: '/go/rakuten-card/',
+  証券: '/line/blog-nisa-mistake/',
+  会計: '/line/blog-tax-basic/',
+  保険: '/line/blog-main/',
+};
+const isPending = link.status === 'pending';
+const destinationUrl = isPending ? fallbackByCategory[link.category] ?? '/line/blog-main/' : link.destinationUrl;
+const destinationJson = JSON.stringify(destinationUrl);
 const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';
 const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_SEND_TO ?? '';
 ---
@@ -25,8 +34,8 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <title>{link.name} 公式サイトへ移動します</title>
-    <meta name="description" content={`${link.name} の公式サイトへ移動します。`} />
+    <title>{isPending ? '確認済みの導線へ移動します' : `${link.name} 公式サイトへ移動します`}</title>
+    <meta name="description" content={isPending ? '現在使える導線へ移動します。' : `${link.name} の公式サイトへ移動します。`} />
     {googleTagId && (
       <>
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}></script>
@@ -66,13 +75,13 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
     <main class="go-page">
       <section class="go-card">
         <p class="go-label">PR</p>
-        <h1>{link.name} 公式サイトへ移動します</h1>
-        <p>{link.disclosure}</p>
-        <p class="go-small">掲載情報やキャンペーン条件は変更される場合があります。申込前に公式サイトで最新情報をご確認ください。</p>
-        <a class="go-button" href={link.destinationUrl} rel="sponsored nofollow noopener noreferrer"
+        <h1>{isPending ? '現在使える導線へ移動します' : `${link.name} 公式サイトへ移動します`}</h1>
+        <p>{isPending ? `${link.name} はASPリンクの動作確認が完了していないため、確認済みの関連導線へ移動します。` : link.disclosure}</p>
+        <p class="go-small">{isPending ? '未確認の外部リンクへは送客しません。申込前には必ず公式条件とリスクをご確認ください。' : '掲載情報やキャンペーン条件は変更される場合があります。申込前に公式サイトで最新情報をご確認ください。'}</p>
+        <a class="go-button" href={destinationUrl} rel="sponsored nofollow noopener noreferrer"
            data-google-event="affiliate_click"
            data-google-category="affiliate"
-           data-google-label={link.slug}>公式サイトを開く</a>
+           data-google-label={isPending ? `${link.slug}:fallback` : link.slug}>{isPending ? '確認済みの導線へ進む' : '公式サイトを開く'}</a>
       </section>
     </main>
     <style>

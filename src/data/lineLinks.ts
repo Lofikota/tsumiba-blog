@@ -84,7 +84,7 @@ export const lineRefs: LineRef[] = [
     source: 'blog',
     intent: 'fx',
     headline: '口座を開く前に3分だけ確認してほしいこと',
-    description: 'DMM FX・JFX・FXTFの比較ポイント、初心者が見落としやすい条件、開設後に最初にやることを整理して届けます。「開いてから気づいた」をなくすためのチェックリストです。',
+    description: 'DMM FX → JFX → FXTFの順で、比較ポイント、初心者が見落としやすい条件、開設後に最初にやることを整理して届けます。「開いてから気づいた」をなくすためのチェックリストです。',
   },
   {
     ref: 'lp-manga-main',
@@ -100,7 +100,7 @@ export const lineRefs: LineRef[] = [
     source: 'lp',
     intent: 'fx',
     headline: 'FX口座を作る前に3分だけ確認するLINE',
-    description: '特典額だけで選んで失敗しないように、DMM FX・JFX・FXTFの条件、リスク、見る順番を整理して届けます。',
+    description: '特典額だけで選んで失敗しないように、DMM FX → JFX → FXTFの順で条件、リスク、見るポイントを整理して届けます。',
   },
   {
     ref: 'campaign-dmm-fx',
@@ -108,7 +108,7 @@ export const lineRefs: LineRef[] = [
     source: 'campaign',
     intent: 'campaign',
     headline: 'DMM FXの条件を先に整理するLINE',
-    description: '口座開設条件、スプレッド、初心者が迷いやすい点を短く整理します。',
+    description: '最初の比較先として、口座開設条件、スプレッド、初心者が迷いやすい点を短く整理します。',
   },
   {
     ref: 'campaign-jfx',
@@ -116,7 +116,7 @@ export const lineRefs: LineRef[] = [
     source: 'campaign',
     intent: 'campaign',
     headline: 'JFXを見る前に条件を整理するLINE',
-    description: '短期売買向きか、ツールの使いやすさ、取引条件を先に見直します。',
+    description: '2番目の比較先として、短期売買向きか、ツールの使いやすさ、取引条件を先に見直します。',
   },
   {
     ref: 'campaign-fxtf',
@@ -124,7 +124,7 @@ export const lineRefs: LineRef[] = [
     source: 'campaign',
     intent: 'campaign',
     headline: 'FXTFの迷いを先に潰すLINE',
-    description: 'スプレッド、約定、ツール面を見てから判断したい人向けです。',
+    description: '3番目の比較先として、スプレッド、手数料、商品幅を見てから判断したい人向けです。',
   },
   {
     ref: 'campaign-smbc-gold-nl',

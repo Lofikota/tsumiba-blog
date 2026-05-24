@@ -17,6 +17,8 @@ const { lineRef } = Astro.props;
 const addUrl = getLineAddUrl(lineRef.ref);
 const isCampaign = lineRef.source === 'campaign';
 const isFx = lineRef.intent === 'fx';
+const isFxCampaign = ['campaign-dmm-fx', 'campaign-jfx', 'campaign-fxtf'].includes(lineRef.ref);
+const showFxRoute = isFx || isFxCampaign;
 const flowLead = isCampaign
   ? '案件は、特典額より先に条件を見ると迷いが減ります。'
   : isFx
@@ -31,9 +33,16 @@ const flowLead = isCampaign
     <p>{lineRef.description}</p>
     <ul class="line-ref-list">
       <li>{flowLead}</li>
-      <li>{isCampaign || isFx ? 'DMM FX / JFX / FXTF のように、案件ごとに確認順を変えます。' : 'テーマ別に整理しているので、あとで見返しやすいです。'}</li>
+      <li>{showFxRoute ? 'DMM FX → JFX → FXTF の順で、条件と向いている人を整理します。' : 'テーマ別に整理しているので、あとで見返しやすいです。'}</li>
       <li>必要ない配信はいつでも止められます。</li>
     </ul>
+    {showFxRoute && (
+      <div class="line-fx-route" aria-label="FX送客の優先順">
+        <a href="/line/campaign-dmm-fx/">1. DMM FX<span>最初の比較先</span></a>
+        <a href="/line/campaign-jfx/">2. JFX<span>取引機能・MT4</span></a>
+        <a href="/line/campaign-fxtf/">3. FXTF<span>コスト・商品幅</span></a>
+      </div>
+    )}
     <a class="line-ref-button" href={addUrl} rel="noopener noreferrer"
        data-google-event="line_add_click"
        data-google-category="line"
@@ -74,6 +83,29 @@ const flowLead = isCampaign
   .line-ref-list li + li {
     margin-top: 0.3rem;
   }
+  .line-fx-route {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .line-fx-route a {
+    display: block;
+    padding: 12px;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.55);
+    color: #fff;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .line-fx-route span {
+    display: block;
+    margin-top: 4px;
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 500;
+  }
   .line-ref-button {
     display: inline-block;
     margin-top: 20px;
@@ -87,5 +119,10 @@ const flowLead = isCampaign
   .line-ref-note {
     margin-top: 10px;
     font-size: 13px;
+  }
+  @media (max-width: 640px) {
+    .line-fx-route {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

@@ -71,11 +71,13 @@ const campaignRefs: LineRef[] = ['campaign-dmm-fx', 'campaign-jfx', 'campaign-fx
 
   <section class="line-section">
     <h2>案件別の入口</h2>
+    <p class="line-section-lead">FXはまずDMM FX、次にJFX、最後にFXTFの順で確認します。迷った人を高単価の使えるASP導線へ戻す設計です。</p>
     <div class="line-topic-list">
       {campaignRefs.map((ref) => (
-        <article>
+        <article class="line-topic-card">
           <h3>{ref.label}</h3>
           <p>{ref.description}</p>
+          <a href={`/line/${ref.ref}/`}>この順番で条件を見る</a>
         </article>
       ))}
     </div>
@@ -147,6 +149,11 @@ const campaignRefs: LineRef[] = ['campaign-dmm-fx', 'campaign-jfx', 'campaign-fx
     font-size: 22px;
     margin-bottom: 14px;
   }
+  .line-section-lead {
+    color: #475569;
+    line-height: 1.8;
+    margin: -6px 0 14px;
+  }
   .line-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -194,6 +201,14 @@ const campaignRefs: LineRef[] = ['campaign-dmm-fx', 'campaign-jfx', 'campaign-fx
     color: #64748b;
     font-size: 14px;
     line-height: 1.7;
+  }
+  .line-topic-card a {
+    display: inline-block;
+    margin-top: 10px;
+    color: #2563eb;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
   }
   .line-caution {
     margin-top: 24px;
