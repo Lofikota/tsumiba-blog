@@ -1,0 +1,36 @@
+name: affiliate-link-check
+
+on:
+  schedule:
+    # 毎週月曜日 09:00 JST（00:00 UTC）
+    - cron: '0 0 * * 1'
+  push:
+    paths:
+      - 'src/content/blog/**/*.mdx'
+      - 'src/data/affiliateLinks.ts'
+  workflow_dispatch:
+
+jobs:
+  check-affiliate-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check affiliate links (static)
+        run: node scripts/check-affiliate-links.mjs
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: affiliate-link-status
+          path: reports/affiliate-link-status.json
+          retention-days: 30
