@@ -42,7 +42,7 @@ const limit = Number(getArg('--limit') ?? 999);
 
 const model = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
 const size = process.env.OPENAI_IMAGE_SIZE || '1024x1024';
-const quality = process.env.OPENAI_IMAGE_QUALITY || 'standard';
+const quality = process.env.OPENAI_IMAGE_QUALITY || 'low';
 
 if (!slugArg && !allMode) {
   console.error('Usage: node scripts/generate-article-images.mjs --slug <slug> または --all');
