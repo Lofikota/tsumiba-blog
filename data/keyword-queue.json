@@ -398,9 +398,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "FXで月5万の不労所得は現実的か？必要な元手・リスク・失敗率を正直に解説。夢を煽らず現実を伝える。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "done",
     "priority": 20,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "completedAt": "2026-05-24"
   },
   {
     "slug": "nisa-tsumitate-kingaku",
@@ -550,9 +551,10 @@
     "type": "comparison",
     "category": "保険",
     "notes": "30代が選ぶべき生命保険を掛け捨て型で比較。保険見直しラボ・FP相談へのCTA。コスパ重視の視点で。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "done",
     "priority": 2,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "completedAt": "2026-05-24"
   },
   {
     "slug": "iryo-hoken-hitsuyou",
@@ -560,9 +562,10 @@
     "type": "guide",
     "category": "保険",
     "notes": "高額療養費制度があれば医療保険は不要か？公的保険の手厚さと民間保険の必要性を整理。FP相談CTAへ。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "done",
     "priority": 3,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "completedAt": "2026-05-24"
   },
   {
     "slug": "iryo-hoken-hikaku",
