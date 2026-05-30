@@ -86,8 +86,8 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
 
 const tocHeadings = headings.filter(h => h.depth === 2);
 
-// モバイル追従CTA（FX記事のみ・控えめ）。承認済み /go/jfx/ へ送客。
-const stickyCta = category === 'FX' ? { href: '/go/jfx/', text: 'FX口座を無料で比較', label: 'sticky-jfx' } : null;
+// モバイル追従CTA（FX記事のみ・控えめ）。サイト優先順位#1のFXTFへ送客（FxPriorityCTAと整合）。
+const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無料で比較', label: 'sticky-fxtf' } : null;
 ---
 
 <BaseLayout title={title} description={description} image={ogImage} article={true} pubDate={pubDate} updatedDate={updatedDate}>
