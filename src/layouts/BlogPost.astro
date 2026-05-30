@@ -85,6 +85,9 @@ const dateStr = pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'l
 const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 
 const tocHeadings = headings.filter(h => h.depth === 2);
+
+// モバイル追従CTA（FX記事のみ・控えめ）。承認済み /go/jfx/ へ送客。
+const stickyCta = category === 'FX' ? { href: '/go/jfx/', text: 'FX口座を無料で比較', label: 'sticky-jfx' } : null;
 ---
 
 <BaseLayout title={title} description={description} image={ogImage} article={true} pubDate={pubDate} updatedDate={updatedDate}>
@@ -200,6 +203,32 @@ const tocHeadings = headings.filter(h => h.depth === 2);
       投資にはリスクが伴い、元本を割り込む可能性があります。最終的な判断はご自身の責任でお願いします。
       掲載情報は作成時点のものであり、最新情報は各社公式サイトをご確認ください。
     </div>
+
+    {stickyCta && (
+      <div class="sticky-cta" id="stickyCta" hidden>
+        <span class="sticky-cta-pr">PR</span>
+        <a class="sticky-cta-link" href={stickyCta.href} rel="sponsored nofollow noopener noreferrer"
+           data-google-event="affiliate_click"
+           data-google-category="affiliate"
+           data-google-label={stickyCta.label}>{stickyCta.text}</a>
+        <button type="button" class="sticky-cta-close" id="stickyCtaClose" aria-label="閉じる">×</button>
+      </div>
+      <script is:inline>
+        (() => {
+          const bar = document.getElementById('stickyCta');
+          if (!bar) return;
+          const close = document.getElementById('stickyCtaClose');
+          let dismissed = false;
+          close?.addEventListener('click', () => { dismissed = true; bar.hidden = true; });
+          const onScroll = () => {
+            if (dismissed) return;
+            bar.hidden = window.scrollY < 600;
+          };
+          window.addEventListener('scroll', onScroll, { passive: true });
+          onScroll();
+        })();
+      </script>
+    )}
   </article>
 </BaseLayout>
 
@@ -403,5 +432,54 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     color: #fff;
     font-weight: 800;
     text-decoration: none;
+  }
+
+  /* ── モバイル追従CTA（控えめ・FX記事のみ） ── */
+  .sticky-cta { display: none; }
+  @media (max-width: 640px) {
+    .sticky-cta {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 50;
+      padding: 0.6rem 0.85rem;
+      background: #fff;
+      border-top: 1px solid #d7e7df;
+      box-shadow: 0 -4px 16px rgba(15,23,42,.06);
+    }
+    .sticky-cta[hidden] { display: none; }
+    .sticky-cta-pr {
+      flex-shrink: 0;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.05em;
+    }
+    .sticky-cta-link {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.7rem 0.5rem;
+      border-radius: 8px;
+      background: #0f8a5f;
+      color: #fff;
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .sticky-cta-close {
+      flex-shrink: 0;
+      width: 1.9rem;
+      height: 1.9rem;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 1.2rem;
+      line-height: 1;
+      cursor: pointer;
+    }
   }
 </style>
