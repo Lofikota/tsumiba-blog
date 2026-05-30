@@ -22,6 +22,9 @@ const fallbackByCategory: Partial<Record<AffiliateLink['category'], string>> = {
 };
 const isPending = link.status === 'pending';
 const destinationUrl = isPending ? fallbackByCategory[link.category] ?? '/line/blog-main/' : link.destinationUrl;
+const eventLabel = isPending ? `${link.slug}:fallback` : link.slug;
+const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';
+const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_SEND_TO ?? '';
 ---
 
 <!doctype html>
@@ -33,7 +36,45 @@ const destinationUrl = isPending ? fallbackByCategory[link.category] ?? '/line/b
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <title>{isPending ? '確認済みの導線へ移動します' : `${link.name} 公式サイトへ移動します`}</title>
     <meta name="description" content={isPending ? '現在使える導線へ移動します。' : `${link.name} の公式サイトへ移動します。`} />
-    <meta http-equiv="refresh" content={`1;url=${destinationUrl}`} />
+    <meta http-equiv="refresh" content={`2;url=${destinationUrl}`} />
+    {googleTagId && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}></script>
+        <script define:vars={{ googleTagId, googleAdsConversionSendTo, destinationUrl, eventLabel }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          window.gtag = window.gtag || gtag;
+          gtag('js', new Date());
+          gtag('config', googleTagId);
+
+          var params = new URLSearchParams(window.location.search);
+          var source = params.get('utm_source') || params.get('ref') || 'direct';
+          var medium = params.get('utm_medium') || '';
+          var campaign = params.get('utm_campaign') || '';
+
+          var redirected = false;
+          function go(){ if (redirected) return; redirected = true; window.location.replace(destinationUrl); }
+
+          gtag('event', 'affiliate_click', {
+            event_category: 'affiliate',
+            event_label: eventLabel,
+            traffic_source: source,
+            traffic_medium: medium,
+            campaign: campaign,
+            transport_type: 'beacon',
+          });
+          if (googleAdsConversionSendTo) {
+            gtag('event', 'conversion', {
+              send_to: googleAdsConversionSendTo,
+              event_category: 'affiliate',
+              event_label: eventLabel,
+            });
+          }
+          // 計測ビーコン送信の猶予を取ってから遷移（JS無効時はmeta refreshが2秒で発火）
+          setTimeout(go, 600);
+        </script>
+      </>
+    )}
   </head>
   <body>
     <main class="go-page">
