@@ -1,0 +1,134 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdminNav from '../../components/AdminNav.astro';
+
+const posts = await getCollection('blog');
+const sorted = posts.sort((a, b) =>
+  new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+);
+
+function fmt(d: Date | string | undefined) {
+  if (!d) return '-';
+  return new Date(d).toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' });
+}
+---
+
+<BaseLayout
+  title="記事編集 | ren-money.com 管理"
+  description="公開済みブログ記事の一覧と編集"
+  robots="noindex,nofollow"
+  wide
+>
+  <AdminNav active="article-editor" />
+
+  <section class="articles-wrap">
+    <div class="articles-header">
+      <div>
+        <p class="kicker">CONTENT EDITOR</p>
+        <h1>ブログ記事編集</h1>
+        <p class="subtitle">記事を選んでタイトル・本文・画像を編集できます。保存するとGitHubにコミットされ自動デプロイされます。</p>
+      </div>
+      <div class="count-badge">{sorted.length}本</div>
+    </div>
+
+    <div class="search-row">
+      <input id="search" type="search" placeholder="タイトル・スラッグで検索..." autocomplete="off" />
+    </div>
+
+    <div class="articles-table-wrap">
+      <table class="articles-table">
+        <thead>
+          <tr>
+            <th>タイトル</th>
+            <th>カテゴリ</th>
+            <th>公開日</th>
+            <th>状態</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="articles-tbody">
+          {sorted.map(post => (
+            <tr data-title={post.data.title.toLowerCase()} data-slug={post.id}>
+              <td class="td-title">
+                <span class="post-title">{post.data.title}</span>
+                <span class="post-slug">{post.id}</span>
+              </td>
+              <td><span class="category-badge">{post.data.category}</span></td>
+              <td class="td-date">{fmt(post.data.pubDate)}</td>
+              <td>
+                {post.data.draft
+                  ? <span class="status draft">下書き</span>
+                  : <span class="status published">公開中</span>
+                }
+              </td>
+              <td class="td-actions">
+                <a href={`/admin/edit/${post.id}/`} class="btn-edit">編集</a>
+                <a href={`/blog/${post.id}/`} target="_blank" rel="noopener" class="btn-preview">プレビュー</a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <script>
+    const searchInput = document.getElementById('search') as HTMLInputElement;
+    const tbody = document.getElementById('articles-tbody');
+    if (searchInput && tbody) {
+      searchInput.addEventListener('input', () => {
+        const q = searchInput.value.toLowerCase();
+        tbody.querySelectorAll('tr').forEach(row => {
+          const title = (row as HTMLElement).dataset.title || '';
+          const slug = (row as HTMLElement).dataset.slug || '';
+          (row as HTMLElement).style.display = (!q || title.includes(q) || slug.includes(q)) ? '' : 'none';
+        });
+      });
+    }
+  </script>
+
+  <style>
+    .articles-wrap { max-width: 1100px; margin: 0 auto; }
+    .articles-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
+    .kicker { color: #64748b; font-size: .7rem; font-weight: 800; letter-spacing: .1em; margin: 0 0 .25rem; }
+    h1 { margin: 0 0 .25rem; font-size: 1.5rem; color: #0f172a; }
+    .subtitle { margin: 0; color: #64748b; font-size: .85rem; max-width: 560px; line-height: 1.6; }
+    .count-badge { background: #1e40af; color: #fff; border-radius: 999px; padding: .35rem .85rem; font-size: .88rem; font-weight: 800; white-space: nowrap; }
+
+    .search-row { margin-bottom: 1rem; }
+    #search { width: 100%; max-width: 400px; padding: .55rem .85rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: .9rem; outline: none; }
+    #search:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+
+    .articles-table-wrap { overflow-x: auto; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 1px 2px rgba(15,23,42,.05); }
+    .articles-table { width: 100%; border-collapse: collapse; }
+    .articles-table th { background: #f8fafc; color: #64748b; font-size: .74rem; font-weight: 700; letter-spacing: .06em; padding: .65rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .articles-table td { padding: .75rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .articles-table tr:last-child td { border-bottom: none; }
+    .articles-table tr:hover td { background: #f8fafc; }
+
+    .td-title { max-width: 360px; }
+    .post-title { display: block; color: #0f172a; font-size: .9rem; font-weight: 600; line-height: 1.4; }
+    .post-slug { display: block; color: #94a3b8; font-size: .75rem; font-family: monospace; margin-top: .1rem; }
+
+    .category-badge { background: #e0f2fe; color: #0369a1; border-radius: 999px; padding: .18rem .55rem; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+
+    .td-date { color: #64748b; font-size: .82rem; white-space: nowrap; }
+
+    .status { border-radius: 999px; padding: .18rem .55rem; font-size: .72rem; font-weight: 700; }
+    .status.published { background: #dcfce7; color: #15803d; }
+    .status.draft { background: #fef9c3; color: #92400e; }
+
+    .td-actions { white-space: nowrap; }
+    .btn-edit, .btn-preview { display: inline-block; border-radius: 6px; padding: .3rem .7rem; font-size: .78rem; font-weight: 700; text-decoration: none; transition: background .15s; }
+    .btn-edit { background: #2563eb; color: #fff; margin-right: .35rem; }
+    .btn-edit:hover { background: #1d4ed8; }
+    .btn-preview { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-preview:hover { background: #e2e8f0; }
+
+    @media (max-width: 700px) {
+      .articles-header { flex-direction: column; }
+      .td-title { max-width: 200px; }
+    }
+  </style>
+</BaseLayout>

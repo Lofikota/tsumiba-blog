@@ -1,0 +1,481 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdminNav from '../../../components/AdminNav.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { slug: post.id },
+    props: { title: post.data.title, heroImage: post.data.heroImage ?? '' },
+  }));
+}
+
+const { slug, title, heroImage } = Astro.props;
+---
+
+<BaseLayout
+  title={`編集: ${title}`}
+  description="ブログ記事編集エディタ"
+  robots="noindex,nofollow"
+  wide
+>
+  <!-- Toast UI Editor CSS -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+
+  <AdminNav active="article-editor" />
+
+  <div id="editor-root" data-slug={slug} data-hero={heroImage}>
+
+    <!-- トークン入力（未認証時のみ表示） -->
+    <div id="token-gate" class="token-gate">
+      <div class="token-card">
+        <p class="token-title">管理トークンを入力してください</p>
+        <p class="token-desc">Cloudflare に設定した <code>ADMIN_ACTION_TOKEN</code> を入力してください。このブラウザのセッションにのみ保存されます。</p>
+        <div class="token-row">
+          <input id="token-input" type="password" placeholder="管理トークン" autocomplete="off" />
+          <button id="token-save" type="button">確認</button>
+        </div>
+        <p id="token-error" class="token-error"></p>
+      </div>
+    </div>
+
+    <!-- エディタ本体（認証後に表示） -->
+    <div id="editor-body" class="editor-body" style="display:none">
+      <div class="editor-topbar">
+        <a href="/admin/articles/" class="back-link">← 記事一覧</a>
+        <h1 id="page-title" class="page-title">読み込み中...</h1>
+        <div class="topbar-actions">
+          <span id="save-status" class="save-status"></span>
+          <button id="btn-save" type="button" class="btn-save" disabled>保存して公開</button>
+        </div>
+      </div>
+
+      <div id="loading-msg" class="loading-msg">記事を読み込んでいます...</div>
+
+      <div id="editor-layout" class="editor-layout" style="display:none">
+        <!-- サイドバー -->
+        <aside class="editor-sidebar">
+          <div class="sidebar-section">
+            <label class="field-label">トップ画像</label>
+            <div class="hero-preview-wrap">
+              <img id="hero-preview" class="hero-preview" src="" alt="トップ画像" style="display:none" />
+              <div id="hero-placeholder" class="hero-placeholder">画像なし</div>
+            </div>
+            <label class="upload-label" for="hero-file">画像を変更</label>
+            <input id="hero-file" type="file" accept="image/jpeg,image/png,image/webp" style="display:none" />
+            <p id="hero-upload-status" class="field-hint"></p>
+          </div>
+
+          <div class="sidebar-section">
+            <label class="field-label" for="field-title">タイトル</label>
+            <textarea id="field-title" class="field-input" rows="3" placeholder="記事タイトル"></textarea>
+          </div>
+
+          <div class="sidebar-section">
+            <label class="field-label" for="field-desc">説明文</label>
+            <textarea id="field-desc" class="field-input" rows="4" placeholder="メタディスクリプション（検索結果に表示）"></textarea>
+          </div>
+
+          <div class="sidebar-section">
+            <label class="field-label">スラッグ</label>
+            <p id="field-slug" class="field-slug-val"></p>
+            <p class="field-hint">変更不可</p>
+          </div>
+        </aside>
+
+        <!-- エディタ本体 -->
+        <div class="editor-main">
+          <div id="toast-editor"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+  (function () {
+    // ─── 定数 ───────────────────────────────────────────
+    const ROOT = document.getElementById('editor-root');
+    const SLUG = ROOT.dataset.slug;
+    const FILE_PATH = `src/content/blog/${SLUG}.mdx`;
+    const SESSION_KEY = 'ren_blog_admin_token';
+
+    // ─── DOM 参照 ────────────────────────────────────────
+    const tokenGate = document.getElementById('token-gate');
+    const editorBody = document.getElementById('editor-body');
+    const tokenInput = document.getElementById('token-input');
+    const tokenSave = document.getElementById('token-save');
+    const tokenError = document.getElementById('token-error');
+    const loadingMsg = document.getElementById('loading-msg');
+    const editorLayout = document.getElementById('editor-layout');
+    const pageTitle = document.getElementById('page-title');
+    const btnSave = document.getElementById('btn-save');
+    const saveStatus = document.getElementById('save-status');
+    const fieldTitle = document.getElementById('field-title');
+    const fieldDesc = document.getElementById('field-desc');
+    const fieldSlug = document.getElementById('field-slug');
+    const heroPreview = document.getElementById('hero-preview');
+    const heroPlaceholder = document.getElementById('hero-placeholder');
+    const heroFile = document.getElementById('hero-file');
+    const heroUploadStatus = document.getElementById('hero-upload-status');
+
+    // ─── 状態 ────────────────────────────────────────────
+    let currentSha = '';
+    let rawFm = '';
+    let imports = '';
+    let heroImagePath = ROOT.dataset.hero || '';
+    let editorInstance = null;
+
+    // ─── ユーティリティ ──────────────────────────────────
+    const toBase64 = str => btoa(unescape(encodeURIComponent(str)));
+    const fromBase64 = b64 => decodeURIComponent(escape(atob(b64.replace(/\s/g, ''))));
+
+    function getToken() {
+      return sessionStorage.getItem(SESSION_KEY) || '';
+    }
+
+    async function apiCall(action, data) {
+      const token = getToken();
+      const res = await fetch('/api/admin-action', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify({ action, ...data }),
+      });
+      return res.json();
+    }
+
+    // ─── MDX パース ──────────────────────────────────────
+    function parseMdx(text) {
+      if (!text.startsWith('---\n') && !text.startsWith('---\r\n')) {
+        return { rawFm: '', fmMap: {}, imports: '', body: text };
+      }
+      const fmEnd = text.indexOf('\n---\n', 4);
+      if (fmEnd === -1) return { rawFm: '', fmMap: {}, imports: '', body: text };
+
+      const fm = text.slice(4, fmEnd);
+      const afterFm = text.slice(fmEnd + 5);
+
+      const fmMap = {};
+      fm.split('\n').forEach(line => {
+        const m = line.match(/^([a-zA-Z]+):\s*(.*?)\s*$/);
+        if (m) fmMap[m[1]] = m[2].replace(/^["'](.*)["']$/, '$1');
+      });
+
+      const lines = afterFm.split('\n');
+      let bodyStart = 0;
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].startsWith('import ') || lines[i].trim() === '') {
+          bodyStart = i + 1;
+        } else {
+          break;
+        }
+      }
+      const importsBlock = lines.slice(0, bodyStart).join('\n').trimEnd();
+      const body = lines.slice(bodyStart).join('\n').trim();
+
+      return { rawFm: fm, fmMap, imports: importsBlock, body };
+    }
+
+    // ─── MDX 再構築 ──────────────────────────────────────
+    function buildMdx(fm, updates, importsBlock, body) {
+      const today = new Date().toISOString().split('T')[0];
+      let newFm = fm;
+
+      const setFm = (key, val) => {
+        const re = new RegExp(`^${key}:.*$`, 'm');
+        if (re.test(newFm)) {
+          newFm = newFm.replace(re, `${key}: ${val}`);
+        } else {
+          newFm += `\n${key}: ${val}`;
+        }
+      };
+
+      const q = s => `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+      setFm('title', q(updates.title));
+      setFm('description', q(updates.description));
+      if (updates.heroImage) setFm('heroImage', q(updates.heroImage));
+      setFm('updatedDate', today);
+
+      let out = `---\n${newFm.trim()}\n---\n\n`;
+      if (importsBlock.trim()) out += importsBlock.trim() + '\n\n';
+      out += body.trim() + '\n';
+      return out;
+    }
+
+    // ─── ヒーロー画像プレビュー更新 ──────────────────────
+    function updateHeroPreview(path) {
+      if (path) {
+        heroPreview.src = path;
+        heroPreview.style.display = 'block';
+        heroPlaceholder.style.display = 'none';
+      } else {
+        heroPreview.style.display = 'none';
+        heroPlaceholder.style.display = 'block';
+      }
+    }
+
+    // ─── ステータス表示 ──────────────────────────────────
+    function setStatus(msg, type) {
+      saveStatus.textContent = msg;
+      saveStatus.className = `save-status ${type || ''}`;
+    }
+
+    // ─── 動的スクリプト読み込み ──────────────────────────
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('Script load failed: ' + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    // ─── エディタ初期化 ──────────────────────────────────
+    async function initEditor(initialMd) {
+      await loadScript('https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js');
+
+      editorInstance = new toastui.Editor({
+        el: document.getElementById('toast-editor'),
+        initialValue: initialMd,
+        previewStyle: 'tab',
+        height: '600px',
+        toolbarItems: [
+          ['heading', 'bold', 'italic', 'strike'],
+          ['hr', 'quote'],
+          ['ul', 'ol', 'task'],
+          ['table', 'link'],
+          ['image'],
+        ],
+        hooks: {
+          addImageBlobHook: async (blob, callback) => {
+            const ext = blob.name ? blob.name.split('.').pop() : 'jpg';
+            const fname = `inline-${Date.now()}.${ext}`;
+            try {
+              const b64 = await blobToBase64(blob);
+              const data = await apiCall('upload_image', {
+                slug: SLUG,
+                filename: fname,
+                content: b64.split(',')[1],
+              });
+              if (data.ok) {
+                callback(data.url, fname);
+              } else {
+                alert('画像アップロード失敗: ' + data.message);
+              }
+            } catch (e) {
+              alert('画像アップロードエラー: ' + e.message);
+            }
+          },
+        },
+      });
+    }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    // ─── 記事読み込み ────────────────────────────────────
+    async function loadArticle() {
+      loadingMsg.style.display = 'block';
+      editorLayout.style.display = 'none';
+
+      const data = await apiCall('get_file', { path: FILE_PATH });
+      if (!data.ok) {
+        loadingMsg.textContent = 'エラー: ' + data.message;
+        return;
+      }
+
+      currentSha = data.sha;
+      const text = fromBase64(data.content);
+      const { rawFm: fm, fmMap, imports: importsBlock, body } = parseMdx(text);
+
+      rawFm = fm;
+      imports = importsBlock;
+      heroImagePath = fmMap.heroImage || ROOT.dataset.hero || '';
+
+      fieldTitle.value = fmMap.title || '';
+      fieldDesc.value = fmMap.description || '';
+      fieldSlug.textContent = SLUG;
+      pageTitle.textContent = fmMap.title || SLUG;
+      updateHeroPreview(heroImagePath);
+
+      await initEditor(body);
+
+      loadingMsg.style.display = 'none';
+      editorLayout.style.display = 'grid';
+      btnSave.disabled = false;
+    }
+
+    // ─── 保存 ────────────────────────────────────────────
+    async function saveArticle() {
+      if (!editorInstance) return;
+      btnSave.disabled = true;
+      setStatus('保存中...', '');
+
+      const body = editorInstance.getMarkdown();
+      const newMdx = buildMdx(rawFm, {
+        title: fieldTitle.value.trim(),
+        description: fieldDesc.value.trim(),
+        heroImage: heroImagePath,
+      }, imports, body);
+
+      const data = await apiCall('commit_file', {
+        path: FILE_PATH,
+        content: toBase64(newMdx),
+        sha: currentSha,
+        message: `[CMS] ${fieldTitle.value.trim().slice(0, 60)}`,
+      });
+
+      if (data.ok) {
+        setStatus('保存しました。デプロイ中...', 'success');
+        // sha を更新（再保存のため）
+        const refreshed = await apiCall('get_file', { path: FILE_PATH });
+        if (refreshed.ok) currentSha = refreshed.sha;
+      } else {
+        setStatus('エラー: ' + data.message, 'error');
+      }
+      btnSave.disabled = false;
+    }
+
+    // ─── ヒーロー画像アップロード ────────────────────────
+    heroFile.addEventListener('change', async () => {
+      const file = heroFile.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        heroUploadStatus.textContent = '5MB以下の画像を選択してください';
+        return;
+      }
+      heroUploadStatus.textContent = 'アップロード中...';
+
+      const ext = file.name.split('.').pop();
+      const fname = `hero-${Date.now()}.${ext}`;
+      const b64 = await blobToBase64(file);
+
+      const data = await apiCall('upload_image', {
+        slug: SLUG,
+        filename: fname,
+        content: b64.split(',')[1],
+      });
+
+      if (data.ok) {
+        heroImagePath = data.url;
+        updateHeroPreview(heroImagePath);
+        heroUploadStatus.textContent = '画像をアップロードしました';
+      } else {
+        heroUploadStatus.textContent = 'エラー: ' + data.message;
+      }
+    });
+
+    document.querySelector('label[for="hero-file"]').addEventListener('click', () => heroFile.click());
+
+    // ─── 保存ボタン ──────────────────────────────────────
+    btnSave.addEventListener('click', saveArticle);
+
+    // Ctrl+S / Cmd+S
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (!btnSave.disabled) saveArticle();
+      }
+    });
+
+    // ─── トークン認証フロー ──────────────────────────────
+    async function checkTokenAndLoad() {
+      const token = getToken();
+      if (!token) {
+        tokenGate.style.display = 'flex';
+        editorBody.style.display = 'none';
+        return;
+      }
+
+      // トークンを簡易確認（ファイル取得試み）
+      tokenGate.style.display = 'none';
+      editorBody.style.display = 'block';
+      await loadArticle();
+    }
+
+    tokenSave.addEventListener('click', async () => {
+      const token = tokenInput.value.trim();
+      if (!token) { tokenError.textContent = 'トークンを入力してください'; return; }
+      sessionStorage.setItem(SESSION_KEY, token);
+      tokenError.textContent = '';
+      await checkTokenAndLoad();
+    });
+
+    tokenInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') tokenSave.click();
+    });
+
+    // 初期化
+    checkTokenAndLoad();
+  })();
+  </script>
+
+  <style>
+    /* ── レイアウト ── */
+    .token-gate { display: none; align-items: center; justify-content: center; min-height: 60vh; }
+    .token-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2rem; max-width: 480px; width: 100%; }
+    .token-title { margin: 0 0 .5rem; font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+    .token-desc { margin: 0 0 1.2rem; color: #64748b; font-size: .88rem; line-height: 1.6; }
+    .token-desc code { background: #f1f5f9; color: #475569; padding: .15rem .35rem; border-radius: 4px; font-size: .82rem; }
+    .token-row { display: flex; gap: .5rem; }
+    .token-row input { flex: 1; padding: .55rem .75rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: .9rem; }
+    .token-row input:focus { outline: none; border-color: #2563eb; }
+    .token-row button { padding: .55rem 1.1rem; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: .88rem; font-weight: 700; cursor: pointer; }
+    .token-row button:hover { background: #1d4ed8; }
+    .token-error { margin: .6rem 0 0; color: #dc2626; font-size: .82rem; min-height: 1.2em; }
+
+    /* ── トップバー ── */
+    .editor-topbar { display: flex; align-items: center; gap: 1rem; background: #0f172a; border-radius: 8px; padding: .75rem 1rem; margin-bottom: 1rem; }
+    .back-link { color: #94a3b8; font-size: .8rem; text-decoration: none; white-space: nowrap; }
+    .back-link:hover { color: #f8fafc; }
+    .page-title { flex: 1; margin: 0; font-size: .95rem; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .topbar-actions { display: flex; align-items: center; gap: .75rem; }
+    .save-status { font-size: .78rem; color: #94a3b8; white-space: nowrap; }
+    .save-status.success { color: #4ade80; }
+    .save-status.error { color: #f87171; }
+    .btn-save { padding: .45rem 1.1rem; background: #16a34a; color: #fff; border: none; border-radius: 6px; font-size: .85rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-save:hover:not(:disabled) { background: #15803d; }
+    .btn-save:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── ローディング ── */
+    .loading-msg { text-align: center; color: #64748b; padding: 3rem; font-size: .9rem; }
+
+    /* ── エディタレイアウト ── */
+    .editor-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1rem; align-items: start; }
+
+    /* ── サイドバー ── */
+    .editor-sidebar { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; }
+    .sidebar-section { margin-bottom: 1.25rem; }
+    .sidebar-section:last-child { margin-bottom: 0; }
+    .field-label { display: block; font-size: .74rem; font-weight: 700; color: #64748b; letter-spacing: .06em; margin-bottom: .45rem; }
+    .field-input { width: 100%; box-sizing: border-box; padding: .55rem .7rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: .88rem; line-height: 1.5; resize: vertical; }
+    .field-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+    .field-hint { margin: .35rem 0 0; font-size: .73rem; color: #94a3b8; }
+    .field-slug-val { margin: 0 0 .25rem; font-family: monospace; font-size: .82rem; color: #475569; word-break: break-all; }
+
+    /* ── ヒーロー画像 ── */
+    .hero-preview-wrap { margin-bottom: .6rem; }
+    .hero-preview { width: 100%; height: 140px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; }
+    .hero-placeholder { width: 100%; height: 140px; background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: .8rem; color: #94a3b8; }
+    .upload-label { display: inline-block; padding: .35rem .75rem; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px; font-size: .78rem; font-weight: 700; color: #475569; cursor: pointer; }
+    .upload-label:hover { background: #e2e8f0; }
+
+    /* ── エディタ本体 ── */
+    .editor-main { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+    #toast-editor .toastui-editor-defaultUI { border: none !important; }
+
+    @media (max-width: 900px) {
+      .editor-layout { grid-template-columns: 1fr; }
+      .editor-topbar { flex-wrap: wrap; }
+      .page-title { flex-basis: 100%; order: -1; }
+    }
+  </style>
+</BaseLayout>

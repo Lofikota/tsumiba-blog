@@ -1,12 +1,13 @@
 ---
 interface Props {
-  active: 'dashboard' | 'articles' | 'revenue';
+  active: 'dashboard' | 'articles' | 'article-editor' | 'revenue';
 }
 const { active } = Astro.props;
 const tabs = [
-  { id: 'dashboard', label: 'ダッシュボード', href: '/admin/' },
-  { id: 'articles',  label: '記事管理',       href: '/admin/blog/' },
-  { id: 'revenue',   label: '収益トラッカー', href: '/admin/revenue/' },
+  { id: 'dashboard',      label: 'ダッシュボード', href: '/admin/' },
+  { id: 'articles',       label: '記事管理',       href: '/admin/blog/' },
+  { id: 'article-editor', label: 'CMS編集',        href: '/admin/articles/' },
+  { id: 'revenue',        label: '収益トラッカー', href: '/admin/revenue/' },
 ];
 ---
 <nav class="admin-nav">
