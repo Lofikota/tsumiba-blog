@@ -5,8 +5,8 @@ interface Props {
 }
 
 const {
-  heading = '今は確認済みリンクから優先',
-  lead = 'DMM FXはASPリンク確認中のため、現時点ではJFXとFXTFを優先して比較してください。',
+  heading = 'まず2口座を比較する',
+  lead = 'FX口座はFXTFとJFXを優先して確認してください。FXTFはコスト・商品幅重視、JFXは取引機能・MT4重視と特性が異なります。',
 } = Astro.props;
 ---
 
@@ -14,21 +14,16 @@ const {
   <p class="fx-priority-kicker">PR</p>
   <h2>{heading}</h2>
   <p class="fx-priority-lead">{lead}</p>
-  <div class="fx-priority-grid">
-    <a href="/go/jfx/" class="fx-priority-card fx-priority-main" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-jfx">
+  <div class="fx-priority-grid fx-priority-grid-2">
+    <a href="/go/fxtf/" class="fx-priority-card fx-priority-main" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-fxtf">
       <span class="fx-priority-rank">1</span>
-      <strong>JFX</strong>
-      <small>MT4・取引機能・短期売買の使いやすさ重視。</small>
-    </a>
-    <a href="/go/fxtf/" class="fx-priority-card" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-fxtf">
-      <span class="fx-priority-rank">2</span>
       <strong>FXTF</strong>
-      <small>スプレッドと手数料を細かく確認したい人向け。</small>
+      <small>ゼロスプ・CFD・ノックアウトオプションまで扱える。コストと商品幅を細かく見たい人向け。</small>
     </a>
-    <a href="/blog/dmm-fx-review/" class="fx-priority-card fx-priority-muted" data-google-event="internal_click" data-google-category="article" data-google-label="fx-priority-dmm-fx-review">
-      <span class="fx-priority-rank">確認中</span>
-      <strong>DMM FX</strong>
-      <small>A8リンク停止確認済み。新リンク取得まではレビュー記事で条件だけ確認。</small>
+    <a href="/go/jfx/" class="fx-priority-card" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-jfx">
+      <span class="fx-priority-rank">2</span>
+      <strong>JFX</strong>
+      <small>オリコン顧客満足度FX総合1位。MT4対応・約定力重視の短期売買に強い。</small>
     </a>
   </div>
   <p class="fx-priority-note">FXは元本割れや預け入れた資金を上回る損失が発生するリスクがあります。申込前に必ず公式条件を確認してください。</p>
@@ -63,6 +58,9 @@ const {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
+  }
+  .fx-priority-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .fx-priority-card {
     display: grid;
@@ -112,7 +110,8 @@ const {
     line-height: 1.7;
   }
   @media (max-width: 720px) {
-    .fx-priority-grid {
+    .fx-priority-grid,
+    .fx-priority-grid-2 {
       grid-template-columns: 1fr;
     }
     .fx-priority-card {
