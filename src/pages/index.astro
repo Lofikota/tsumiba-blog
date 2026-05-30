@@ -1,9 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import { CATEGORIES } from '../data/categories';
 
-const allPosts = (await getCollection('blog')).sort(
+const allPosts = (await getCollection('blog', (e: CollectionEntry<'blog'>) => !e.data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 

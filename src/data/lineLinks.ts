@@ -10,7 +10,9 @@ export interface LineRef {
 export const lineOfficial = {
   accountId: '@610htila',
   addFriendUrl: 'https://line.me/R/ti/p/@610htila',
-  harnessAuthBaseUrl: import.meta.env.PUBLIC_LINE_HARNESS_AUTH_BASE_URL || 'https://line-harness-production.yoshikou888.workers.dev/auth/line',
+  harnessAuthBaseUrl: import.meta.env.PUBLIC_LINE_LINK_MODE === 'harness'
+    ? import.meta.env.PUBLIC_LINE_HARNESS_AUTH_BASE_URL || ''
+    : '',
 };
 
 export const lineRefs: LineRef[] = [
@@ -146,9 +148,13 @@ export const lineRefs: LineRef[] = [
 
 export function getLineAddUrl(ref?: string): string {
   if (lineOfficial.harnessAuthBaseUrl && ref) {
-    const url = new URL(lineOfficial.harnessAuthBaseUrl);
-    url.searchParams.set('ref', ref);
-    return url.toString();
+    try {
+      const url = new URL(lineOfficial.harnessAuthBaseUrl);
+      url.searchParams.set('ref', ref);
+      return url.toString();
+    } catch {
+      return lineOfficial.addFriendUrl;
+    }
   }
 
   return lineOfficial.addFriendUrl;

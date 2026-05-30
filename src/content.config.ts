@@ -11,6 +11,7 @@ const blog = defineCollection({
     category: z.string(),
     tags: z.array(z.string()).default([]),
     heroImage: z.string().optional(),
+    draft: z.boolean().default(false),
     affiliate: z.boolean().default(true),
     articleType: z.enum(['review', 'guide', 'comparison', 'news']).optional(),
     rating: z.number().min(1).max(5).optional(),
