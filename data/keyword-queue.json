@@ -80,10 +80,12 @@
     "type": "guide",
     "category": "保険",
     "notes": "Google Ads出稿対象。副業・NISA開始後に保険を見直すタイミングを田中蓮視点で解説。保険見直しラボ・保険チャンネルへのCTA。無料FP相談の流れ・注意点も含める。ASP申請完了後にaff URLへ差し替え。",
-    "status": "published",
+    "status": "suspended",
     "priority": 1,
     "channel": "google_ads",
-    "publishedAt": "2026-05-10T07:08:27.191Z"
+    "publishedAt": "2026-05-10T07:08:27.191Z",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "hoken-minaoshi-30dai-kaisha-in",
@@ -91,10 +93,12 @@
     "type": "guide",
     "category": "保険",
     "notes": "Google Ads出稿対象。30代会社員が保険を見直すべきタイミング（副業開始・結婚・子育て・住宅購入）を整理。田中蓮の経験談として。保険見直しラボへのCTA。",
-    "status": "published",
+    "status": "suspended",
     "priority": 2,
     "channel": "google_ads",
-    "publishedAt": "2026-05-10T07:10:14.436Z"
+    "publishedAt": "2026-05-10T07:10:14.436Z",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "ideco-shoshinsha-guide",
@@ -102,8 +106,10 @@
     "type": "guide",
     "category": "投資・資産運用",
     "notes": "副業会社員がiDeCoを始める手順。節税効果の計算例を具体的に。SBI証券とマネックス証券を比較",
-    "status": "published",
-    "publishedAt": "2026-05-10T07:12:21.207Z"
+    "status": "suspended",
+    "publishedAt": "2026-05-10T07:12:21.207Z",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "sarakin-kaishaku-kaihi",
@@ -111,8 +117,10 @@
     "type": "guide",
     "category": "クレジットカード",
     "notes": "リボ払いの罠と解除方法。田中蓮の借金体験（200万）からの導入で強い共感を狙う",
-    "status": "published",
-    "publishedAt": "2026-05-10T07:13:54.001Z"
+    "status": "suspended",
+    "publishedAt": "2026-05-10T07:13:54.001Z",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "moneyforward-me-review",
@@ -120,8 +128,10 @@
     "type": "review",
     "category": "家計・節約",
     "notes": "副業収入の管理にマネーフォワードMEを使う方法。確定申告との連携も解説",
-    "status": "published",
-    "publishedAt": "2026-05-10T07:15:39.887Z"
+    "status": "suspended",
+    "publishedAt": "2026-05-10T07:15:39.887Z",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "nisa-ideco-docchi",
@@ -129,8 +139,10 @@
     "type": "comparison",
     "category": "投資・資産運用",
     "notes": "副業収入がある人がNISAとiDeCoをどの順番で始めるべきか。節税効果の違いを数字で比較",
-    "status": "published",
-    "publishedAt": "2026-05-21T15:25:44.258Z"
+    "status": "suspended",
+    "publishedAt": "2026-05-21T15:25:44.258Z",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "rakuten-card-review",
@@ -138,8 +150,10 @@
     "type": "review",
     "category": "クレジットカード",
     "notes": "楽天カードの正直レビュー。ポイント還元率・楽天経済圏との相性・田中蓮が実際に使っている感想",
-    "status": "published",
-    "publishedAt": "2026-05-10"
+    "status": "suspended",
+    "publishedAt": "2026-05-10",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "fukugyo-kakuteishinkoku-guide",
@@ -147,8 +161,10 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "副業収入20万円以下でも確定申告が必要なケース。住民税の注意点も含める",
-    "status": "published",
-    "publishedAt": "2026-05-10T07:19:15.783Z"
+    "status": "suspended",
+    "publishedAt": "2026-05-10T07:19:15.783Z",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "sumitomo-goldnl-review",
@@ -156,8 +172,10 @@
     "type": "review",
     "category": "クレジットカード",
     "notes": "三井住友ゴールドNLの年会費無料条件（100万修行）を実体験ベースで解説",
-    "status": "published",
-    "publishedAt": "2026-05-10T07:20:58.541Z"
+    "status": "suspended",
+    "publishedAt": "2026-05-10T07:20:58.541Z",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "sbi-shoken-tsumitate-nisa",
@@ -165,8 +183,10 @@
     "type": "guide",
     "category": "投資・資産運用",
     "notes": "SBI証券でつみたてNISAを設定する手順。銘柄選びの考え方も田中蓮の判断基準で",
-    "status": "published",
-    "publishedAt": "2026-05-10T07:22:56.116Z"
+    "status": "suspended",
+    "publishedAt": "2026-05-10T07:22:56.116Z",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "hoken-minaoshi-30dai-hitori",
@@ -174,10 +194,12 @@
     "type": "guide",
     "category": "保険相談",
     "notes": "30代独身向け保険見直し。保険見直し本舗・FPに相談へ誘導。LINE登録CTAを末尾に設置。",
-    "status": "published",
+    "status": "suspended",
     "priority": 1,
     "channel": "seo_x_organic",
-    "publishedAt": "2026-05-21T16:38:23.958Z"
+    "publishedAt": "2026-05-21T16:38:23.958Z",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "hoken-minaoshi-40dai-family",
@@ -185,10 +207,12 @@
     "type": "guide",
     "category": "保険相談",
     "notes": "40代家族向け保険見直し。子育て・住宅ローンとの掛け合わせ。保険見直しラボ・保険ガーデンへ誘導。",
-    "status": "published",
+    "status": "suspended",
     "priority": 2,
     "channel": "seo_x_organic",
-    "publishedAt": "2026-05-22T04:55:34.828Z"
+    "publishedAt": "2026-05-22T04:55:34.828Z",
+    "_prev_status": "published",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "fx-tokudan-jouken",
@@ -207,10 +231,12 @@
     "type": "guide",
     "category": "保険相談",
     "notes": "FP無料相談の流れ・選び方。FPに相談（13,000円）・保険ガーデン（10,250円）へ誘導。LINE登録CTA必須。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "done",
+    "status": "suspended",
     "priority": 1,
     "channel": "seo_x_organic",
-    "completedAt": "2026-05-24"
+    "completedAt": "2026-05-24",
+    "_prev_status": "done",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "gmo-click-fx-review",
@@ -541,9 +567,11 @@
     "type": "guide",
     "category": "保険",
     "notes": "生命保険の必要保障額を家族構成・収入・住宅ローン別に計算する方法を解説。多すぎる保険料の見直しにつなげる。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "done",
+    "status": "suspended",
     "priority": 1,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "done",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "seimei-hoken-hikaku-30dai",
@@ -551,10 +579,12 @@
     "type": "comparison",
     "category": "保険",
     "notes": "30代が選ぶべき生命保険を掛け捨て型で比較。保険見直しラボ・FP相談へのCTA。コスパ重視の視点で。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "done",
+    "status": "suspended",
     "priority": 2,
     "channel": "seo_x_organic",
-    "completedAt": "2026-05-24"
+    "completedAt": "2026-05-24",
+    "_prev_status": "done",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "iryo-hoken-hitsuyou",
@@ -562,10 +592,12 @@
     "type": "guide",
     "category": "保険",
     "notes": "高額療養費制度があれば医療保険は不要か？公的保険の手厚さと民間保険の必要性を整理。FP相談CTAへ。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "done",
+    "status": "suspended",
     "priority": 3,
     "channel": "seo_x_organic",
-    "completedAt": "2026-05-24"
+    "completedAt": "2026-05-24",
+    "_prev_status": "done",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "iryo-hoken-hikaku",
@@ -573,9 +605,11 @@
     "type": "comparison",
     "category": "保険",
     "notes": "主要医療保険を入院給付・通院・先進医療特約で比較。保険見直しラボ経由のFP相談へ誘導。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 4,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "hoken-minaoshi-40dai-hitori",
@@ -583,9 +617,11 @@
     "type": "guide",
     "category": "保険",
     "notes": "40代独身が見直すべき保険の種類・金額を整理。老後の医療・就業不能リスクに絞った内容。FP相談CTA。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 5,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "hoken-minaoshi-50dai",
@@ -593,9 +629,11 @@
     "type": "guide",
     "category": "保険",
     "notes": "50代の保険見直しポイント。子供独立後に不要になる保険と、介護・就業不能保険の重要性を整理。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 6,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "shuushin-vs-teiki-hoken",
@@ -603,9 +641,11 @@
     "type": "comparison",
     "category": "保険",
     "notes": "終身保険と定期保険の違い・コスト・向いている人を整理。田中蓮は掛け捨て派として明確に立場表明。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 7,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "cancer-hoken-hitsuyou",
@@ -613,9 +653,11 @@
     "type": "guide",
     "category": "保険",
     "notes": "がん保険が必要な人・不要な人の判断基準を整理。高額療養費・貯蓄額・家族状況で判断する方法を解説。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 8,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "cancer-hoken-hikaku",
@@ -623,9 +665,11 @@
     "type": "comparison",
     "category": "保険",
     "notes": "主要がん保険を一時金・診断給付・治療給付で比較。FP相談・保険見直しラボへのCTA。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 9,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "gakushi-hoken-vs-nisa",
@@ -644,9 +688,11 @@
     "type": "comparison",
     "category": "保険",
     "notes": "自動車任意保険を補償内容・保険料で比較。一括見積りサービスへの誘導。等級・年齢別の選び方も解説。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 11,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "salaryman-hoken-minimum",
@@ -654,9 +700,11 @@
     "type": "guide",
     "category": "保険",
     "notes": "会社員が最低限入るべき保険を整理。健康保険・厚生年金の公的保障を踏まえ、民間で補う部分を明示。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 12,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "furusato-nozei-hikaku",
@@ -664,9 +712,11 @@
     "type": "comparison",
     "category": "副業・節税",
     "notes": "ふるさと納税サイト（楽天・さとふる・ふるなび・マイナビ）を使いやすさ・還元率で比較。楽天経済圏ユーザー向け推奨。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 1,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "furusato-nozei-jougen-keisan",
@@ -674,9 +724,11 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "ふるさと納税の上限額を年収・家族構成別に計算する方法を解説。ワンストップ特例と確定申告の違いも。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 2,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "setsuzei-jissen-guide",
@@ -684,9 +736,11 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "サラリーマンができる節税を網羅。iDeCo・NISA・ふるさと納税・生命保険料控除・住宅ローン控除を整理。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 3,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "kakuteishinkoku-hitsuyou-hito",
@@ -694,9 +748,11 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "確定申告が必要な会社員の条件（副業20万・医療費控除・住宅取得等）をわかりやすく整理。必要書類も含める。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 4,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "kojinjigyonushi-kaishi",
@@ -704,9 +760,11 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "副業で個人事業主になるメリット（経費・青色申告）とデメリット（社保・融資）を整理。田中蓮の実体験ベースで。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 5,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "money-plan-30dai",
@@ -714,9 +772,11 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "30代が実践すべき資産形成のステップ。家計見直し→iDeCo→NISA→副業の順番で田中蓮の経験ベースで解説。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 6,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "money-plan-20dai",
@@ -724,9 +784,11 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "20代が貯金・投資を始める順番を整理。生活防衛資金→iDeCo→NISA→FXの優先順位を田中蓮視点で解説。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 7,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "rougo-2000man-taisaku",
@@ -734,9 +796,11 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "老後2000万円問題の実態と30代が今からできる対策。NISAとiDeCoを組み合わせたシミュレーションを提示。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 8,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "kakeibo-app-hikaku",
@@ -744,9 +808,11 @@
     "type": "comparison",
     "category": "副業・節税",
     "notes": "マネーフォワードME・Zaim・マネーツリーを機能・使いやすさ・副業対応で比較。田中蓮の推奨を明示。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 9,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "fukugyo-kehi-setsuzei",
@@ -754,9 +820,11 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "副業の経費に計上できるもの・できないものを整理。青色申告65万控除の方法も解説。税理士相談推奨も。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 10,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "toushin-tsumitate-kingaku",
@@ -764,9 +832,11 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "投資信託の積立を100円からでも始める方法を解説。SBI証券・楽天証券でのNISA設定手順も含める。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 11,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "zaisan-keisei-tejun",
@@ -774,9 +844,11 @@
     "type": "guide",
     "category": "副業・節税",
     "notes": "資産形成の正しい順番（生活防衛資金→保険整理→iDeCo→NISA→投資）を初心者向けに整理。田中蓮のロードマップ。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "suspended",
     "priority": 12,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_prev_status": "pending",
+    "suspendReason": "FX特化方針により非FXカテゴリを停止(2026-05-31)"
   },
   {
     "slug": "rakuten-shoken-review",
