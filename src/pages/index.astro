@@ -22,6 +22,14 @@ const recommendedAccounts = [
     specs: ['最小1,000通貨〜', 'MT4対応', '少額から始めやすい'],
     reviewHref: '/blog/fxtf-review/',
   },
+  {
+    slug: 'central-tanshi-fx',
+    tag: '高金利スワップ・中長期向け',
+    name: 'セントラル短資FX',
+    point: '老舗の短資会社グループ。高金利通貨のスワップや「みらいチャート」など、中長期でじっくり運用したい人に向きます。',
+    specs: ['最小1,000通貨〜', '取引手数料0円', 'みらいチャート搭載'],
+    reviewHref: '/blog/fx-kouza-hikaku/',
+  },
 ];
 
 const allPosts = (await getCollection('blog', (e: CollectionEntry<'blog'>) => !e.data.draft)).sort(
@@ -524,7 +532,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   }
   .pick-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 16px;
     margin-top: 18px;
   }
