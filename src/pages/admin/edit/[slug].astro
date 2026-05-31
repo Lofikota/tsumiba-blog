@@ -149,14 +149,16 @@ const { slug, title, heroImage } = Astro.props;
       localStorage.removeItem(SESSION_KEY);
     }
 
-    async function apiCall(action, data) {
-      const token = getToken();
+    async function apiCall(action, data, tokenOverride) {
+      const token = tokenOverride !== undefined ? tokenOverride : getToken();
       const res = await fetch('/api/admin-action', {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-admin-token': token },
         body: JSON.stringify({ action, ...data }),
       });
-      return res.json();
+      const out = await res.json().catch(() => ({ ok: false, message: '応答の解析に失敗しました' }));
+      out.__status = res.status;
+      return out;
     }
 
     // ─── MDX パース ──────────────────────────────────────
@@ -302,6 +304,9 @@ const { slug, title, heroImage } = Astro.props;
       editorLayout.style.display = 'none';
 
       const data = await apiCall('get_file', { path: FILE_PATH });
+      if (data.__status === 401) {
+        return 'unauthorized';
+      }
       if (!data.ok) {
         loadingMsg.textContent = 'エラー: ' + data.message;
         return;
@@ -326,6 +331,7 @@ const { slug, title, heroImage } = Astro.props;
       loadingMsg.style.display = 'none';
       editorLayout.style.display = 'grid';
       btnSave.disabled = false;
+      return 'ok';
     }
 
     // ─── 保存 ────────────────────────────────────────────
@@ -444,26 +450,50 @@ const { slug, title, heroImage } = Astro.props;
     });
 
     // ─── トークン認証フロー ──────────────────────────────
-    async function checkTokenAndLoad() {
-      const token = getToken();
-      if (!token) {
-        tokenGate.style.display = 'flex';
-        editorBody.style.display = 'none';
-        return;
-      }
-
-      // トークンを簡易確認（ファイル取得試み）
+    function showGate(msg) {
+      tokenGate.style.display = 'flex';
+      editorBody.style.display = 'none';
+      tokenError.textContent = msg || '';
+    }
+    function showEditor() {
       tokenGate.style.display = 'none';
       editorBody.style.display = 'block';
-      await loadArticle();
+    }
+
+    async function checkTokenAndLoad() {
+      const token = getToken();
+      if (!token) { showGate(); return; }
+
+      // 記憶された合言葉で読み込み。無効なら破棄してログイン画面に戻す。
+      showEditor();
+      const result = await loadArticle();
+      if (result === 'unauthorized') {
+        clearToken();
+        showGate('保存していた合言葉が使えませんでした。もう一度入力してください。');
+      }
     }
 
     tokenSave.addEventListener('click', async () => {
       const token = tokenInput.value.trim();
-      if (!token) { tokenError.textContent = 'トークンを入力してください'; return; }
+      if (!token) { tokenError.textContent = '合言葉を入力してください'; return; }
+
+      // 入力された合言葉が正しいか、その場で確認する
+      tokenError.textContent = '確認中...';
+      const probe = await apiCall('get_file', { path: FILE_PATH }, token);
+      if (probe.__status === 401) {
+        tokenError.textContent = '合言葉が違います（または Cloudflare に ADMIN_ACTION_TOKEN が未設定です）。';
+        return;
+      }
+      if (!probe.ok) {
+        tokenError.textContent = 'エラー: ' + (probe.message || '不明なエラー');
+        return;
+      }
+
+      // 正しいので記憶して編集画面へ
       localStorage.setItem(SESSION_KEY, token);
       tokenError.textContent = '';
-      await checkTokenAndLoad();
+      showEditor();
+      await loadArticle();
     });
 
     tokenInput.addEventListener('keydown', e => {
