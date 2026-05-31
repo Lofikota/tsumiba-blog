@@ -6,12 +6,11 @@ const { active } = Astro.props;
 const tabs = [
   { id: 'article-editor', label: '記事',           href: '/admin/articles/' },
   { id: 'dashboard',      label: 'ダッシュボード', href: '/admin/' },
-  { id: 'articles',       label: '運用チェック',   href: '/admin/blog/' },
   { id: 'revenue',        label: '収益',           href: '/admin/revenue/' },
 ];
 ---
 <nav class="admin-nav">
-  <span class="admin-nav-logo">⌘ ren-money.com</span>
+  <a href="/admin/articles/" class="admin-nav-logo">⌘ ren-money.com</a>
   <div class="admin-nav-tabs">
     {tabs.map(t => (
       <a href={t.href} class={`admin-nav-tab${active === t.id ? ' active' : ''}`}>{t.label}</a>
@@ -36,7 +35,9 @@ const tabs = [
   font-weight: 800;
   letter-spacing: .06em;
   white-space: nowrap;
+  text-decoration: none;
 }
+.admin-nav-logo:hover { color: #fbbf24; }
 .admin-nav-tabs {
   display: flex;
   gap: .25rem;
