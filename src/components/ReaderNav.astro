@@ -1,0 +1,73 @@
+---
+interface NavItem {
+  href: string;
+  icon: string;
+  label: string;
+}
+interface Props {
+  items: NavItem[];
+  title?: string;
+}
+const { items, title = "▶ 目的別：読みたい箇所に直接ジャンプ" } = Astro.props;
+---
+
+<div class="reader-nav">
+  <p class="reader-nav-title">{title}</p>
+  <ul class="reader-nav-list">
+    {items.map(item => (
+      <li>
+        <a href={item.href} class="reader-nav-link">
+          <span class="reader-nav-icon">{item.icon}</span>
+          <span>{item.label}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+.reader-nav {
+  background: #f0f7ff;
+  border: 2px solid #b0d4f1;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 20px 0;
+}
+.reader-nav-title {
+  font-weight: bold;
+  margin: 0 0 12px 0;
+  color: #1a5276;
+  font-size: 0.95em;
+}
+.reader-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.reader-nav-link {
+  color: #1a6ea8;
+  text-decoration: none;
+  font-size: 0.92em;
+  padding: 5px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #d6eaf8;
+  transition: color 0.15s;
+}
+.reader-nav-link:last-child {
+  border-bottom: none;
+}
+.reader-nav-link:hover {
+  color: #1258a0;
+  text-decoration: underline;
+}
+.reader-nav-icon {
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+</style>

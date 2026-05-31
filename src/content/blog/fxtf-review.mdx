@@ -12,6 +12,7 @@ heroImage: "/images/articles/fxtf-review.png"
 import AffiliateCTA from '../../components/AffiliateCTA.astro';
 import FxPriorityCTA from '../../components/FxPriorityCTA.astro';
 import LineCTA from '../../components/LineCTA.astro';
+import ReaderNav from '../../components/ReaderNav.astro';
 
 > アフィリエイト広告を含みます
 
@@ -30,51 +31,13 @@ FX・CFD・ノックアウトオプションは、元本が保証されない取
 
 この記事ではFXTFの特徴・メリット・デメリットを、初心者が知っておくべき[リスク](/blog/fx-yametoke-reason/)情報も含めて正直に書く。
 
-<div class="nav-purpose">
-<p class="nav-purpose-label">▶ 目的別：読みたい箇所に直接ジャンプ</p>
-<ul class="nav-purpose-list">
-<li><a href="#cost">💰 手数料の実際のコストを数字で確認したい</a></li>
-<li><a href="#vs-jfx">⚖️ JFXとどっちか迷っている・比較したい</a></li>
-<li><a href="#demerit">⚠️ 悪い評判・向かない人だけ先に見たい</a></li>
-<li><a href="#open">📋 口座開設の手順を確認したい</a></li>
-<li><a href="#company">🏢 ゴールデンウェイ・ジャパンとは何か知りたい</a></li>
-</ul>
-</div>
-
-<style>{`
-.nav-purpose {
-  margin: 1.5rem 0;
-  padding: 16px 20px;
-  border: 2px solid #2563eb;
-  border-radius: 10px;
-  background: #eff6ff;
-}
-.nav-purpose-label {
-  margin: 0 0 10px;
-  font-weight: 800;
-  font-size: 13px;
-  color: #1d4ed8;
-}
-.nav-purpose-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 6px;
-}
-.nav-purpose-list a {
-  display: block;
-  padding: 8px 12px;
-  border-radius: 6px;
-  background: #fff;
-  color: #1e40af;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  border: 1px solid #bfdbfe;
-}
-.nav-purpose-list a:hover { background: #dbeafe; }
-`}</style>
+<ReaderNav items={[
+  { href: "#cost",    icon: "💰", label: "手数料の実際のコストを数字で確認したい" },
+  { href: "#vs-jfx",  icon: "⚖️", label: "JFXとどっちか迷っている・比較したい" },
+  { href: "#demerit", icon: "⚠️", label: "悪い評判・向かない人だけ先に見たい" },
+  { href: "#open",    icon: "📋", label: "口座開設の手順を確認したい" },
+  { href: "#company", icon: "🏢", label: "ゴールデンウェイ・ジャパンとは何か知りたい" },
+]} />
 
 ## この記事でわかること
 
