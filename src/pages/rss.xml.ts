@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
 
 export async function GET(context: APIContext) {
-  const posts = await getCollection('blog');
+  const posts = await getCollection('blog', (e) => !e.data.draft);
   return rss({
     title: '田中蓮のマネーブログ',
     description: '副業・NISA・節税でFIREを目指す田中蓮のブログ',

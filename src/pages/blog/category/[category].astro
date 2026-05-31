@@ -13,7 +13,7 @@ const { category: slug } = Astro.params;
 const categoryName = SLUG_TO_CATEGORY[slug] ?? '';
 const catInfo = CATEGORIES[categoryName];
 
-const allPosts = await getCollection('blog');
+const allPosts = (await getCollection('blog')).filter(e => !e.data.draft);
 const matchSlugs = catInfo?.matchSlugs ?? [];
 const posts = allPosts
   .filter(p => p.data.category === categoryName || matchSlugs.includes(p.id))

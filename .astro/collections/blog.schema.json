@@ -29,6 +29,10 @@
     "heroImage": {
       "type": "string"
     },
+    "draft": {
+      "default": false,
+      "type": "boolean"
+    },
     "affiliate": {
       "default": true,
       "type": "boolean"

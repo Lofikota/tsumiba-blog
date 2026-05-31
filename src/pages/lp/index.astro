@@ -8,10 +8,10 @@ const allPosts = (await getCollection('blog')).sort(
 const featuredSlugs = [
   'fx-kouza-hikaku',
   'fx-small-start-guide',
-  'hoken-soudan-muryou-hikaku',
-  'hoken-minaoshi-fp-soudan',
   'fx-company-barenai',
-  'hoken-minaoshi-30dai-kaisha-in',
+  'fx-shoshinsha-guide',
+  'jfx-review',
+  'fxtf-review',
 ];
 const featuredPosts: CollectionEntry<'blog'>[] = featuredSlugs
   .map((slug) => allPosts.find((post) => post.id === slug))
@@ -20,11 +20,9 @@ const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBL
 const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_SEND_TO ?? '';
 type CatStyle = { cls: string; bg: string };
 const catStyle: Record<string, CatStyle> = {
-  'NISA・投資': { cls: 'cat-invest',  bg: 'linear-gradient(135deg,#DBEAFE,#93C5FD)' },
   '副業・節税': { cls: 'cat-income',  bg: 'linear-gradient(135deg,#D4EDDA,#86EFAC)' },
   'お得情報':   { cls: 'cat-savings', bg: 'linear-gradient(135deg,#FEF3C7,#FDE68A)' },
   'FX・外貨':   { cls: 'cat-debt',    bg: 'linear-gradient(135deg,#FFE4E6,#FCA5A5)' },
-  '保険':       { cls: 'cat-insurance', bg: 'linear-gradient(135deg,#DCFCE7,#86EFAC)' },
 };
 ---
 <!doctype html>
@@ -32,8 +30,8 @@ const catStyle: Record<string, CatStyle> = {
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>やさしいお金の教室 | 副業・FX・保険、失敗しない順番をLINEで無料整理。</title>
-  <meta name="description" content="副業・FX・保険、何から始めればいいか分からない人へ。田中蓮が失敗しないための順番をLINEで無料で整理します。勧誘なし・3分で登録完了・いつでも退会OK。"/>
+  <title>やさしいお金の教室 | 副業・FX、失敗しない順番をLINEで無料整理。</title>
+  <meta name="description" content="副業・FX、何から始めればいいか分からない人へ。田中蓮が失敗しないための順番をLINEで無料で整理します。勧誘なし・3分で登録完了・いつでも退会OK。"/>
   <meta name="robots" content="index,follow"/>
   <link rel="canonical" href={`${siteUrl}/lp/`}/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -1048,8 +1046,7 @@ const catStyle: Record<string, CatStyle> = {
         {[
           { label: "FX比較", href: "/blog/fx-kouza-hikaku/" },
           { label: "少額FX", href: "/blog/fx-small-start-guide/" },
-          { label: "保険相談", href: "/blog/hoken-soudan-muryou-hikaku/" },
-          { label: "FP相談", href: "/blog/hoken-minaoshi-fp-soudan/" },
+          { label: "FX初心者ガイド", href: "/blog/fx-shoshinsha-guide/" },
           { label: "LINE", href: "/line/lp-manga-main/" },
         ].map((item) => (
           <a href={item.href} class="nav-link">{item.label}</a>
@@ -1068,13 +1065,13 @@ const catStyle: Record<string, CatStyle> = {
     <div class="hero-left">
       <div class="hero-issue">Free 7-day guide — Money Journal Tokyo</div>
       <h1 class="hero-h1">
-        副業・FX・保険、<br/>
+        副業・FX、<br/>
         何から始めればいいか分からないあなたへ。
       </h1>
       <p class="hero-lead">
         借金200万から資産500万まで立て直した田中蓮が、<br/>
         失敗しないための順番をLINEで無料で教えます。<br/>
-        登録後は7日間で、家計・副業・FX・保険を順番に整理します。
+        登録後は7日間で、家計・副業・FXを順番に整理します。
         <span class="hero-disclaimer">※当サイトはアフィリエイト広告を含みます。成果を保証するものではありません。</span>
       </p>
       <div class="hero-cta-row">
@@ -1090,7 +1087,7 @@ const catStyle: Record<string, CatStyle> = {
            data-google-label="hero_secondary_articles">
           判断前の記事を読む
         </a>
-        <span class="hero-microcopy">勧誘なし・3分で登録完了・いつでも退会OK。FXや保険の申込みを急がせるものではありません。</span>
+        <span class="hero-microcopy">勧誘なし・3分で登録完了・いつでも退会OK。FXの申込みを急がせるものではありません。</span>
       </div>
       <div class="hero-stats">
         <div class="hero-stat">
@@ -1102,8 +1099,8 @@ const catStyle: Record<string, CatStyle> = {
           <span class="hero-stat-label">メイン収益の<br/>判断軸</span>
         </div>
         <div class="hero-stat">
-          <span class="hero-stat-num">保険</span>
-          <span class="hero-stat-label">家計見直しの<br/>サブ導線</span>
+          <span class="hero-stat-num">副業</span>
+          <span class="hero-stat-label">収益の土台<br/>節税まで整理</span>
         </div>
       </div>
     </div>
@@ -1166,7 +1163,7 @@ const catStyle: Record<string, CatStyle> = {
         </div>
         <div>
           <div class="sb-title">このLPのゴールは、FX申込みではなくLINE登録です</div>
-          <div class="sb-sub">まず安心して順番を知り、必要な人だけFX比較・保険相談へ進める設計です。</div>
+          <div class="sb-sub">まず安心して順番を知り、必要な人だけFX比較・口座開設へ進める設計です。</div>
         </div>
       </div>
       <a class="btn btn-navy" href="/line/lp-manga-main/"
@@ -1189,7 +1186,7 @@ const catStyle: Record<string, CatStyle> = {
           <div class="problem-num">01</div>
           <div class="problem-icon">¥</div>
           <div class="problem-title">お金の不安はあるのに<br/>最初の一手が分からない</div>
-          <div class="problem-body">副業、FX、保険、家計管理。全部大事そうに見えて、優先順位を決められない。</div>
+          <div class="problem-body">副業、FX、家計管理。全部大事そうに見えて、優先順位を決められない。</div>
         </div>
         <div class="problem-card reveal" style="animation-delay:.1s">
           <div class="problem-num">02</div>
@@ -1199,9 +1196,9 @@ const catStyle: Record<string, CatStyle> = {
         </div>
         <div class="problem-card reveal" style="animation-delay:.2s">
           <div class="problem-num">03</div>
-          <div class="problem-icon">保</div>
-          <div class="problem-title">保険も気になるけど<br/>営業されそうで不安</div>
-          <div class="problem-body">無料相談に行く前に、今の保険・家計・必要保障をどう整理すればいいか分からない。</div>
+          <div class="problem-icon">¥¥</div>
+          <div class="problem-title">副業収入が増えても<br/>税金・節税が分からない</div>
+          <div class="problem-body">確定申告・経費・iDeCo不要論。情報が多すぎて自分のケースに何が当てはまるか分からない。</div>
         </div>
       </div>
     </div>
@@ -1219,7 +1216,7 @@ const catStyle: Record<string, CatStyle> = {
         <div class="decision-card reveal">
           <span class="decision-step">1</span>
           <div class="decision-title">Day 1: 現状整理</div>
-          <p class="decision-body">今の不安を言語化し、家計・副業・FX・保険のどこから見るかを決めます。</p>
+          <p class="decision-body">今の不安を言語化し、家計・副業・FXのどこから見るかを決めます。</p>
         </div>
         <div class="decision-card reveal" style="animation-delay:.08s">
           <span class="decision-step">2</span>
@@ -1233,8 +1230,8 @@ const catStyle: Record<string, CatStyle> = {
         </div>
         <div class="decision-card reveal" style="animation-delay:.24s">
           <span class="decision-step">4</span>
-          <div class="decision-title">Day 6-7: 保険と次の行動</div>
-          <p class="decision-body">保険見直しの準備と、自分に合う次の行動を1つに絞ります。</p>
+          <div class="decision-title">Day 6-7: 口座開設と次の行動</div>
+          <p class="decision-body">FX口座の選び方を整理し、自分に合う次の行動を1つに絞ります。</p>
         </div>
       </div>
     </div>
@@ -1342,8 +1339,8 @@ const catStyle: Record<string, CatStyle> = {
               <path d="M14 24 L22 18 L28 20 L34 14" stroke="#1E6B45" stroke-width="2" fill="none"/>
             </svg>
           </div>
-          <div class="theme-title">4. 保険相談の準備</div>
-          <div class="theme-body">無料相談に行く前に、今の保障内容・家族構成・不要な重複を確認します。</div>
+          <div class="theme-title">4. FX口座の選び方</div>
+          <div class="theme-body">スプレッド・レバレッジ・ツールの違いを整理し、自分に合った口座を選びます。</div>
         </div>
       </div>
     </div>
@@ -1559,24 +1556,14 @@ const catStyle: Record<string, CatStyle> = {
                      data-google-label="compare_fx_line">LINEで整理</a></td>
             </tr>
             <tr>
-              <td>保険相談</td>
-              <td>現在の保障・固定費・家族構成</td>
-              <td>不要な加入や重複保障に注意</td>
-              <td class="highlight-cell">保険料を見直したい人</td>
-              <td><a class="btn-compare" href="/blog/hoken-soudan-muryou-hikaku/"
+              <td>副業・節税</td>
+              <td>確定申告・経費・所得の仕組み</td>
+              <td>年20万超で確定申告が必要</td>
+              <td class="highlight-cell">副業収入を最大化したい人</td>
+              <td><a class="btn-compare" href="/blog/fukugyo-zeikin/"
                      data-google-event="lp_direct_article_click"
                      data-google-category="lp"
-                     data-google-label="compare_hoken_roundup">保険比較を読む</a></td>
-            </tr>
-            <tr>
-              <td>FP相談</td>
-              <td>相談前に聞きたいことをメモ</td>
-              <td>相談先ごとの提案範囲を確認</td>
-              <td>第三者に整理してほしい人</td>
-              <td><a class="btn-compare" href="/blog/hoken-minaoshi-fp-soudan/"
-                     data-google-event="lp_direct_article_click"
-                     data-google-category="lp"
-                     data-google-label="compare_fp_soudan">準備を読む</a></td>
+                     data-google-label="compare_fukugyo_tax">節税を読む</a></td>
             </tr>
           </tbody>
         </table>
@@ -1598,12 +1585,12 @@ const catStyle: Record<string, CatStyle> = {
             <span class="faq-q-text">LINEでは何が届きますか？</span>
             <span class="faq-toggle">+</span>
           </summary>
-          <div class="faq-a">FX口座、保険相談、家計整理など、申し込む前に見るべき条件・注意点・関連記事の順番を短く届けます。</div>
+          <div class="faq-a">FX口座比較・副業節税・家計整理など、申し込む前に見るべき条件・注意点・関連記事の順番を短く届けます。</div>
         </details>
         <details class="faq-item">
           <summary>
             <div class="faq-q-icon">Q</div>
-            <span class="faq-q-text">FXや保険に詳しくなくても大丈夫ですか？</span>
+            <span class="faq-q-text">FXや副業に詳しくなくても大丈夫ですか？</span>
             <span class="faq-toggle">+</span>
           </summary>
           <div class="faq-a">専門用語はなるべく使わず、使う場合も「何を確認すればよいか」に落として説明します。</div>
@@ -1633,7 +1620,7 @@ const catStyle: Record<string, CatStyle> = {
     <div class="finalcta-inner">
       <span class="finalcta-eyebrow">Start Today</span>
       <h2 class="finalcta-h">まずはLINEで、<br/>失敗しない順番を受け取ろう。</h2>
-      <p class="finalcta-sub">勧誘なし。登録後、7日間で家計・副業・FX・保険を順番に整理します。</p>
+      <p class="finalcta-sub">勧誘なし。登録後、7日間で家計・副業・FXを順番に整理します。</p>
       <div class="finalcta-row">
         <a class="btn btn-primary btn-lg" href="/line/lp-manga-main/"
            data-google-event="lp_line_cta_click"
@@ -1667,8 +1654,8 @@ const catStyle: Record<string, CatStyle> = {
         <ul class="footer-list">
           <li><a href="/blog/fx-kouza-hikaku/">FX口座比較</a></li>
           <li><a href="/blog/fx-small-start-guide/">少額FXの始め方</a></li>
-          <li><a href="/blog/hoken-soudan-muryou-hikaku/">保険相談比較</a></li>
-          <li><a href="/blog/hoken-minaoshi-fp-soudan/">FP相談の準備</a></li>
+          <li><a href="/blog/fx-shoshinsha-guide/">FX初心者ガイド</a></li>
+          <li><a href="/blog/fx-company-barenai/">会社員のFX副業</a></li>
         </ul>
       </div>
       <div>
