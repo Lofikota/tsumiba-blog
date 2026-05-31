@@ -1,0 +1,329 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdminNav from '../../components/AdminNav.astro';
+import { affiliateLinks } from '../../data/affiliateLinks';
+import keywordQueue from '../../../data/keyword-queue.json';
+import draftIndex from '../../../data/article-drafts/index.json';
+import kpiSnapshots from '../../../data/kpi-snapshots.json';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const posts = await getCollection('blog');
+const drafts = draftIndex.filter((draft) => draft.status === 'draft');
+const pendingQueue = keywordQueue.filter((item) => item.status === 'pending');
+const affiliateReady = affiliateLinks.filter((link) => link.status === 'affiliate');
+const affiliatePending = affiliateLinks.filter((link) => link.status === 'pending');
+const affiliateByCategory = affiliateLinks.reduce((acc, link) => {
+  acc[link.category] = acc[link.category] ?? [];
+  acc[link.category].push(link);
+  return acc;
+}, {});
+
+// KPI 計算
+const kpi = [...kpiSnapshots].sort((a, b) => a.weekKey.localeCompare(b.weekKey));
+const latest = kpi[kpi.length - 1] ?? null;
+const prev   = kpi[kpi.length - 2] ?? null;
+const diff = (key: string) => {
+  if (!latest || !prev) return null;
+  const a = (latest as any)[key];
+  const b = (prev as any)[key];
+  return typeof a === 'number' && typeof b === 'number' ? a - b : null;
+};
+const followerDiff = diff('xFollowers');
+const tweetDiff    = diff('tweetCount');
+const clickDiff    = latest && prev ? latest.gsc.clicks - prev.gsc.clicks : null;
+
+// 緊急アクション：heroImage が未生成の記事
+const noImage = posts.filter(p => {
+  const imgPath = p.data.heroImage;
+  if (!imgPath) return true;
+  return !fs.existsSync(path.join(root, 'public', imgPath));
+}).length;
+
+function dateLabel(value: any) {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.valueOf())) return '-';
+  return date.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+function diffBadge(n: number | null) {
+  if (n === null) return '';
+  if (n > 0) return `+${n}`;
+  return `${n}`;
+}
+function diffClass(n: number | null) {
+  if (n === null) return '';
+  return n > 0 ? 'up' : n < 0 ? 'down' : 'flat';
+}
+
+// Chart.js 用データを JSON 文字列でクライアントへ渡す
+const chartLabels = JSON.stringify(kpi.map(d => d.weekRange));
+const chartFollowers = JSON.stringify(kpi.map(d => d.xFollowers));
+const chartClicks = JSON.stringify(kpi.map(d => d.gsc.clicks));
+---
+
+<BaseLayout
+  title="ダッシュボード | ren-money.com 管理"
+  description="KPI・記事・収益を一元管理するダッシュボード。"
+  robots="noindex,nofollow"
+  wide
+>
+  <AdminNav active="dashboard" />
+
+  <!-- KPI トレンドセクション -->
+  <section class="kpi-section">
+    <div class="kpi-header">
+      <p class="kpi-kicker">WEEKLY KPI</p>
+      <h2>今週の指標</h2>
+      {latest && <span class="kpi-week">{latest.weekRange} 時点</span>}
+    </div>
+
+    <div class="kpi-cards">
+      <div class="kpi-card">
+        <span class="kpi-label">Xフォロワー</span>
+        <strong class="kpi-val">{latest?.xFollowers ?? '—'}</strong>
+        {followerDiff !== null && <span class={`kpi-diff ${diffClass(followerDiff)}`}>{diffBadge(followerDiff)}</span>}
+        <small>前週比</small>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">X投稿数</span>
+        <strong class="kpi-val">{latest?.tweetCount ?? '—'}</strong>
+        {tweetDiff !== null && <span class={`kpi-diff ${diffClass(tweetDiff)}`}>{diffBadge(tweetDiff)}</span>}
+        <small>前週比</small>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">GSCクリック</span>
+        <strong class="kpi-val">{latest?.gsc.clicks ?? '—'}</strong>
+        {clickDiff !== null && <span class={`kpi-diff ${diffClass(clickDiff)}`}>{diffBadge(clickDiff)}</span>}
+        <small>前週比</small>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">GSCインプレ</span>
+        <strong class="kpi-val">{latest?.gsc.impressions ?? '—'}</strong>
+        <small>直近週計</small>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">LINEフォロワー</span>
+        <strong class="kpi-val">{latest?.lineFollowers ?? '—'}</strong>
+        <small>手動入力</small>
+      </div>
+    </div>
+
+    <!-- 緊急アクション -->
+    {(noImage > 0 || pendingQueue.length > 0 || drafts.length > 0) && (
+      <div class="kpi-alerts">
+        <p class="kpi-alerts-title">⚡ 対応が必要なこと</p>
+        <div class="kpi-alert-list">
+          {noImage > 0 && (
+            <a href="https://github.com/Lofikota/ren-blog-/actions/workflows/article-image-gen.yml" target="_blank" rel="noopener" class="kpi-alert red">
+              <strong>{noImage}本</strong><span>ヒーロー画像が未生成</span><em>画像生成ワークフローを実行 →</em>
+            </a>
+          )}
+          {pendingQueue.length > 0 && (
+            <div class="kpi-alert yellow">
+              <strong>{pendingQueue.length}件</strong><span>KWキューに記事が未作成</span><em>優先度1位：{pendingQueue[0]?.keyword}</em>
+            </div>
+          )}
+          {drafts.length > 0 && (
+            <a href="/admin/blog/" class="kpi-alert blue">
+              <strong>{drafts.length}件</strong><span>下書きが公開待ち</span><em>記事管理で確認 →</em>
+            </a>
+          )}
+        </div>
+      </div>
+    )}
+
+    <!-- フォロワー推移グラフ -->
+    {kpi.length >= 2 && (
+      <div class="kpi-chart-wrap">
+        <p class="kpi-chart-title">Xフォロワー推移</p>
+        <canvas id="chart-followers" height="80"></canvas>
+        <p class="kpi-chart-title" style="margin-top:1rem">GSCクリック推移</p>
+        <canvas id="chart-clicks" height="60"></canvas>
+      </div>
+    )}
+
+    <div class="kpi-update-cta">
+      <span>毎週月曜にKPIを更新する</span>
+      <a href="https://github.com/Lofikota/ren-blog-/actions/workflows/kpi-update.yml" target="_blank" rel="noopener">KPI入力フォームを開く →</a>
+    </div>
+  </section>
+
+  <!-- 既存コンテンツ -->
+  <section class="admin-hero">
+    <div>
+      <p class="admin-kicker">MANUAL PUBLISH CONTROL</p>
+      <h1>ブログ管理</h1>
+      <p>毎日生成された記事をここで確認し、稼げる導線だけを手動で公開します。</p>
+    </div>
+    <div class="admin-command">
+      <span>次の下書き生成</span>
+      <code>npm run draft:generate</code>
+    </div>
+  </section>
+
+  <section class="admin-stats" aria-label="運営状況">
+    <article><span>下書き</span><strong>{drafts.length}</strong><small>手動公開待ち</small></article>
+    <article><span>公開記事</span><strong>{posts.length}</strong><small>ブログ掲載中</small></article>
+    <article><span>ASP承認済み</span><strong>{affiliateReady.length}</strong><small>送客可能</small></article>
+    <article><span>ASP承認待ち</span><strong>{affiliatePending.length}</strong><small>差替待ち</small></article>
+  </section>
+
+  <section class="admin-section">
+    <div class="section-head">
+      <div><p>DRAFT INBOX</p><h2>公開待ち下書き</h2></div>
+      <span>{drafts.length}件</span>
+    </div>
+    {drafts.length > 0 ? (
+      <div class="draft-list">
+        {drafts.map((draft) => (
+          <article class="draft-card">
+            <div>
+              <div class="draft-topline"><span>{draft.category}</span><span>{draft.channel}</span><span>{dateLabel(draft.draftedAt)}</span></div>
+              <h3>{draft.keyword}</h3>
+              <p>{draft.slug} / {draft.charCount?.toLocaleString?.() ?? '-'}字 / {draft.draftPath}</p>
+            </div>
+            <code>npm run draft:publish -- {draft.slug}</code>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <div class="empty-state">
+        <h3>まだ下書きはありません</h3>
+        <p>次の pending キューから下書きを作るには、ローカルまたはGitHub Actionsで下書き生成を実行します。</p>
+        <code>cd /Users/kudokota/Affiliate/ren-blog- && npm run draft:generate</code>
+      </div>
+    )}
+  </section>
+
+  <section class="admin-grid">
+    <div class="admin-panel">
+      <div class="section-head compact"><div><p>NEXT QUEUE</p><h2>次に作る記事</h2></div><span>{pendingQueue.length}件</span></div>
+      <div class="queue-list">
+        {pendingQueue.map((item) => (
+          <article><strong>{item.keyword}</strong><span>{item.slug}</span><small>{item.category} / {item.channel ?? 'manual'} / priority {item.priority ?? '-'}</small></article>
+        ))}
+      </div>
+    </div>
+    <div class="admin-panel">
+      <div class="section-head compact"><div><p>WHY THIS EXISTS</p><h2>この画面の目的</h2></div></div>
+      <ul class="purpose-list">
+        <li>自動生成は公開ではなく、下書き保存で止める。</li>
+        <li>人間がASP導線、リスク表記、読者の悩みを確認してから公開する。</li>
+        <li>公開判断はPVではなく、LINE登録とASPクリックに近い記事を優先する。</li>
+        <li>承認済み案件へ送れる記事を先に公開し、pending案件は差替待ちにする。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="admin-section">
+    <div class="section-head"><div><p>AFFILIATE LINKS</p><h2>ASPリンク台帳</h2></div><span>{affiliateLinks.length}件</span></div>
+    <div class="affiliate-groups">
+      {Object.entries(affiliateByCategory).map(([category, links]) => (
+        <div class="affiliate-group">
+          <h3>{category}</h3>
+          <div class="affiliate-list">
+            {(links as any[]).map((link) => (
+              <a href={`/go/${link.slug}/`} class={`affiliate-item ${link.status}`}>
+                <div><strong>{link.name}</strong><span>{link.provider}</span></div>
+                <em>{link.status}</em>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Chart.js 初期化 -->
+  <script define:vars={{ chartLabels, chartFollowers, chartClicks }}>
+    (function() {
+      const labels  = JSON.parse(chartLabels);
+      const follows = JSON.parse(chartFollowers);
+      const clicks  = JSON.parse(chartClicks);
+
+      function loadChartJs(cb) {
+        if (window.Chart) { cb(); return; }
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js';
+        s.onload = cb;
+        document.head.appendChild(s);
+      }
+
+      loadChartJs(() => {
+        const base = {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { font: { size: 11 } }, grid: { display: false } },
+            y: { ticks: { font: { size: 11 } }, beginAtZero: true },
+          },
+        };
+
+        const fc = document.getElementById('chart-followers');
+        if (fc) new Chart(fc, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{ data: follows, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,.08)',
+              fill: true, tension: 0.3, pointRadius: 4, pointBackgroundColor: '#2563eb' }],
+          },
+          options: base,
+        });
+
+        const cc = document.getElementById('chart-clicks');
+        if (cc) new Chart(cc, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{ data: clicks, backgroundColor: '#1d4ed8', borderRadius: 4 }],
+          },
+          options: { ...base, scales: { ...base.scales, y: { ...base.scales.y, ticks: { font: { size: 11 }, precision: 0 } } } },
+        });
+      });
+    })();
+  </script>
+
+  <style>
+    /* KPI セクション */
+    .kpi-section{background:#fff;border:1px solid #d8dee9;border-radius:10px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+    .kpi-header{display:flex;align-items:baseline;gap:.75rem;margin-bottom:1rem}
+    .kpi-kicker{color:#64748b;font-size:.7rem;font-weight:800;letter-spacing:.1em;margin:0}
+    .kpi-header h2{margin:0;font-size:1rem;color:#0f172a}
+    .kpi-week{margin-left:auto;color:#94a3b8;font-size:.75rem}
+    .kpi-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.65rem;margin-bottom:1rem}
+    .kpi-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:.75rem;text-align:center}
+    .kpi-label{display:block;color:#64748b;font-size:.7rem;font-weight:700;margin-bottom:.25rem}
+    .kpi-val{display:block;color:#0f172a;font-size:1.6rem;font-weight:800;line-height:1.1}
+    .kpi-diff{display:inline-block;font-size:.72rem;font-weight:800;border-radius:999px;padding:.1rem .4rem;margin-top:.2rem}
+    .kpi-diff.up{background:#eff6ff;color:#1d4ed8}
+    .kpi-diff.down{background:#fee2e2;color:#dc2626}
+    .kpi-diff.flat{background:#f1f5f9;color:#64748b}
+    .kpi-card small{display:block;color:#94a3b8;font-size:.65rem;margin-top:.15rem}
+    /* 緊急アクション */
+    .kpi-alerts{background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:.85rem;margin-bottom:1rem}
+    .kpi-alerts-title{margin:0 0 .6rem;font-size:.75rem;font-weight:800;color:#92400e;letter-spacing:.06em}
+    .kpi-alert-list{display:grid;gap:.4rem}
+    .kpi-alert{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.6rem;border-radius:6px;padding:.55rem .75rem;text-decoration:none;font-size:.82rem}
+    .kpi-alert.red{background:#fee2e2;border:1px solid #fca5a5}
+    .kpi-alert.yellow{background:#fef9c3;border:1px solid #fde047}
+    .kpi-alert.blue{background:#dbeafe;border:1px solid #93c5fd}
+    .kpi-alert strong{font-size:1rem;font-weight:800;color:#0f172a;white-space:nowrap}
+    .kpi-alert span{color:#374151}
+    .kpi-alert em{font-style:normal;color:#2563eb;font-size:.75rem;white-space:nowrap}
+    /* グラフ */
+    .kpi-chart-wrap{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:.85rem;margin-bottom:1rem}
+    .kpi-chart-title{margin:0 0 .5rem;font-size:.72rem;font-weight:800;color:#64748b;letter-spacing:.08em}
+    /* KPI更新CTA */
+    .kpi-update-cta{display:flex;align-items:center;justify-content:space-between;background:#f1f5f9;border-radius:6px;padding:.6rem .85rem;font-size:.78rem}
+    .kpi-update-cta span{color:#64748b}
+    .kpi-update-cta a{color:#2563eb;font-weight:700;text-decoration:none}
+    .kpi-update-cta a:hover{text-decoration:underline}
+    /* 既存スタイル */
+    .admin-hero{display:grid;grid-template-columns:minmax(0,1fr)320px;gap:1rem;align-items:stretch;background:#111827;color:#f9fafb;border-radius:8px;padding:1.5rem;margin-bottom:1rem}.admin-kicker{color:#f59e0b;font-size:.72rem;font-weight:800;letter-spacing:.12em;margin-bottom:.35rem}.admin-hero h1{font-size:2rem;line-height:1.2;margin:0 0 .45rem;letter-spacing:0}.admin-hero p{color:#cbd5e1;margin:0}.admin-command{display:grid;align-content:center;gap:.5rem;border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:1rem;background:rgba(255,255,255,.06)}.admin-command span{color:#cbd5e1;font-size:.8rem}code{display:block;width:fit-content;max-width:100%;white-space:normal;overflow-wrap:anywhere;background:#0f172a;color:#f8fafc;border-radius:6px;padding:.35rem .5rem;font-size:.78rem;line-height:1.55}.admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin-bottom:1rem}.admin-stats article,.admin-section,.admin-panel{background:#fff;border:1px solid #d8dee9;border-radius:8px;box-shadow:0 1px 2px rgba(15,23,42,.05)}.admin-stats article{padding:1rem}.admin-stats span,.admin-stats small{display:block;color:#64748b;font-size:.78rem}.admin-stats strong{display:block;color:#0f172a;font-size:1.8rem;line-height:1.2;margin:.1rem 0}.admin-section{padding:1rem;margin-bottom:1rem}.section-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:.85rem}.section-head.compact{margin-bottom:.7rem}.section-head p,.section-head span{margin:0;color:#64748b;font-size:.72rem;font-weight:800;letter-spacing:.08em}.section-head h2{margin:0;color:#0f172a;font-size:1rem;line-height:1.35}.draft-list,.queue-list,.affiliate-list{display:grid;gap:.55rem}.draft-card,.queue-list article{display:grid;gap:.35rem;border:1px solid #e2e8f0;border-radius:8px;padding:.8rem;background:#f8fafc}.draft-topline{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.35rem}.draft-topline span{border-radius:999px;background:#e0f2fe;color:#075985;padding:.12rem .5rem;font-size:.7rem;font-weight:800}.draft-card h3{margin:0;color:#0f172a;font-size:1rem;line-height:1.45}.draft-card p{margin:0;color:#475569;font-size:.84rem}.empty-state{border:1px dashed #cbd5e1;border-radius:8px;padding:1rem;background:#f8fafc}.empty-state h3,.empty-state p{margin:0 0 .6rem}.admin-grid{display:grid;grid-template-columns:minmax(0,1fr)minmax(0,1fr);gap:1rem;margin-bottom:1rem}.admin-panel{padding:1rem}.queue-list{max-height:420px;overflow:auto}.queue-list strong,.queue-list span,.queue-list small{display:block}.queue-list strong{color:#0f172a;font-size:.86rem;line-height:1.45}.queue-list span,.queue-list small{color:#64748b;font-size:.76rem}.purpose-list{display:grid;gap:.45rem;padding-left:1.1rem;color:#334155;font-size:.88rem;line-height:1.7}.affiliate-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem}.affiliate-group{border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;padding:.75rem}.affiliate-group h3{margin:0 0 .55rem;color:#0f172a;font-size:.92rem}.affiliate-item{display:grid;grid-template-columns:minmax(0,1fr)auto;gap:.75rem;align-items:center;border:1px solid #e2e8f0;border-left-width:4px;border-radius:8px;background:#fff;padding:.65rem;color:#334155;text-decoration:none}.affiliate-item.affiliate{border-left-color:#1d4ed8}.affiliate-item.pending{border-left-color:#d97706}.affiliate-item.official{border-left-color:#2563eb}.affiliate-item:hover{text-decoration:none;border-color:#94a3b8}.affiliate-item strong,.affiliate-item span{display:block}.affiliate-item strong{color:#0f172a;font-size:.85rem;line-height:1.45}.affiliate-item span{color:#64748b;font-size:.74rem;line-height:1.5}.affiliate-item em{border-radius:999px;background:#e2e8f0;color:#334155;padding:.14rem .48rem;font-style:normal;font-size:.68rem;font-weight:800}@media(max-width:860px){.admin-hero,.admin-stats,.admin-grid,.affiliate-groups,.kpi-cards{grid-template-columns:1fr}.admin-hero h1{font-size:1.55rem}}
+  </style>
+</BaseLayout>

@@ -9,7 +9,7 @@ const allPosts = (await getCollection('blog', (e) => !e.data.draft)).sort(
 const posts = allPosts.filter((post) => post.data.category === 'FX・外貨' || post.id.includes('fx') || ['dmm-fx-review', 'jfx-review', 'fxtf-review', 'matsui-fx-review'].includes(post.id));
 
 const catColors: Record<string, { bg: string; text: string }> = {
-  'FX・外貨':   { bg: '#FEE2E2', text: '#991B1B' },
+  'FX・外貨':   { bg: '#eff6ff', text: '#1d4ed8' },
 };
 ---
 
@@ -18,7 +18,7 @@ const catColors: Record<string, { bg: string; text: string }> = {
   description="DMM FX・JFX・FXTF・松井証券FXなど、FX口座比較と初心者向けリスク管理の記事を読めます。"
 >
   <div style="margin-bottom:1.5rem;display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
-    <h1 style="font-size:1.8rem;font-weight:900;margin:0;color:#17352a;">FX記事一覧</h1>
+    <h1 style="font-size:1.8rem;font-weight:900;margin:0;color:#1a1a1a;">FX記事一覧</h1>
     <p style="font-size:0.875rem;color:var(--color-text-muted);margin:0;">{posts.length}件</p>
   </div>
 
@@ -41,7 +41,7 @@ const catColors: Record<string, { bg: string; text: string }> = {
             width="96"
             height="64"
             loading="lazy"
-            style="width:112px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0;background:#f2fbf5;"
+            style="width:112px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0;background:#f6f7f9;"
           />
           <div style="min-width:0;flex:1;">
             <div style="margin-bottom:0.3rem;">
@@ -49,7 +49,7 @@ const catColors: Record<string, { bg: string; text: string }> = {
                 {post.data.category}
               </span>
             </div>
-            <h2 style="font-size:1rem;font-weight:800;margin:0 0 0.3rem;line-height:1.5;color:#17352a;">{post.data.title}</h2>
+            <h2 style="font-size:1rem;font-weight:800;margin:0 0 0.3rem;line-height:1.5;color:#1a1a1a;">{post.data.title}</h2>
             <p style="font-size:0.8rem;color:#6B7280;margin:0 0 0.4rem;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{post.data.description}</p>
             <span style="font-size:0.72rem;color:#9CA3AF;">{dateStr}</span>
           </div>

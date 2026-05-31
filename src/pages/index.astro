@@ -323,8 +323,8 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
 <style>
   :global(body) {
     background:
-      linear-gradient(180deg, #fffaf0 0, #f6f7f2 280px, #f3f5f2 100%);
-    color: #17211b;
+      linear-gradient(180deg, #ffffff 0, #ffffff 280px, #ffffff 100%);
+    color: #1a1a1a;
   }
   .site-hero {
     display: grid;
@@ -339,29 +339,29 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   .side-card,
   .category-strip,
   .line-band {
-    border: 1px solid #ded7c7;
-    background: #fffdfa;
-    box-shadow: 0 14px 34px rgba(61, 46, 20, .08);
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    box-shadow: 0 14px 34px rgba(0,0,0,.06);
   }
   .hero-copy {
     padding: clamp(26px, 4vw, 46px);
     border-radius: 6px;
     background:
       linear-gradient(135deg, rgba(255,255,255,.94), rgba(255,250,239,.92)),
-      radial-gradient(circle at top right, rgba(232, 143, 34, .18), transparent 42%);
+      radial-gradient(circle at top right, rgba(37,99,235,.12), transparent 42%);
   }
   .eyebrow,
   .section-title p,
   .line-band p {
     margin: 0 0 10px;
-    color: #b66313;
+    color: #2563eb;
     font-size: .76rem;
     font-weight: 900;
     letter-spacing: .08em;
   }
   .hero-copy h1 {
     margin: 0;
-    color: #17211b;
+    color: #1a1a1a;
     font-size: clamp(2.25rem, 4.8vw, 4rem);
     line-height: 1.18;
     letter-spacing: 0;
@@ -369,7 +369,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   .hero-lead {
     max-width: 710px;
     margin: 20px 0 0;
-    color: #536158;
+    color: #4b5563;
     font-size: 1rem;
     line-height: 2;
   }
@@ -391,12 +391,12 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   }
   .btn:hover { text-decoration: none; }
   .btn-main {
-    background: #e87913;
+    background: #2563eb;
     color: #fff;
-    box-shadow: 0 10px 20px rgba(232, 121, 19, .24);
+    box-shadow: 0 10px 20px rgba(37,99,235,.24);
   }
   .btn-sub {
-    background: #17211b;
+    background: #1a1a1a;
     color: #fff;
   }
   .trust-row {
@@ -408,9 +408,9 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     list-style: none;
   }
   .trust-row li {
-    border: 1px solid #e5d8bf;
-    background: #fff7e8;
-    color: #77552b;
+    border: 1px solid #e5e7eb;
+    background: #eff6ff;
+    color: #4b5563;
     border-radius: 999px;
     padding: 4px 10px;
     font-size: .78rem;
@@ -435,7 +435,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   .feature-label {
     display: block;
     padding: 12px 16px;
-    background: #17211b;
+    background: #1a1a1a;
     color: #fff;
     font-size: .82rem;
     font-weight: 900;
@@ -446,7 +446,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   .new-row img {
     width: 100%;
     object-fit: cover;
-    background: #f0eee7;
+    background: #f3f4f6;
   }
   .hero-feature img {
     aspect-ratio: 16/9;
@@ -462,7 +462,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   .line-band h2,
   .side-card h2 {
     margin: 0;
-    color: #17211b;
+    color: #1a1a1a;
     letter-spacing: 0;
   }
   .feature-body h2 {
@@ -478,7 +478,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   .line-band span,
   .profile-text,
   .side-line span {
-    color: #657168;
+    color: #6b7280;
     line-height: 1.75;
   }
   .feature-body p {
@@ -492,17 +492,17 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   .pick-band {
     margin: 0 0 26px;
     padding: 24px;
-    border: 1px solid #ded7c7;
+    border: 1px solid #e5e7eb;
     border-radius: 6px;
-    background: #fffdfa;
-    box-shadow: 0 14px 34px rgba(61, 46, 20, .08);
+    background: #ffffff;
+    box-shadow: 0 14px 34px rgba(0,0,0,.06);
   }
   .pick-head p {
     display: flex;
     align-items: center;
     gap: 8px;
     margin: 0 0 6px;
-    color: #b66313;
+    color: #2563eb;
     font-size: .76rem;
     font-weight: 900;
     letter-spacing: .08em;
@@ -512,21 +512,21 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     align-items: center;
     padding: 1px 7px;
     border-radius: 999px;
-    background: #efe2c8;
-    color: #7a4211;
+    background: #eff6ff;
+    color: #1d4ed8;
     font-size: .66rem;
     letter-spacing: .04em;
   }
   .pick-head h2 {
     margin: 0;
-    color: #17211b;
+    color: #1a1a1a;
     font-size: 1.45rem;
     line-height: 1.45;
   }
   .pick-note {
     display: block;
     margin-top: 8px;
-    color: #657168;
+    color: #6b7280;
     font-size: .9rem;
     line-height: 1.7;
   }
@@ -540,8 +540,8 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     display: flex;
     flex-direction: column;
     padding: 20px;
-    border: 1px solid #e4ddcf;
-    border-left: 4px solid #e87913;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #2563eb;
     border-radius: 6px;
     background: #fff;
   }
@@ -550,20 +550,20 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     margin-bottom: 10px;
     padding: 3px 11px;
     border-radius: 999px;
-    background: #ffe1d7;
-    color: #9c2f13;
+    background: #eff6ff;
+    color: #1d4ed8;
     font-size: .74rem;
     font-weight: 900;
   }
   .pick-card h3 {
     margin: 0;
-    color: #17211b;
+    color: #1a1a1a;
     font-size: 1.2rem;
     line-height: 1.4;
   }
   .pick-point {
     margin: 10px 0 0;
-    color: #536158;
+    color: #4b5563;
     font-size: .9rem;
     line-height: 1.8;
   }
@@ -577,7 +577,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   .pick-specs li {
     position: relative;
     padding-left: 20px;
-    color: #3a463e;
+    color: #374151;
     font-size: .86rem;
     font-weight: 700;
   }
@@ -585,7 +585,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     content: '✓';
     position: absolute;
     left: 0;
-    color: #1f9d55;
+    color: #2563eb;
     font-weight: 900;
   }
   .pick-actions {
@@ -602,11 +602,11 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     min-height: 48px;
     padding: 0 18px;
     border-radius: 4px;
-    background: #e87913;
+    background: #2563eb;
     color: #fff;
     font-weight: 900;
     text-decoration: none;
-    box-shadow: 0 10px 20px rgba(232, 121, 19, .24);
+    box-shadow: 0 10px 20px rgba(37,99,235,.24);
   }
   .pick-cta:hover { text-decoration: none; transform: translateY(-2px); }
   .pick-review {
@@ -616,14 +616,14 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     min-height: 48px;
     padding: 0 16px;
     border-radius: 4px;
-    border: 1px solid #d7cdb8;
-    color: #17211b;
+    border: 1px solid #d1d5db;
+    color: #1a1a1a;
     font-weight: 900;
     text-decoration: none;
   }
   .pick-risk {
     margin: 16px 0 0;
-    color: #8a7d6b;
+    color: #9ca3af;
     font-size: .76rem;
     line-height: 1.7;
   }
@@ -634,7 +634,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     margin-bottom: 26px;
     overflow: hidden;
     border-radius: 6px;
-    background: #ded7c7;
+    background: #e5e7eb;
   }
   .category-strip a {
     display: grid;
@@ -642,7 +642,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     column-gap: 12px;
     align-items: center;
     padding: 16px;
-    background: #fffdfa;
+    background: #ffffff;
     color: inherit;
     text-decoration: none;
   }
@@ -652,8 +652,8 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: #f1e4c8;
-    color: #7a4211;
+    background: #eff6ff;
+    color: #1d4ed8;
     font-weight: 900;
   }
   .category-strip strong {
@@ -664,7 +664,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     display: block;
     grid-column: 2;
     margin-top: 3px;
-    color: #6d786f;
+    color: #6b7280;
     font-size: .78rem;
     font-style: normal;
   }
@@ -689,7 +689,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     gap: 16px;
     margin-bottom: 18px;
     padding-bottom: 12px;
-    border-bottom: 3px solid #efe7d6;
+    border-bottom: 3px solid #e5e7eb;
   }
   .section-title h2,
   .line-band h2 {
@@ -702,7 +702,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     gap: 18px;
   }
   .lead-card {
-    border: 1px solid #e4ddcf;
+    border: 1px solid #e5e7eb;
     border-radius: 6px;
     overflow: hidden;
     background: #fff;
@@ -736,12 +736,12 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     font-size: .72rem;
     font-weight: 900;
   }
-  .tone-hoken { background: #dff3e6; color: #11613a; }
-  .tone-fx { background: #ffe1d7; color: #9c2f13; }
-  .tone-nisa { background: #dceafa; color: #1d4c86; }
-  .tone-tax { background: #fff0c8; color: #84520a; }
-  .tone-card { background: #fff4b8; color: #755500; }
-  .tone-gray { background: #ececec; color: #444; }
+  .tone-hoken { background: #f3f4f6; color: #4b5563; }
+  .tone-fx { background: #eff6ff; color: #1d4ed8; }
+  .tone-nisa { background: #eff6ff; color: #1d4ed8; }
+  .tone-tax { background: #f3f4f6; color: #4b5563; }
+  .tone-card { background: #f3f4f6; color: #4b5563; }
+  .tone-gray { background: #f3f4f6; color: #444; }
   .lead-card h3 {
     margin-top: 10px;
     font-size: 1.04rem;
@@ -770,9 +770,9 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   .route-card {
     min-height: 170px;
     padding: 18px;
-    border: 1px solid #e1d8c6;
+    border: 1px solid #e5e7eb;
     border-radius: 6px;
-    background: linear-gradient(180deg, #fffdf9, #fff8ea);
+    background: linear-gradient(180deg, #ffffff, #fafafa);
     color: inherit;
     text-decoration: none;
     transition: transform .15s ease, border-color .15s ease;
@@ -780,13 +780,13 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   .route-card span {
     display: inline-flex;
     margin-bottom: 12px;
-    color: #b66313;
+    color: #2563eb;
     font-size: .76rem;
     font-weight: 900;
   }
   .route-card strong {
     display: block;
-    color: #17211b;
+    color: #1a1a1a;
     font-size: 1.05rem;
     line-height: 1.45;
   }
@@ -801,7 +801,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   }
   .ranking-item,
   .new-row {
-    border: 1px solid #e4ddcf;
+    border: 1px solid #e5e7eb;
     border-radius: 6px;
     background: #fff;
     overflow: hidden;
@@ -819,7 +819,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: #e87913;
+    background: #2563eb;
     color: #fff;
     font-weight: 900;
   }
@@ -845,7 +845,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     margin-bottom: 24px;
     padding: 24px;
     border-radius: 6px;
-    background: linear-gradient(135deg, #e9fff1, #fffdfa);
+    background: linear-gradient(135deg, #f8fafc, #ffffff);
   }
   .line-band span {
     display: block;
@@ -882,7 +882,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
   .new-row time {
     display: inline-block;
     margin-top: 8px;
-    color: #928676;
+    color: #9ca3af;
     font-size: .76rem;
     font-weight: 700;
   }
@@ -907,14 +907,14 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #17211b, #36543f);
+    background: linear-gradient(135deg, #1a1a1a, #374151);
     color: #fff;
     font-size: 1.35rem;
     font-weight: 900;
   }
   .profile-top p {
     margin: 0 0 2px;
-    color: #b66313;
+    color: #2563eb;
     font-size: .72rem;
     font-weight: 900;
   }
@@ -928,7 +928,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     margin-top: 14px;
     padding: 11px 14px;
     border-radius: 4px;
-    background: #17211b;
+    background: #1a1a1a;
     color: #fff;
     font-weight: 900;
     text-align: center;
@@ -943,17 +943,17 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     justify-content: space-between;
     gap: 12px;
     padding: 12px 0;
-    border-top: 1px solid #eee4d4;
-    color: #17211b;
+    border-top: 1px solid #f0f0f0;
+    color: #1a1a1a;
     font-weight: 900;
     text-decoration: none;
   }
   .side-category-list em {
-    color: #958775;
+    color: #9ca3af;
     font-style: normal;
   }
   .hot-card {
-    background: #fff8ea;
+    background: #fafafa;
   }
   .hot-card ol {
     margin: 12px 0 0;
@@ -963,7 +963,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     margin-top: 8px;
   }
   .hot-card a {
-    color: #17211b;
+    color: #1a1a1a;
     font-weight: 900;
   }
   .side-ranking {
@@ -974,7 +974,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     display: grid;
     grid-template-columns: 28px minmax(0, 1fr);
     gap: 10px;
-    color: #17211b;
+    color: #1a1a1a;
     text-decoration: none;
   }
   .side-ranking span {
@@ -983,7 +983,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: #e87913;
+    background: #2563eb;
     color: #fff;
     font-size: .78rem;
     font-weight: 900;
@@ -993,7 +993,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     line-height: 1.55;
   }
   .side-line {
-    background: #eafff1;
+    background: #f8fafc;
   }
   .side-line p {
     display: inline-flex;

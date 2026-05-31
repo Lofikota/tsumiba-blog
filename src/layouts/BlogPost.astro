@@ -109,14 +109,14 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
       <span style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.8rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:4px;">{category}</span>
     </div>
 
-    <h1 style="font-size:clamp(1.75rem, 4vw, 2.45rem);font-weight:900;line-height:1.35;margin-bottom:0.75rem;color:#17352a;">{title}</h1>
+    <h1 style="font-size:clamp(1.75rem, 4vw, 2.45rem);font-weight:900;line-height:1.35;margin-bottom:0.75rem;color:#1a1a1a;">{title}</h1>
 
     <div style="font-size:0.8rem;color:var(--color-text-muted);margin-bottom:1.25rem;">
       <time datetime={pubDate.toISOString()}>公開：{dateStr}</time>
       {updatedDate && <span style="margin-left:0.75rem;"><time datetime={updatedDate.toISOString()}>更新：{updatedStr}</time></span>}
     </div>
 
-    <img src={heroImage ?? ogImage} alt={title} decoding="async" fetchpriority="high" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;margin-bottom:1.5rem;border:1px solid #d7e7df;background:#f2fbf5;box-shadow:0 14px 38px rgba(42,71,59,.08);" />
+    <img src={heroImage ?? ogImage} alt={title} decoding="async" fetchpriority="high" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;margin-bottom:1.5rem;border:1px solid #e5e7eb;background:#f6f7f9;box-shadow:0 14px 38px rgba(42,71,59,.08);" />
 
     {tocHeadings.length > 2 && (
       <nav class="toc" aria-label="目次">
@@ -165,10 +165,10 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
       <div class="author-box-avatar">
         <svg width="56" height="56" viewBox="0 0 40 40" fill="none" aria-hidden="true">
           <rect width="40" height="40" rx="8" fill="#EEF1F7"/>
-          <rect x="9"  y="22" width="4.5" height="9" rx="1" fill="#17352A"/>
-          <rect x="17" y="17" width="4.5" height="14" rx="1" fill="#17352A"/>
-          <rect x="25" y="11" width="4.5" height="20" rx="1" fill="#17352A"/>
-          <path d="M10 22 L19 15 L26 18 L31 10" stroke="#0F8A5F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="9"  y="22" width="4.5" height="9" rx="1" fill="#1a1a1a"/>
+          <rect x="17" y="17" width="4.5" height="14" rx="1" fill="#1a1a1a"/>
+          <rect x="25" y="11" width="4.5" height="20" rx="1" fill="#1a1a1a"/>
+          <path d="M10 22 L19 15 L26 18 L31 10" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div class="author-box-body">
@@ -229,14 +229,14 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
   .toc {
     margin: 1.5rem 0;
     padding: 1.1rem 1.25rem 1.25rem;
-    background: #f2fbf5;
-    border: 1px solid #d7e7df;
+    background: #f6f7f9;
+    border: 1px solid #e5e7eb;
     border-radius: 10px;
   }
   .toc-title {
     font-size: 0.82rem;
     font-weight: 800;
-    color: #0f8a5f;
+    color: #2563eb;
     letter-spacing: 0.06em;
     margin: 0 0 0.85rem;
     display: flex;
@@ -248,7 +248,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     display: inline-block;
     width: 14px;
     height: 14px;
-    background: #0f8a5f;
+    background: #2563eb;
     border-radius: 3px;
     flex-shrink: 0;
   }
@@ -266,7 +266,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     align-items: baseline;
     gap: 0.6rem;
     font-size: 0.88rem;
-    color: #174638;
+    color: #1a1a1a;
     text-decoration: none;
     line-height: 1.55;
     padding: 0.3rem 0.5rem;
@@ -281,7 +281,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     flex-shrink: 0;
     width: 1.4rem;
     height: 1.4rem;
-    background: #0f8a5f;
+    background: #2563eb;
     color: #fff;
     border-radius: 50%;
     font-size: 0.7rem;
@@ -372,7 +372,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     height: 60px;
     border-radius: 50%;
     overflow: hidden;
-    border: 2px solid #dff5e9;
+    border: 2px solid #eff6ff;
   }
   .author-box-avatar svg { display: block; }
   .author-box-label {
@@ -398,9 +398,9 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
   .line-cta {
     margin-top: 2rem;
     padding: 1.2rem 1.25rem;
-    border: 1px solid #d7e7df;
+    border: 1px solid #e5e7eb;
     border-radius: var(--radius);
-    background: linear-gradient(180deg, #f2fbf5 0%, #ffffff 100%);
+    background: linear-gradient(180deg, #f6f7f9 0%, #ffffff 100%);
   }
   .line-cta h2 {
     font-size: 1.1rem;
@@ -438,7 +438,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
       z-index: 50;
       padding: 0.6rem 0.85rem;
       background: #fff;
-      border-top: 1px solid #d7e7df;
+      border-top: 1px solid #e5e7eb;
       box-shadow: 0 -4px 16px rgba(15,23,42,.06);
     }
     .sticky-cta[hidden] { display: none; }
@@ -456,7 +456,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
       justify-content: center;
       padding: 0.7rem 0.5rem;
       border-radius: 8px;
-      background: #0f8a5f;
+      background: #2563eb;
       color: #fff;
       font-size: 0.92rem;
       font-weight: 700;
