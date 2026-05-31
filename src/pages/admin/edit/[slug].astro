@@ -30,13 +30,17 @@ const { slug, title, heroImage } = Astro.props;
     <!-- トークン入力（未認証時のみ表示） -->
     <div id="token-gate" class="token-gate">
       <div class="token-card">
-        <p class="token-title">管理トークンを入力してください</p>
-        <p class="token-desc">Cloudflare に設定した <code>ADMIN_ACTION_TOKEN</code> を入力してください。このブラウザのセッションにのみ保存されます。</p>
+        <p class="token-title">🔑 はじめてのログイン（初回だけ）</p>
+        <p class="token-desc">編集機能を使うには、最初の1回だけ「合言葉（管理トークン）」を入力します。<strong>一度入力すれば、次回からはこの画面は出ません</strong>（このブラウザが覚えます）。</p>
         <div class="token-row">
-          <input id="token-input" type="password" placeholder="管理トークン" autocomplete="off" />
-          <button id="token-save" type="button">確認</button>
+          <input id="token-input" type="password" placeholder="合言葉（管理トークン）を入力" autocomplete="off" />
+          <button id="token-save" type="button">ログイン</button>
         </div>
         <p id="token-error" class="token-error"></p>
+        <details class="token-help">
+          <summary>合言葉が分からないときは？</summary>
+          <p>Cloudflareダッシュボード → Pages → <code>ren-blog-</code> → Settings → Environment variables にある <code>ADMIN_ACTION_TOKEN</code> の値です。設定していない場合はそこで新しく作れます（1Passwordにも保存しておくと安心）。</p>
+        </details>
       </div>
     </div>
 
@@ -48,6 +52,7 @@ const { slug, title, heroImage } = Astro.props;
         <div class="topbar-actions">
           <span id="save-status" class="save-status"></span>
           <button id="btn-save" type="button" class="btn-save" disabled>保存して公開</button>
+          <button id="btn-logout" type="button" class="btn-logout" title="このブラウザの合言葉を消します">ログアウト</button>
         </div>
       </div>
 
@@ -137,7 +142,11 @@ const { slug, title, heroImage } = Astro.props;
     const fromBase64 = b64 => decodeURIComponent(escape(atob(b64.replace(/\s/g, ''))));
 
     function getToken() {
-      return sessionStorage.getItem(SESSION_KEY) || '';
+      // 一度ログインしたら覚える（localStorage）。ブラウザを閉じても保持される。
+      return localStorage.getItem(SESSION_KEY) || '';
+    }
+    function clearToken() {
+      localStorage.removeItem(SESSION_KEY);
     }
 
     async function apiCall(action, data) {
@@ -415,6 +424,17 @@ const { slug, title, heroImage } = Astro.props;
     // ─── 保存ボタン ──────────────────────────────────────
     btnSave.addEventListener('click', saveArticle);
 
+    // ─── ログアウト ──────────────────────────────────────
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+      btnLogout.addEventListener('click', () => {
+        if (confirm('ログアウトします。次回また合言葉の入力が必要になります。')) {
+          clearToken();
+          location.reload();
+        }
+      });
+    }
+
     // Ctrl+S / Cmd+S
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -441,7 +461,7 @@ const { slug, title, heroImage } = Astro.props;
     tokenSave.addEventListener('click', async () => {
       const token = tokenInput.value.trim();
       if (!token) { tokenError.textContent = 'トークンを入力してください'; return; }
-      sessionStorage.setItem(SESSION_KEY, token);
+      localStorage.setItem(SESSION_KEY, token);
       tokenError.textContent = '';
       await checkTokenAndLoad();
     });
@@ -468,6 +488,13 @@ const { slug, title, heroImage } = Astro.props;
     .token-row button { padding: .55rem 1.1rem; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: .88rem; font-weight: 700; cursor: pointer; }
     .token-row button:hover { background: #1d4ed8; }
     .token-error { margin: .6rem 0 0; color: #dc2626; font-size: .82rem; min-height: 1.2em; }
+    .token-help { margin-top: 1.1rem; border-top: 1px solid #e2e8f0; padding-top: .9rem; }
+    .token-help summary { cursor: pointer; font-size: .82rem; font-weight: 700; color: #2563eb; list-style: none; }
+    .token-help summary::-webkit-details-marker { display: none; }
+    .token-help summary::before { content: '＋ '; }
+    .token-help[open] summary::before { content: '－ '; }
+    .token-help p { margin: .7rem 0 0; font-size: .8rem; color: #64748b; line-height: 1.7; }
+    .token-help code { background: #f1f5f9; color: #475569; padding: .12rem .3rem; border-radius: 4px; font-size: .78rem; }
 
     /* ── トップバー ── */
     .editor-topbar { display: flex; align-items: center; gap: 1rem; background: #0f172a; border-radius: 8px; padding: .75rem 1rem; margin-bottom: 1rem; }
@@ -481,6 +508,8 @@ const { slug, title, heroImage } = Astro.props;
     .btn-save { padding: .45rem 1.1rem; background: #1d4ed8; color: #fff; border: none; border-radius: 6px; font-size: .85rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
     .btn-save:hover:not(:disabled) { background: #1d4ed8; }
     .btn-save:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-logout { padding: .45rem .8rem; background: transparent; color: #94a3b8; border: 1px solid #334155; border-radius: 6px; font-size: .78rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-logout:hover { color: #f8fafc; border-color: #475569; }
 
     /* ── ローディング ── */
     .loading-msg { text-align: center; color: #64748b; padding: 3rem; font-size: .9rem; }

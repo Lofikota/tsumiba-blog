@@ -36,6 +36,16 @@ const thumb = (post: typeof sorted[number]) => post.data.heroImage ?? `/og/${pos
       </div>
     </div>
 
+    <details class="howto">
+      <summary>📖 使い方（はじめての方はこちら）</summary>
+      <ol class="howto-steps">
+        <li><b>記事を選ぶ</b> — 下の一覧から編集したい記事の「編集」を押します。</li>
+        <li><b>本文・画像を直す</b> — タイトルや本文をそのまま書き換えられます。トップ画像は左側の枠に画像を<b>ドラッグ&ドロップ</b>するだけで差し替え。本文中の画像はツールバーの🖼️ボタン、または画像を本文へドロップで挿入できます。</li>
+        <li><b>保存して公開</b> — 右上の「保存して公開」を押すと自動で公開されます（数分でサイトに反映）。<code>Ctrl</code>(Mac は <code>⌘</code>)+<code>S</code> でも保存できます。</li>
+      </ol>
+      <p class="howto-note">※ 最初の1回だけ「合言葉（管理トークン）」のログインが必要です。一度入れればこのブラウザが覚えるので、次回からは不要です。</p>
+    </details>
+
     <div class="toolbar">
       <div class="filters" role="tablist">
         <button class="filter active" data-filter="all" type="button">すべて <span class="cnt">{sorted.length}</span></button>
@@ -117,6 +127,17 @@ const thumb = (post: typeof sorted[number]) => post.data.heroImage ?? `/og/${pos
     .articles-header { margin-bottom: 1.25rem; }
     h1 { margin: 0 0 .3rem; font-size: 1.6rem; color: #0f172a; }
     .subtitle { margin: 0; color: #64748b; font-size: .86rem; max-width: 620px; line-height: 1.6; }
+
+    .howto { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: .85rem 1.1rem; margin-bottom: 1rem; }
+    .howto summary { cursor: pointer; font-size: .88rem; font-weight: 700; color: #0f172a; list-style: none; }
+    .howto summary::-webkit-details-marker { display: none; }
+    .howto summary::before { content: '▶ '; font-size: .7rem; color: #2563eb; }
+    .howto[open] summary::before { content: '▼ '; }
+    .howto-steps { margin: .9rem 0 0; padding-left: 1.3rem; display: flex; flex-direction: column; gap: .55rem; }
+    .howto-steps li { color: #475569; font-size: .85rem; line-height: 1.7; }
+    .howto-steps b { color: #0f172a; }
+    .howto-steps code { background: #e2e8f0; color: #334155; padding: .1rem .35rem; border-radius: 4px; font-size: .78rem; }
+    .howto-note { margin: .8rem 0 0; padding-top: .7rem; border-top: 1px dashed #e2e8f0; color: #64748b; font-size: .8rem; line-height: 1.6; }
 
     .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
     .filters { display: flex; gap: .35rem; }
