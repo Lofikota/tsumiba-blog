@@ -58,11 +58,17 @@ const { slug, title, heroImage } = Astro.props;
         <aside class="editor-sidebar">
           <div class="sidebar-section">
             <label class="field-label">トップ画像</label>
-            <div class="hero-preview-wrap">
-              <img id="hero-preview" class="hero-preview" src="" alt="トップ画像" style="display:none" />
-              <div id="hero-placeholder" class="hero-placeholder">画像なし</div>
+            <div id="hero-dropzone" class="hero-dropzone">
+              <div class="hero-preview-wrap">
+                <img id="hero-preview" class="hero-preview" src="" alt="トップ画像" style="display:none" />
+                <div id="hero-placeholder" class="hero-placeholder">
+                  <span class="hero-ph-icon">🖼️</span>
+                  <span>ここに画像をドラッグ&ドロップ</span>
+                </div>
+              </div>
+              <div class="hero-drop-overlay">ドロップして画像を差し替え</div>
             </div>
-            <label class="upload-label" for="hero-file">画像を変更</label>
+            <label class="upload-label" for="hero-file">またはファイルを選択</label>
             <input id="hero-file" type="file" accept="image/jpeg,image/png,image/webp" style="display:none" />
             <p id="hero-upload-status" class="field-hint"></p>
           </div>
@@ -344,17 +350,20 @@ const { slug, title, heroImage } = Astro.props;
       btnSave.disabled = false;
     }
 
-    // ─── ヒーロー画像アップロード ────────────────────────
-    heroFile.addEventListener('change', async () => {
-      const file = heroFile.files[0];
+    // ─── ヒーロー画像アップロード（共通処理）──────────────
+    async function uploadHero(file) {
       if (!file) return;
+      if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+        heroUploadStatus.textContent = 'JPEG・PNG・WebP画像を選択してください';
+        return;
+      }
       if (file.size > 5 * 1024 * 1024) {
         heroUploadStatus.textContent = '5MB以下の画像を選択してください';
         return;
       }
       heroUploadStatus.textContent = 'アップロード中...';
 
-      const ext = file.name.split('.').pop();
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
       const fname = `hero-${Date.now()}.${ext}`;
       const b64 = await blobToBase64(file);
 
@@ -367,13 +376,41 @@ const { slug, title, heroImage } = Astro.props;
       if (data.ok) {
         heroImagePath = data.url;
         updateHeroPreview(heroImagePath);
-        heroUploadStatus.textContent = '画像をアップロードしました';
+        heroUploadStatus.textContent = '画像をアップロードしました（保存ボタンで確定）';
       } else {
         heroUploadStatus.textContent = 'エラー: ' + data.message;
       }
-    });
+    }
 
+    heroFile.addEventListener('change', () => uploadHero(heroFile.files[0]));
     document.querySelector('label[for="hero-file"]').addEventListener('click', () => heroFile.click());
+
+    // ─── ヒーロー画像 ドラッグ&ドロップ ──────────────────
+    const heroDropzone = document.getElementById('hero-dropzone');
+    if (heroDropzone) {
+      heroDropzone.addEventListener('click', () => heroFile.click());
+      ['dragenter', 'dragover'].forEach(evt =>
+        heroDropzone.addEventListener(evt, e => {
+          e.preventDefault();
+          e.stopPropagation();
+          heroDropzone.classList.add('dragging');
+        })
+      );
+      ['dragleave', 'dragend'].forEach(evt =>
+        heroDropzone.addEventListener(evt, e => {
+          e.preventDefault();
+          e.stopPropagation();
+          heroDropzone.classList.remove('dragging');
+        })
+      );
+      heroDropzone.addEventListener('drop', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        heroDropzone.classList.remove('dragging');
+        const file = e.dataTransfer && e.dataTransfer.files[0];
+        if (file) uploadHero(file);
+      });
+    }
 
     // ─── 保存ボタン ──────────────────────────────────────
     btnSave.addEventListener('click', saveArticle);
@@ -462,9 +499,15 @@ const { slug, title, heroImage } = Astro.props;
     .field-slug-val { margin: 0 0 .25rem; font-family: monospace; font-size: .82rem; color: #475569; word-break: break-all; }
 
     /* ── ヒーロー画像 ── */
-    .hero-preview-wrap { margin-bottom: .6rem; }
-    .hero-preview { width: 100%; height: 140px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; }
-    .hero-placeholder { width: 100%; height: 140px; background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: .8rem; color: #94a3b8; }
+    .hero-dropzone { position: relative; margin-bottom: .6rem; border-radius: 8px; cursor: pointer; transition: box-shadow .15s; }
+    .hero-dropzone.dragging { box-shadow: 0 0 0 3px rgba(37,99,235,.35); }
+    .hero-dropzone.dragging .hero-drop-overlay { display: flex; }
+    .hero-preview-wrap {}
+    .hero-preview { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; display: block; }
+    .hero-placeholder { width: 100%; height: 140px; box-sizing: border-box; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; gap: .35rem; align-items: center; justify-content: center; font-size: .78rem; color: #94a3b8; text-align: center; padding: .5rem; }
+    .hero-dropzone:hover .hero-placeholder { border-color: #93c5fd; background: #f0f7ff; }
+    .hero-ph-icon { font-size: 1.4rem; }
+    .hero-drop-overlay { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; background: rgba(37,99,235,.12); border: 2px dashed #2563eb; border-radius: 8px; color: #1d4ed8; font-size: .82rem; font-weight: 700; pointer-events: none; }
     .upload-label { display: inline-block; padding: .35rem .75rem; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px; font-size: .78rem; font-weight: 700; color: #475569; cursor: pointer; }
     .upload-label:hover { background: #e2e8f0; }
 

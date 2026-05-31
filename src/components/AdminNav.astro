@@ -4,10 +4,10 @@ interface Props {
 }
 const { active } = Astro.props;
 const tabs = [
+  { id: 'article-editor', label: '記事',           href: '/admin/articles/' },
   { id: 'dashboard',      label: 'ダッシュボード', href: '/admin/' },
-  { id: 'articles',       label: '記事管理',       href: '/admin/blog/' },
-  { id: 'article-editor', label: 'CMS編集',        href: '/admin/articles/' },
-  { id: 'revenue',        label: '収益トラッカー', href: '/admin/revenue/' },
+  { id: 'articles',       label: '運用チェック',   href: '/admin/blog/' },
+  { id: 'revenue',        label: '収益',           href: '/admin/revenue/' },
 ];
 ---
 <nav class="admin-nav">

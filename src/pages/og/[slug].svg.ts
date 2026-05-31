@@ -58,7 +58,7 @@ export const GET: APIRoute = ({ props }) => {
   <rect x="140" y="390" width="80" height="4" rx="2" fill="#FBBF24"/>
 
   <!-- サイト名 -->
-  <text x="140" y="460" font-family="'Noto Sans JP', sans-serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.75)">田中蓮のマネーブログ</text>
+  <text x="140" y="460" font-family="'Noto Sans JP', sans-serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.75)">田中蓮のFX口座比較ブログ</text>
   <text x="1060" y="460" font-family="sans-serif" font-size="20" fill="rgba(255,255,255,0.45)" text-anchor="end">ren-money.com</text>
 
   <!-- ロゴ -->
@@ -68,7 +68,7 @@ export const GET: APIRoute = ({ props }) => {
     <rect x="24" y="0"  width="8"  height="30" rx="1" fill="rgba(255,255,255,0.6)"/>
     <path d="M3 12 L15 6 L27 2 L44 -4" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round" fill="none"/>
   </g>
-  <text x="200" y="513" font-family="sans-serif" font-size="18" fill="rgba(255,255,255,0.5)">副業・NISA・節税でFIREを目指す32歳のリアル</text>
+  <text x="200" y="513" font-family="sans-serif" font-size="18" fill="rgba(255,255,255,0.5)">会社員目線でFX口座を比較する32歳のリアル</text>
 </svg>`;
 
   return new Response(svg, {
