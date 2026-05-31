@@ -33,7 +33,7 @@ const { slug, title, heroImage } = Astro.props;
         <p class="token-title">🔑 はじめてのログイン（初回だけ）</p>
         <p class="token-desc">編集機能を使うには、最初の1回だけ「合言葉（管理トークン）」を入力します。<strong>一度入力すれば、次回からはこの画面は出ません</strong>（このブラウザが覚えます）。</p>
         <div class="token-row">
-          <input id="token-input" type="password" placeholder="合言葉（管理トークン）を入力" autocomplete="off" />
+          <input id="token-input" type="password" placeholder="合言葉（管理トークン）を入力" autocomplete="off" data-1p-ignore data-lpignore="true" data-form-type="other" />
           <button id="token-save" type="button">ログイン</button>
         </div>
         <p id="token-error" class="token-error"></p>
