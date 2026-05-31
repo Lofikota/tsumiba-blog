@@ -5,8 +5,8 @@ import type { APIContext } from 'astro';
 export async function GET(context: APIContext) {
   const posts = await getCollection('blog', (e) => !e.data.draft);
   return rss({
-    title: '田中蓮のFX口座比較ブログ',
-    description: 'DMM FX・JFX・FXTFなど、会社員目線でFX口座の条件・スプレッド・リスクを比較する田中蓮のFX特化ブログ',
+    title: 'FX口座比較ナビ',
+    description: 'DMM FX・JFX・FXTFなど、会社員目線でFX口座の条件・スプレッド・リスクを比較するFX口座比較メディア',
     site: context.site!,
     items: posts
       .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())

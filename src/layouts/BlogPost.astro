@@ -27,7 +27,7 @@ const adSourceRef = Astro.url.searchParams.get('ref')?.trim();
 const resolvedLineRef = lineRef ? lineRef.ref : 'blog-main';
 const lineAddUrl = getLineAddUrl(adSourceRef ? `${resolvedLineRef}__${adSourceRef}` : resolvedLineRef);
 const SITE_URL = 'https://ren-money.com';
-const AUTHOR = { '@type': 'Person', name: '田中蓮', url: `${SITE_URL}/about/` };
+const AUTHOR = { '@type': 'Organization', name: 'FX口座比較ナビ編集部', url: `${SITE_URL}/about/` };
 
 // BreadcrumbList スキーマ
 const breadcrumbJsonLd = JSON.stringify({
@@ -160,29 +160,21 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     {faqJsonLd && <script is:inline type="application/ld+json" set:html={faqJsonLd} />}
     <script is:inline type="application/ld+json" set:html={breadcrumbJsonLd} />
 
-    <!-- 著者プロフィールボックス -->
+    <!-- 編集部プロフィールボックス -->
     <aside class="author-box">
       <div class="author-box-avatar">
-        <svg width="56" height="56" viewBox="0 0 120 120" aria-hidden="true">
-          <defs><clipPath id="ab1"><circle cx="60" cy="60" r="56"/></clipPath></defs>
-          <g clip-path="url(#ab1)">
-            <rect width="120" height="120" fill="#EEF1F7"/>
-            <rect x="50" y="62" width="20" height="20" fill="#F4D5BA"/>
-            <path d="M30 92 Q60 80 90 92 L100 120 L20 120 Z" fill="#fff"/>
-            <path d="M18 120 L30 86 Q42 94 42 110 L60 120 Z" fill="#0B1942"/>
-            <path d="M102 120 L90 86 Q78 94 78 110 L60 120 Z" fill="#0B1942"/>
-            <ellipse cx="60" cy="52" rx="22" ry="26" fill="#F4D5BA"/>
-            <path d="M38 46 Q38 22 60 22 Q82 22 82 46 Q82 38 76 34 Q70 30 60 32 Q50 34 44 40 Q40 44 38 46Z" fill="#1A1A1A"/>
-            <ellipse cx="51" cy="54" rx="2.2" ry="3" fill="#111"/>
-            <ellipse cx="69" cy="54" rx="2.2" ry="3" fill="#111"/>
-            <path d="M55 66 Q60 70 65 66" stroke="#9B5A4A" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-          </g>
+        <svg width="56" height="56" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <rect width="40" height="40" rx="8" fill="#EEF1F7"/>
+          <rect x="9"  y="22" width="4.5" height="9" rx="1" fill="#17352A"/>
+          <rect x="17" y="17" width="4.5" height="14" rx="1" fill="#17352A"/>
+          <rect x="25" y="11" width="4.5" height="20" rx="1" fill="#17352A"/>
+          <path d="M10 22 L19 15 L26 18 L31 10" stroke="#0F8A5F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div class="author-box-body">
         <p class="author-box-label">この記事を書いた人</p>
-        <p class="author-box-name">田中 蓮</p>
-        <p class="author-box-bio">32歳のIT会社員。借金200万円からFX・副業・NISA で資産500万円を達成。35歳FIREを目指して情報発信中。体験ベースで初心者にわかりやすく解説します。</p>
+        <p class="author-box-name">FX口座比較ナビ 編集部</p>
+        <p class="author-box-bio">国内・海外FX口座のスプレッド・スワップ・約定力・取引単位・各種条件を、公式情報ベースで比較・整理する編集部です。会社員や初心者がFX口座を選ぶときの判断材料を、できるだけ中立にまとめています。</p>
       </div>
     </aside>
 

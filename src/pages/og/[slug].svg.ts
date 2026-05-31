@@ -58,7 +58,7 @@ export const GET: APIRoute = ({ props }) => {
   <rect x="140" y="390" width="80" height="4" rx="2" fill="#FBBF24"/>
 
   <!-- サイト名 -->
-  <text x="140" y="460" font-family="'Noto Sans JP', sans-serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.75)">田中蓮のFX口座比較ブログ</text>
+  <text x="140" y="460" font-family="'Noto Sans JP', sans-serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.75)">FX口座比較ナビ</text>
   <text x="1060" y="460" font-family="sans-serif" font-size="20" fill="rgba(255,255,255,0.45)" text-anchor="end">ren-money.com</text>
 
   <!-- ロゴ -->

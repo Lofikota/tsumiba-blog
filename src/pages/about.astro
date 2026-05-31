@@ -1,17 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const personJsonLd = JSON.stringify({
+const orgJsonLd = JSON.stringify({
   "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "田中蓮",
+  "@type": "Organization",
+  "name": "FX口座比較ナビ",
   "url": "https://ren-money.com/about/",
-  "description": "30代IT会社員。FX口座の条件、ツール、スプレッド、リスクを会社員目線で比較しています。",
+  "description": "国内・海外FX口座の条件・ツール・スプレッド・リスクを、会社員目線で比較・整理するFX口座比較メディア。",
   "knowsAbout": ["FX", "FX口座比較", "DMM FX", "JFX", "FXTF", "FXリスク管理"],
-  "hasCredential": [
-    { "@type": "EducationalOccupationalCredential", "credentialCategory": "FX口座比較メディア運営" },
-    { "@type": "EducationalOccupationalCredential", "credentialCategory": "金融広告のPR表記・リスク表記確認" }
-  ],
   "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://ren-money.com/about/"
@@ -19,20 +15,20 @@ const personJsonLd = JSON.stringify({
 });
 ---
 
-<BaseLayout title="田中蓮のプロフィール｜会社員向けFX口座比較ブログ" description="田中蓮のプロフィール。30代IT会社員。FX口座の条件・ツール・スプレッド・リスクを会社員目線で比較しています。">
-  <script is:inline type="application/ld+json" set:html={personJsonLd}></script>
-  <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;">このブログについて</h1>
+<BaseLayout title="FX口座比較ナビとは｜会社員向けFX口座比較メディア" description="FX口座比較ナビについて。国内・海外FX口座の条件・ツール・スプレッド・リスクを会社員目線で比較・整理するFX口座比較メディアです。">
+  <script is:inline type="application/ld+json" set:html={orgJsonLd}></script>
+  <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;">このサイトについて</h1>
 
   <div class="prose">
     <div class="box-blue">
-      <strong>田中蓮（30代・IT会社員）</strong><br />
-      FX口座の条件・ツール・スプレッド・リスクを、会社員目線で比較しています。
+      <strong>FX口座比較ナビ</strong><br />
+      国内・海外FX口座の条件・ツール・スプレッド・リスクを、会社員目線で比較・整理するFX口座比較メディアです。
     </div>
 
-    <h2>このブログを始めたきっかけ</h2>
-    <p>FX口座は、公式サイトだけを見るとキャンペーンや機能の違いが分かりにくく、初心者ほど「どこを比較すればいいのか」で迷いやすいと感じています。</p>
+    <h2>このサイトの目的</h2>
+    <p>FX口座は、公式サイトだけを見るとキャンペーンや機能の違いが分かりにくく、初心者ほど「どこを比較すればいいのか」で迷いやすい領域です。</p>
 
-    <p>このブログでは、DMM FX・JFX・FXTF・松井証券FXなどを申し込む前に、条件、ツール、スプレッド、取引単位、リスクを落ち着いて確認できるよう整理します。</p>
+    <p>当サイトでは、DMM FX・JFX・FXTF・松井証券FXなどを申し込む前に、条件・ツール・スプレッド・取引単位・リスクを落ち着いて確認できるよう、公式情報ベースで整理しています。</p>
 
     <h2>発信している内容</h2>
     <ul>
@@ -43,7 +39,7 @@ const personJsonLd = JSON.stringify({
 
     <div class="box-yellow">
       <strong>【免責事項】</strong>
-      当ブログの情報は個人の体験・調査に基づくものです。投資判断は必ずご自身でご確認ください。
+      当サイトの情報は公式情報の調査・整理に基づくものです。投資判断は必ずご自身でご確認ください。
     </div>
 
     <h2>お問い合わせ</h2>
