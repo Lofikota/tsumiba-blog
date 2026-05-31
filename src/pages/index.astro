@@ -2,6 +2,27 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { CATEGORIES } from '../data/categories';
+import { getAffiliatePath } from '../data/affiliateLinks';
+
+// 稼働中アフィリエイトリンク(status:'affiliate')のみ掲載。承認が増えたらここに追加する。
+const recommendedAccounts = [
+  {
+    slug: 'jfx',
+    tag: '短期・スキャルピング向け',
+    name: 'JFX MATRIX TRADER',
+    point: '約定力とスプレッドの狭さに定評。1,000通貨から取引でき、短期売買を試したい人に向く口座です。',
+    specs: ['最小1,000通貨〜', '高機能ツール MATRIX TRADER', '平日サポート'],
+    reviewHref: '/blog/jfx-review/',
+  },
+  {
+    slug: 'fxtf',
+    tag: 'MT4・裁量トレード向け',
+    name: 'FXTF',
+    point: '世界標準ツールMT4が使える数少ない国内口座。少額から自動売買やカスタム分析をしたい人に向きます。',
+    specs: ['最小1,000通貨〜', 'MT4対応', '少額から始めやすい'],
+    reviewHref: '/blog/fxtf-review/',
+  },
+];
 
 const allPosts = (await getCollection('blog', (e: CollectionEntry<'blog'>) => !e.data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
@@ -105,6 +126,31 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
         <p>{primary.data.description}</p>
       </div>
     </a>
+  </section>
+
+  <section class="pick-band" aria-label="タイプ別おすすめFX口座">
+    <div class="pick-head">
+      <p>PICK UP <span class="pr-badge">PR</span></p>
+      <h2>タイプ別・いま開けるFX口座</h2>
+      <span class="pick-note">編集部が実際の取引条件で比較。あなたの取引スタイルに合う口座から確認できます。</span>
+    </div>
+    <div class="pick-grid">
+      {recommendedAccounts.map((acc) => (
+        <div class="pick-card">
+          <span class="pick-tag">{acc.tag}</span>
+          <h3>{acc.name}</h3>
+          <p class="pick-point">{acc.point}</p>
+          <ul class="pick-specs">
+            {acc.specs.map((spec) => <li>{spec}</li>)}
+          </ul>
+          <div class="pick-actions">
+            <a class="pick-cta" href={getAffiliatePath(acc.slug)} target="_blank" rel="nofollow sponsored noopener">公式サイトで口座開設</a>
+            <a class="pick-review" href={acc.reviewHref}>レビューを読む</a>
+          </div>
+        </div>
+      ))}
+    </div>
+    <p class="pick-risk">FXには元本割れや預け入れた資金を上回る損失が発生するリスクがあります。取引条件は各社公式サイトで最新情報をご確認ください。</p>
   </section>
 
   <nav class="category-strip" aria-label="主要カテゴリ">
@@ -434,6 +480,144 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     overflow: hidden;
     margin: 8px 0 0;
     font-size: .9rem;
+  }
+  .pick-band {
+    margin: 0 0 26px;
+    padding: 24px;
+    border: 1px solid #ded7c7;
+    border-radius: 6px;
+    background: #fffdfa;
+    box-shadow: 0 14px 34px rgba(61, 46, 20, .08);
+  }
+  .pick-head p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 6px;
+    color: #b66313;
+    font-size: .76rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+  }
+  .pr-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: #efe2c8;
+    color: #7a4211;
+    font-size: .66rem;
+    letter-spacing: .04em;
+  }
+  .pick-head h2 {
+    margin: 0;
+    color: #17211b;
+    font-size: 1.45rem;
+    line-height: 1.45;
+  }
+  .pick-note {
+    display: block;
+    margin-top: 8px;
+    color: #657168;
+    font-size: .9rem;
+    line-height: 1.7;
+  }
+  .pick-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 18px;
+  }
+  .pick-card {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border: 1px solid #e4ddcf;
+    border-left: 4px solid #e87913;
+    border-radius: 6px;
+    background: #fff;
+  }
+  .pick-tag {
+    align-self: flex-start;
+    margin-bottom: 10px;
+    padding: 3px 11px;
+    border-radius: 999px;
+    background: #ffe1d7;
+    color: #9c2f13;
+    font-size: .74rem;
+    font-weight: 900;
+  }
+  .pick-card h3 {
+    margin: 0;
+    color: #17211b;
+    font-size: 1.2rem;
+    line-height: 1.4;
+  }
+  .pick-point {
+    margin: 10px 0 0;
+    color: #536158;
+    font-size: .9rem;
+    line-height: 1.8;
+  }
+  .pick-specs {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 6px;
+  }
+  .pick-specs li {
+    position: relative;
+    padding-left: 20px;
+    color: #3a463e;
+    font-size: .86rem;
+    font-weight: 700;
+  }
+  .pick-specs li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #1f9d55;
+    font-weight: 900;
+  }
+  .pick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .pick-cta {
+    flex: 1 1 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: 4px;
+    background: #e87913;
+    color: #fff;
+    font-weight: 900;
+    text-decoration: none;
+    box-shadow: 0 10px 20px rgba(232, 121, 19, .24);
+  }
+  .pick-cta:hover { text-decoration: none; transform: translateY(-2px); }
+  .pick-review {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 16px;
+    border-radius: 4px;
+    border: 1px solid #d7cdb8;
+    color: #17211b;
+    font-weight: 900;
+    text-decoration: none;
+  }
+  .pick-risk {
+    margin: 16px 0 0;
+    color: #8a7d6b;
+    font-size: .76rem;
+    line-height: 1.7;
   }
   .category-strip {
     display: grid;
@@ -835,6 +1019,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
     .category-strip,
     .lead-grid,
     .route-grid,
+    .pick-grid,
     .sidebar {
       grid-template-columns: 1fr;
     }
