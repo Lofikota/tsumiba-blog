@@ -42,17 +42,17 @@ const pickPosts = (slugs: string[]) => slugs.map((slug) => postBySlug.get(slug))
 
 const moneyRoutePosts = pickPosts([
   'fx-kouza-hikaku',
-  'dmm-fx-review',
   'jfx-review',
   'fxtf-review',
+  'dmm-fx-review',
   'fx-shoshinsha-guide',
   'fx-small-start-guide',
 ]);
 
 const rankingPosts = pickPosts([
-  'dmm-fx-review',
   'jfx-review',
   'fxtf-review',
+  'dmm-fx-review',
   'fx-shoshinsha-guide',
   'fx-small-start-guide',
 ]);
@@ -67,26 +67,26 @@ const categoryTone: Record<string, string> = {
 const countBySlugs = (slugs: string[]) => slugs.filter((slug) => postBySlug.has(slug)).length;
 
 const categoryNav = [
-  { name: 'FX口座比較', lead: 'DMM FX・JFX・FXTFを比較', icon: 'FX', href: `/blog/category/${CATEGORIES['FX口座比較'].slug}/`, count: countBySlugs(CATEGORIES['FX口座比較'].matchSlugs ?? []) },
+  { name: 'FX口座比較', lead: 'JFX・FXTFを優先比較', icon: 'FX', href: `/blog/category/${CATEGORIES['FX口座比較'].slug}/`, count: countBySlugs(CATEGORIES['FX口座比較'].matchSlugs ?? []) },
   { name: 'FX初心者ガイド', lead: '仕組みと始め方を確認', icon: '入', href: `/blog/category/${CATEGORIES['FX初心者ガイド'].slug}/`, count: countBySlugs(CATEGORIES['FX初心者ガイド'].matchSlugs ?? []) },
-  { name: 'DMM FX', lead: '条件とツールを確認', icon: 'D', href: `/blog/category/${CATEGORIES['DMM FX'].slug}/`, count: countBySlugs(CATEGORIES['DMM FX'].matchSlugs ?? []) },
   { name: 'JFX', lead: '短期売買との相性を確認', icon: 'J', href: `/blog/category/${CATEGORIES['JFX'].slug}/`, count: countBySlugs(CATEGORIES['JFX'].matchSlugs ?? []) },
   { name: 'FXTF', lead: '少額取引とツールを確認', icon: 'F', href: `/blog/category/${CATEGORIES['FXTF'].slug}/`, count: countBySlugs(CATEGORIES['FXTF'].matchSlugs ?? []) },
+  { name: 'DMM FX', lead: 'リンク確認中の参考情報', icon: 'D', href: `/blog/category/${CATEGORIES['DMM FX'].slug}/`, count: countBySlugs(CATEGORIES['DMM FX'].matchSlugs ?? []) },
   { name: 'FXリスク管理', lead: '損失・税金・会社員の注意点', icon: '守', href: `/blog/category/${CATEGORIES['FXリスク管理'].slug}/`, count: countBySlugs(CATEGORIES['FXリスク管理'].matchSlugs ?? []) },
 ];
 
 const conversionBoxes = [
   {
     label: 'FX口座比較',
-    title: 'まず3社の違いを見たい',
-    body: 'DMM FX、JFX、FXTFの取引単位、ツール、スプレッド、向いている人を比較。',
+    title: 'まずJFX・FXTFを比べたい',
+    body: 'JFX、FXTFを優先し、DMM FXはリンク確認中の参考情報として整理。',
     href: '/blog/fx-kouza-hikaku/',
   },
   {
-    label: 'DMM FX',
-    title: '王道口座から確認したい',
-    body: 'DMM FXの特徴、注意点、初心者が申し込み前に見るべき条件を整理。',
-    href: '/blog/dmm-fx-review/',
+    label: 'JFX',
+    title: '取引機能を重視したい',
+    body: 'JFXのMT4対応、約定力、短期売買との相性を確認。',
+    href: '/blog/jfx-review/',
   },
   {
     label: 'LINE',
@@ -102,21 +102,21 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
 
 <BaseLayout
   title="会社員向けFX口座比較ブログ"
-  description="DMM FX・JFX・FXTFを申し込む前に、スプレッド、取引単位、ツール、リスク、向いている人を会社員目線で整理するFX特化ブログです。"
+  description="JFX・FXTFを優先し、DMM FXはリンク確認中の参考情報として、スプレッド、取引単位、ツール、リスク、向いている人を会社員目線で整理するFX特化ブログです。"
   image="/og/fx-kouza-hikaku.svg"
   wide={true}
 >
   <section class="site-hero">
     <div class="hero-copy">
       <p class="eyebrow">会社員向けFX口座比較ブログ</p>
-      <h1>DMM FX・JFX・FXTFを<br />申し込む前に比較。</h1>
+      <h1>JFX・FXTFを<br />申し込む前に比較。</h1>
       <p class="hero-lead">
         スプレッド、取引単位、ツール、リスク、向いている人を整理。
         会社員がFX口座を選ぶ前に、条件と注意点を落ち着いて確認できるブログです。
       </p>
       <div class="hero-buttons">
         <a class="btn btn-main" href="/blog/fx-kouza-hikaku/">FX口座を比較する</a>
-        <a class="btn btn-sub" href="/blog/dmm-fx-review/">DMM FXのレビューを見る</a>
+        <a class="btn btn-sub" href="/blog/jfx-review/">JFXのレビューを見る</a>
       </div>
       <ul class="trust-row" aria-label="ブログの方針">
         <li>PR表記あり</li>
@@ -236,7 +236,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
         <div>
           <p>無料LINE</p>
           <h2>FX口座選びで迷ったら</h2>
-          <span>DMM FX・JFX・FXTFの比較軸と、初心者が申し込み前に見るべきリスクを整理して送ります。</span>
+          <span>JFX・FXTFの比較軸と、初心者が申し込み前に見るべきリスクを整理して送ります。DMM FXはリンク確認後に再開します。</span>
         </div>
         <a href="/line/x-profile-main/">LINEでFX比較軸を受け取る</a>
       </section>
@@ -295,7 +295,8 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
         <h2>今の主導線</h2>
         <ol>
           <li><a href="/blog/fx-kouza-hikaku/">FX口座比較を見る</a></li>
-          <li><a href="/blog/dmm-fx-review/">DMM FXの条件を見る</a></li>
+          <li><a href="/blog/jfx-review/">JFXの条件を見る</a></li>
+          <li><a href="/blog/fxtf-review/">FXTFの条件を見る</a></li>
           <li><a href="/blog/fx-shoshinsha-guide/">FX初心者ガイドを見る</a></li>
         </ol>
       </section>
@@ -313,7 +314,7 @@ const imageFor = (post: typeof allPosts[number]) => post.data.heroImage ?? `/og/
       <section class="side-card side-line">
         <p>無料</p>
         <h2>FX比較で迷う人向け</h2>
-        <span>口座比較、DMM FXレビュー、リスク管理を読む順番で整理します。</span>
+        <span>JFX・FXTFの比較、リスク管理を読む順番で整理します。</span>
         <a href="/line/x-profile-main/">LINEでFX比較軸を受け取る</a>
       </section>
     </aside>

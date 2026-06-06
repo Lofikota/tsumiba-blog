@@ -106,11 +106,11 @@ export const lineRefs: LineRef[] = [
   },
   {
     ref: 'campaign-dmm-fx',
-    label: '案件 DMM FX',
+    label: 'DMM FX確認中（JFX・FXTF優先）',
     source: 'campaign',
     intent: 'campaign',
-    headline: 'DMM FXはリンク確認中です',
-    description: 'DMM FXはASPリンク確認中のため、今は条件だけ整理します。申し込み導線は確認済みのJFX・FXTFを優先します。',
+    headline: 'DMM FXは現在リンク確認中です',
+    description: 'DMM FXはASPリンク確認中のため、申込導線は確認済みのJFX・FXTFを優先します。条件比較だけ確認したい人向けの入口です。',
   },
   {
     ref: 'campaign-jfx',

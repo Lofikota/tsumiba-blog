@@ -6,7 +6,7 @@ const addUrl = getLineAddUrl('direct-line-page');
 const featuredRefs: LineRef[] = ['blog-main', 'blog-tax-basic', 'blog-fx-roundup', 'blog-nisa-mistake']
   .map((ref) => getLineRef(ref))
   .filter((ref): ref is LineRef => Boolean(ref));
-const campaignRefs: LineRef[] = ['campaign-jfx', 'campaign-fxtf', 'campaign-dmm-fx']
+const campaignRefs: LineRef[] = ['campaign-jfx', 'campaign-fxtf']
   .map((ref) => getLineRef(ref))
   .filter((ref): ref is LineRef => Boolean(ref));
 ---
@@ -34,7 +34,7 @@ const campaignRefs: LineRef[] = ['campaign-jfx', 'campaign-fxtf', 'campaign-dmm-
     <div class="line-grid">
       <article>
         <h3>FX口座を比較したい</h3>
-        <p>DMM FX・JFX・FXTFの口座条件、スプレッド、ツールを整理します。</p>
+        <p>JFX・FXTFを優先し、DMM FXはリンク再確認後に条件だけ整理します。</p>
       </article>
       <article>
         <h3>FX初心者ガイド</h3>

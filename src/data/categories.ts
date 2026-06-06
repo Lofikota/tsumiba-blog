@@ -2,8 +2,8 @@ export const CATEGORIES: Record<string, { slug: string; label: string; descripti
   'FX口座比較': {
     slug: 'fx',
     label: 'FX口座比較',
-    description: 'DMM FX・JFX・FXTF・松井証券FXなど、FX口座の条件、ツール、スプレッド、注意点を比較します。',
-    matchSlugs: ['fx-kouza-hikaku', 'dmm-fx-review', 'jfx-review', 'fxtf-review', 'matsui-fx-review'],
+    description: 'JFX・FXTFを優先し、DMM FX・松井証券FXなども参考情報として、FX口座の条件、ツール、スプレッド、注意点を比較します。',
+    matchSlugs: ['fx-kouza-hikaku', 'jfx-review', 'fxtf-review', 'dmm-fx-review', 'matsui-fx-review'],
   },
   'FX初心者ガイド': {
     slug: 'fx-beginner',
@@ -14,7 +14,7 @@ export const CATEGORIES: Record<string, { slug: string; label: string; descripti
   'DMM FX': {
     slug: 'dmm-fx',
     label: 'DMM FX',
-    description: 'DMM FXの条件、ツール、スプレッド、向いている人、申し込み前の注意点を整理します。',
+    description: 'DMM FXはリンク確認中です。条件、ツール、スプレッド、向いている人、申し込み前の注意点を参考情報として整理します。',
     matchSlugs: ['dmm-fx-review'],
   },
   'JFX': {
