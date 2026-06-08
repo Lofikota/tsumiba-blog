@@ -51,9 +51,9 @@ const cc = catColors[categoryName] ?? { bg: '#E5E7EB', text: '#374151' };
 
   <!-- パンくず -->
   <nav aria-label="パンくずリスト" style="font-size:0.8rem;color:#6b7280;margin-bottom:1.25rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">
-    <a href="/" style="color:#2563eb;text-decoration:none;">ホーム</a>
+    <a href="/" style="color:#1B3A5B;text-decoration:none;">ホーム</a>
     <span aria-hidden="true">›</span>
-    <a href="/blog/" style="color:#2563eb;text-decoration:none;">記事一覧</a>
+    <a href="/blog/" style="color:#1B3A5B;text-decoration:none;">記事一覧</a>
     <span aria-hidden="true">›</span>
     <span style={`background:${cc.bg};color:${cc.text};padding:0.1rem 0.5rem;border-radius:4px;font-weight:700;`}>{categoryName}</span>
   </nav>
@@ -104,6 +104,6 @@ const cc = catColors[categoryName] ?? { bg: '#E5E7EB', text: '#374151' };
   )}
 
   <div style="margin-top:1.5rem;">
-    <a href="/blog/" style="font-size:0.875rem;color:#2563eb;text-decoration:none;">← 記事一覧に戻る</a>
+    <a href="/blog/" style="font-size:0.875rem;color:#1B3A5B;text-decoration:none;">← 記事一覧に戻る</a>
   </div>
 </BaseLayout>

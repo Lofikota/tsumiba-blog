@@ -265,9 +265,10 @@
     "type": "review",
     "category": "FX・外貨",
     "notes": "OANDA Japanのスキャルピング適性・スプレッド・APIを田中蓮視点でレビュー。短期売買志向の読者向け。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "published",
     "priority": 4,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-06-07T01:40:00.000Z"
   },
   {
     "slug": "rakuten-fx-review",
@@ -275,9 +276,10 @@
     "type": "review",
     "category": "FX・外貨",
     "notes": "楽天証券FX部門のレビュー。楽天経済圏ユーザーへのメリット・SPU活用・スプレッド比較を含める。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "published",
     "priority": 5,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-06-08T01:05:00.000Z"
   },
   {
     "slug": "sbi-fx-alpha-review",
@@ -335,9 +337,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "ローソク足・移動平均線・RSIなど基本的なチャートの読み方を初心者向けに図解で解説。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "published",
     "priority": 11,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedDate": "2026-06-07"
   },
   {
     "slug": "fx-dollar-yen-ugoki",

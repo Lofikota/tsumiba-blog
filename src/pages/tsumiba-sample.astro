@@ -1,0 +1,325 @@
+---
+// tsumiba 視認性見本（プラットフォーム判断用 / 公開対象外）
+// ブランドガイドライン: AI運用/戦略/ブランドガイドライン_tsumiba.md
+// 配色: Primary #1B3A5B / Accent #E0A458(CTAのみ) / 白地ベース / 白地+左ボーダー
+const updated = '2026-06-08';
+
+const ranking = [
+  { rank: 1, name: 'A社 FX', spread: '0.2銭', cashback: '最大40,000円', point: '初心者の口座開設数No.1。アプリが分かりやすい', recommend: '★★★★★' },
+  { rank: 2, name: 'B社 FX', spread: '0.2銭', cashback: '最大30,000円', point: 'スワップ狙いに強い。長期保有向き', recommend: '★★★★☆' },
+  { rank: 3, name: 'C社 FX', spread: '0.3銭', cashback: '最大25,000円', point: '自動売買が使える。ほったらかし派に', recommend: '★★★★☆' },
+];
+
+const categories = [
+  { icon: '📊', title: '口座を比較する', desc: 'スプレッド・キャンペーンで横断比較', href: '#ranking' },
+  { icon: '🔥', title: 'キャンペーン速報', desc: '今いちばんお得な口座を毎週更新', href: '#campaign' },
+  { icon: '⚙️', title: '手法で選ぶ', desc: 'スワップ・自動売買で選ぶ', href: '#' },
+  { icon: '🌱', title: '初心者の不安解消', desc: '少額・税金・始め方をやさしく', href: '#faq' },
+];
+
+const faqs = [
+  { q: 'FXは何円から始められますか？', a: '会社によりますが、数千円〜1万円程度の少額から始められます。まずは無理のない範囲で1通貨単位の取引から試すのがおすすめです。' },
+  { q: 'スプレッドって何ですか？', a: '売買するときの実質的なコストです。同じ取引でもスプレッドが狭いほどコストが安くなります。比較表の数字が小さいほどお得、と覚えればOKです。' },
+  { q: '利益が出たら税金はかかりますか？', a: 'かかります。FXの利益は申告分離課税(税率20.315%)の対象です。年間の利益額によっては確定申告が必要になります。' },
+];
+---
+
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tsumiba ｜ FX 視認性見本</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #1B3A5B;
+      --amber: #E0A458;
+      --text: #1F2937;
+      --bg: #FFFFFF;
+      --bg-sub: #F8F9FA;
+      --border: #E5E7EB;
+      --gray: #6B7280;
+      --sans: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--sans); color: var(--text); background: var(--bg); line-height: 1.85; -webkit-font-smoothing: antialiased; }
+    a { color: var(--navy); }
+    img { max-width: 100%; }
+
+    /* ── お知らせバー ── */
+    .ts-announce { background: var(--bg-sub); border-bottom: 1px solid var(--border); text-align: center; font-size: 11.5px; color: var(--gray); padding: 7px 16px; }
+    .ts-announce strong { color: var(--navy); }
+
+    /* ── ヘッダー ── */
+    .ts-header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+    .ts-header-inner { max-width: 1040px; margin: 0 auto; height: 60px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
+    .ts-brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; }
+    .ts-logomark { display: block; }
+    .ts-brand-text { font-weight: 700; font-size: 19px; letter-spacing: .01em; color: var(--navy); }
+    .ts-brand-cat { font-size: 12px; font-weight: 500; color: var(--gray); border-left: 1px solid var(--border); padding-left: 8px; margin-left: 2px; }
+    .ts-nav { display: flex; gap: 22px; }
+    .ts-nav a { font-size: 13.5px; font-weight: 500; color: var(--text); text-decoration: none; opacity: .8; transition: opacity .15s; }
+    .ts-nav a:hover { opacity: 1; color: var(--navy); }
+
+    /* ── ヒーロー ── */
+    .ts-hero { max-width: 1040px; margin: 0 auto; padding: 48px 20px 36px; text-align: center; }
+    .ts-hero-eyebrow { display: inline-block; font-size: 12px; font-weight: 700; color: var(--navy); background: var(--bg-sub); border: 1px solid var(--border); border-radius: 999px; padding: 5px 14px; margin-bottom: 18px; }
+    .ts-hero h1 { font-size: 30px; font-weight: 900; line-height: 1.5; color: var(--navy); letter-spacing: .01em; }
+    .ts-hero h1 .accent { color: var(--amber); }
+    .ts-hero p { margin-top: 14px; font-size: 15px; color: var(--gray); }
+
+    /* ── 共通: セクション ── */
+    .ts-wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+    .ts-section { padding: 32px 0; }
+    .ts-h2 { font-size: 21px; font-weight: 700; color: var(--navy); margin-bottom: 6px; padding-left: 13px; border-left: 4px solid var(--navy); line-height: 1.4; }
+    .ts-h2-sub { font-size: 13px; color: var(--gray); margin-bottom: 20px; padding-left: 17px; }
+
+    /* ── カテゴリカード（目的別ナビ） ── */
+    .ts-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .ts-card { display: block; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 22px 18px; text-decoration: none; color: var(--text); transition: border-color .15s, transform .15s; }
+    .ts-card:hover { border-color: var(--navy); transform: translateY(-2px); }
+    .ts-card-icon { font-size: 26px; }
+    .ts-card-title { font-size: 15px; font-weight: 700; color: var(--navy); margin: 10px 0 4px; }
+    .ts-card-desc { font-size: 12.5px; color: var(--gray); line-height: 1.6; }
+
+    /* ── キャンペーン速報（囲みボックス・白地+左ボーダー） ── */
+    .ts-callout { background: var(--bg); border: 1px solid var(--border); border-left: 3px solid var(--amber); border-radius: 8px; padding: 20px 22px; }
+    .ts-callout-badge { display: inline-block; font-size: 11px; font-weight: 700; color: #fff; background: var(--amber); border-radius: 4px; padding: 3px 9px; margin-bottom: 12px; }
+    .ts-callout-list { list-style: none; }
+    .ts-callout-list li { padding: 9px 0; border-bottom: 1px dashed var(--border); font-size: 14.5px; display: flex; justify-content: space-between; gap: 12px; }
+    .ts-callout-list li:last-child { border-bottom: none; }
+    .ts-callout-list .amount { font-weight: 700; color: var(--navy); white-space: nowrap; }
+
+    /* ── 比較表 ── */
+    .ts-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border); border-radius: 10px; }
+    table.ts-table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 560px; }
+    .ts-table thead th { background: var(--bg-sub); color: var(--navy); font-weight: 700; font-size: 12.5px; text-align: left; padding: 12px 14px; border-bottom: 2px solid var(--border); white-space: nowrap; }
+    .ts-table td { padding: 13px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .ts-table tbody tr:last-child td { border-bottom: none; }
+    .ts-table .rank-badge { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--navy); color: #fff; font-weight: 700; font-size: 13px; }
+    .ts-table .name { font-weight: 700; color: var(--navy); }
+    .ts-table .strong-num { font-weight: 700; }
+
+    /* ── ランキングリスト（番号付きカード + CTA） ── */
+    .ts-ranklist { display: flex; flex-direction: column; gap: 16px; margin-top: 22px; }
+    .ts-rankcard { position: relative; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; }
+    .ts-rankcard .no { position: absolute; top: -11px; left: 18px; font-size: 12px; font-weight: 700; color: #fff; background: var(--navy); border-radius: 6px; padding: 3px 12px; }
+    .ts-rankcard h3 { font-size: 17px; color: var(--navy); margin: 6px 0 8px; }
+    .ts-rankcard .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .ts-chip { font-size: 12px; background: var(--bg-sub); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; color: var(--text); }
+    .ts-chip b { color: var(--navy); }
+    .ts-rankcard p { font-size: 13.5px; color: var(--text); margin-bottom: 14px; }
+
+    /* ── CTAボタン（琥珀・行動専用） ── */
+    .ts-cta { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--amber); color: #fff; font-weight: 700; font-size: 14.5px; text-decoration: none; padding: 13px 26px; border-radius: 8px; box-shadow: 0 2px 0 rgba(180,120,40,.5); transition: filter .15s, transform .1s; }
+    .ts-cta:hover { filter: brightness(1.04); }
+    .ts-cta:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(180,120,40,.5); }
+    .ts-cta-full { display: flex; width: 100%; }
+    .ts-cta-note { font-size: 11px; color: var(--gray); margin-top: 7px; }
+
+    /* ── ポイント囲み（白地+左ボーダー ネイビー） ── */
+    .ts-point { background: var(--bg); border: 1px solid var(--border); border-left: 3px solid var(--navy); border-radius: 8px; padding: 18px 20px; }
+    .ts-point-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .ts-point ul { margin-left: 18px; font-size: 14px; }
+    .ts-point li { margin: 5px 0; }
+
+    /* ── FAQ ── */
+    .ts-faq { display: flex; flex-direction: column; gap: 12px; }
+    .ts-faq details { border: 1px solid var(--border); border-radius: 10px; background: var(--bg); overflow: hidden; }
+    .ts-faq summary { cursor: pointer; list-style: none; padding: 16px 20px; font-weight: 700; font-size: 14.5px; color: var(--navy); display: flex; align-items: center; gap: 10px; }
+    .ts-faq summary::-webkit-details-marker { display: none; }
+    .ts-faq summary::before { content: "Q"; flex: none; width: 24px; height: 24px; background: var(--navy); color: #fff; border-radius: 6px; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; }
+    .ts-faq details[open] summary { border-bottom: 1px solid var(--border); }
+    .ts-faq .ans { padding: 14px 20px 18px; font-size: 14px; color: var(--text); }
+
+    /* ── LINE誘導ブロック ── */
+    .ts-line { background: var(--bg-sub); border: 1px solid var(--border); border-radius: 14px; padding: 28px 24px; text-align: center; }
+    .ts-line h2 { font-size: 19px; color: var(--navy); margin-bottom: 8px; }
+    .ts-line p { font-size: 13.5px; color: var(--gray); margin-bottom: 18px; }
+
+    /* ── フッター ── */
+    .ts-footer { background: var(--navy); color: #cdd6e0; margin-top: 40px; padding: 34px 20px 22px; text-align: center; }
+    .ts-footer-brand { color: #fff; font-weight: 700; font-size: 16px; margin-bottom: 12px; }
+    .ts-footer-nav { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .ts-footer-nav a { color: #cdd6e0; font-size: 12.5px; text-decoration: none; }
+    .ts-footer-nav a:hover { color: #fff; }
+    .ts-footer-risk { max-width: 760px; margin: 0 auto; font-size: 11px; line-height: 1.8; color: #9fb0c2; text-align: left; }
+    .ts-footer-copy { font-size: 11px; color: #8294a8; margin-top: 14px; }
+
+    /* ── サンプル注記 ── */
+    .ts-demo-note { max-width: 1040px; margin: 24px auto 0; padding: 0 20px; }
+    .ts-demo-note div { background: #FFFBEB; border: 1px solid #F2D58A; border-radius: 8px; padding: 12px 16px; font-size: 12.5px; color: #92660C; }
+
+    /* ── モバイル ── */
+    @media (max-width: 760px) {
+      .ts-nav { display: none; }
+      .ts-hero { padding: 34px 20px 24px; }
+      .ts-hero h1 { font-size: 23px; }
+      .ts-cards { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .ts-h2 { font-size: 19px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- お知らせバー -->
+  <div class="ts-announce"><strong>【PR】</strong> 当サイトはアフィリエイト広告を含みます。掲載情報は作成時点のものです。</div>
+
+  <!-- ヘッダー -->
+  <header class="ts-header">
+    <div class="ts-header-inner">
+      <a class="ts-brand" href="/tsumiba-sample">
+        <svg class="ts-logomark" width="30" height="30" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <rect x="6"  y="26" width="28" height="7" rx="1.5" fill="#1B3A5B"/>
+          <rect x="10" y="17" width="20" height="7" rx="1.5" fill="#1B3A5B"/>
+          <rect x="14" y="8"  width="12" height="7" rx="1.5" fill="#1B3A5B"/>
+        </svg>
+        <span class="ts-brand-text">tsumiba</span>
+        <span class="ts-brand-cat">FX</span>
+      </a>
+      <nav class="ts-nav">
+        <a href="#ranking">口座を比較</a>
+        <a href="#campaign">キャンペーン速報</a>
+        <a href="#faq">初心者ガイド</a>
+        <a href="#line">LINE</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ヒーロー（結論先出し） -->
+  <section class="ts-hero">
+    <span class="ts-hero-eyebrow">国内FXの「今いちばんお得」を最速で</span>
+    <h1>今日の<span class="accent">一段</span>を、<br>いちばん分かりやすく。</h1>
+    <p>口座選びで迷う時間をゼロに。スプレッド・キャンペーンを横断比較して、あなたに合う1社だけをご案内します。</p>
+  </section>
+
+  <div class="ts-wrap">
+    <!-- カテゴリカード（目的別ナビ） -->
+    <section class="ts-section" id="categories">
+      <div class="ts-cards">
+        {categories.map((c) => (
+          <a class="ts-card" href={c.href}>
+            <div class="ts-card-icon">{c.icon}</div>
+            <div class="ts-card-title">{c.title}</div>
+            <div class="ts-card-desc">{c.desc}</div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- キャンペーン速報（3層①・囲みボックス） -->
+    <section class="ts-section" id="campaign">
+      <h2 class="ts-h2">今週のキャンペーン速報</h2>
+      <p class="ts-h2-sub">事実ベースで毎週更新。{updated} 時点の情報です</p>
+      <div class="ts-callout">
+        <span class="ts-callout-badge">今週更新</span>
+        <ul class="ts-callout-list">
+          <li><span>A社 FX：新規口座開設＋取引で</span><span class="amount">最大 40,000円</span></li>
+          <li><span>B社 FX：期間限定キャッシュバック</span><span class="amount">最大 30,000円</span></li>
+          <li><span>C社 FX：自動売買スタート応援</span><span class="amount">最大 25,000円</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 比較表 + ランキングリスト -->
+    <section class="ts-section" id="ranking">
+      <h2 class="ts-h2">国内FX口座 おすすめ比較</h2>
+      <p class="ts-h2-sub">スプレッド・キャンペーン・使いやすさで編集部が比較しました</p>
+
+      <div class="ts-table-scroll">
+        <table class="ts-table">
+          <thead>
+            <tr><th>順位</th><th>会社</th><th>スプレッド(米ドル/円)</th><th>キャッシュバック</th><th>おすすめ度</th></tr>
+          </thead>
+          <tbody>
+            {ranking.map((r) => (
+              <tr>
+                <td><span class="rank-badge">{r.rank}</span></td>
+                <td class="name">{r.name}</td>
+                <td class="strong-num">{r.spread}</td>
+                <td class="strong-num">{r.cashback}</td>
+                <td>{r.recommend}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ts-ranklist">
+        {ranking.map((r) => (
+          <div class="ts-rankcard">
+            <span class="no">{r.rank}位</span>
+            <h3>{r.name}</h3>
+            <div class="meta">
+              <span class="ts-chip">スプレッド <b>{r.spread}</b></span>
+              <span class="ts-chip">CB <b>{r.cashback}</b></span>
+              <span class="ts-chip">{r.recommend}</span>
+            </div>
+            <p>{r.point}</p>
+            <a class="ts-cta ts-cta-full" href="#" rel="nofollow sponsored">公式サイトで口座を見る（PR）</a>
+            <p class="ts-cta-note">※ 口座開設は無料。最新のキャンペーン条件は公式サイトをご確認ください</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ポイント囲み（白地+左ボーダー ネイビー） -->
+    <section class="ts-section">
+      <h2 class="ts-h2">迷ったら、ここだけ押さえればOK</h2>
+      <div class="ts-point">
+        <div class="ts-point-title">編集部からの結論</div>
+        <ul>
+          <li><b>コスト重視</b>なら、スプレッドの狭いA社・B社から選ぶ。</li>
+          <li><b>ほったらかし派</b>なら、自動売買が使えるC社。</li>
+          <li>まずは1社、<b>少額で口座開設して操作に慣れる</b>のがいちばんの近道です。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- FAQ（初心者の不安解消・3層③） -->
+    <section class="ts-section" id="faq">
+      <h2 class="ts-h2">FX初心者のよくある質問</h2>
+      <p class="ts-h2-sub">最初のつまずきポイントを、やさしく解説します</p>
+      <div class="ts-faq">
+        {faqs.map((f) => (
+          <details>
+            <summary>{f.q}</summary>
+            <div class="ans">{f.a}</div>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <!-- LINE誘導 -->
+    <section class="ts-section" id="line">
+      <div class="ts-line">
+        <h2>口座選びに迷ったら、LINEで相談</h2>
+        <p>あなたの目的に合った1社を、編集部がやさしくご案内します。登録は無料です。</p>
+        <a class="ts-cta" href="#">LINEで無料相談する</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- フッター -->
+  <footer class="ts-footer">
+    <div class="ts-footer-brand">tsumiba ｜ FX</div>
+    <p style="font-size:10px;color:#9fb0c2;margin-bottom:12px;letter-spacing:.06em;">PR・アフィリエイト広告を含みます</p>
+    <nav class="ts-footer-nav">
+      <a href="#">運営者情報</a>
+      <a href="#">プライバシーポリシー</a>
+      <a href="#">免責事項</a>
+      <a href="#">特定商取引法に基づく表示</a>
+    </nav>
+    <p class="ts-footer-risk">FXは元本保証のない金融商品です。レバレッジにより、預け入れた資金を上回る損失が発生する可能性があります。取引にあたっては各社の契約締結前交付書面・公式サイトの最新情報を必ずご確認のうえ、ご自身の判断と責任で行ってください。</p>
+    <p class="ts-footer-copy">© 2026 tsumiba. All rights reserved.</p>
+  </footer>
+
+  <!-- サンプル注記 -->
+  <div class="ts-demo-note">
+    <div>これはプラットフォーム判断用の視認性見本です（noindex・公開対象外）。掲載中の会社名・数値・キャンペーンはすべてダミーです。</div>
+  </div>
+</body>
+</html>

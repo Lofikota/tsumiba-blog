@@ -1,17 +1,18 @@
 :root {
+  /* tsumiba ブランドトークン（紺#1B3A5B 主 / 琥珀#E0A458 CTAのみ） */
   --color-bg: #ffffff;
   --color-surface: #ffffff;
-  --color-primary: #2563eb;
-  --color-primary-dark: #1d4ed8;
-  --color-primary-light: #eff6ff;
-  --color-text: #1a1a1a;
+  --color-primary: #1B3A5B;
+  --color-primary-dark: #14304D;
+  --color-primary-light: #F8F9FA;
+  --color-text: #1F2937;
   --color-text-muted: #6b7280;
   --color-border: #e5e7eb;
   --color-accent-green: #f3f4f6;
   --color-accent-yellow: #f3f4f6;
   --color-accent-red: #f3f4f6;
-  --color-cta: #2563eb;
-  --color-cta-dark: #1d4ed8;
+  --color-cta: #E0A458;
+  --color-cta-dark: #C98F42;
   --radius: 12px;
   --radius-sm: 6px;
   --font-sans: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
@@ -35,7 +36,7 @@ a:hover { text-decoration: underline; }
 
 /* ─── ヒーローセクション ─── */
 .hero {
-  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #2563eb 100%);
+  background: linear-gradient(135deg, #14304D 0%, #1B3A5B 60%, #234b73 100%);
   color: white;
   border-radius: var(--radius);
   padding: 2.5rem 1.5rem 2rem;
@@ -65,7 +66,7 @@ a:hover { text-decoration: underline; }
   display: inline-block;
   padding: 0.2rem 0.75rem;
   margin-bottom: 1rem;
-  color: #bfdbfe;
+  color: #cdd6e0;
 }
 
 .hero-title {
@@ -77,14 +78,14 @@ a:hover { text-decoration: underline; }
 }
 
 .hero-highlight {
-  color: #fbbf24;
+  color: #E0A458;
   position: relative;
 }
 
 .hero-sub {
   font-size: 0.95rem;
   line-height: 1.75;
-  color: #bfdbfe;
+  color: #cdd6e0;
   max-width: 480px;
   margin-bottom: 1.5rem;
 }
@@ -99,7 +100,7 @@ a:hover { text-decoration: underline; }
 
 .hero-cta-note {
   font-size: 0.75rem;
-  color: #93c5fd;
+  color: #9fb0c2;
 }
 
 .hero-badges {
@@ -148,7 +149,7 @@ a:hover { text-decoration: underline; }
 }
 
 .post-card:focus-visible {
-  outline: 3px solid rgba(37,99,235,.35);
+  outline: 3px solid rgba(27,58,91,.35);
   outline-offset: 2px;
 }
 
@@ -194,33 +195,26 @@ a:hover { text-decoration: underline; }
   width: 100%;
   max-width: 360px;
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 3px 10px rgba(37,99,235,.35);
+  box-shadow: 0 3px 10px rgba(180,120,40,.30);
   text-decoration: none !important;
 }
 .cta-button:hover {
   background: var(--color-cta-dark);
   transform: translateY(-1px);
-  box-shadow: 0 5px 16px rgba(37,99,235,.45);
+  box-shadow: 0 5px 16px rgba(180,120,40,.40);
 }
 
-.cta-button.blue {
-  background: var(--color-primary);
-  box-shadow: 0 3px 10px rgba(37,99,235,.35);
-}
-.cta-button.blue:hover {
-  background: var(--color-primary-dark);
-  box-shadow: 0 5px 16px rgba(37,99,235,.45);
-}
-
+.cta-button.blue,
 .cta-button.green,
 .cta-button.red {
-  background: var(--color-primary);
-  box-shadow: 0 3px 10px rgba(37,99,235,.35);
+  background: var(--color-cta);
+  box-shadow: 0 3px 10px rgba(180,120,40,.30);
 }
+.cta-button.blue:hover,
 .cta-button.green:hover,
 .cta-button.red:hover {
-  background: var(--color-primary-dark);
-  box-shadow: 0 5px 16px rgba(37,99,235,.45);
+  background: var(--color-cta-dark);
+  box-shadow: 0 5px 16px rgba(180,120,40,.40);
 }
 
 /* ─── カラーボックス（シンプル：白地＋グレー枠のみ） ─── */
@@ -296,7 +290,7 @@ a:hover { text-decoration: underline; }
 
 /* LP ファーストビュー */
 .lp-hero {
-  background: linear-gradient(160deg, #0f172a 0%, #1e3a8a 100%);
+  background: linear-gradient(160deg, #14304D 0%, #1B3A5B 100%);
   color: white;
   padding: 2.5rem 1.25rem 2rem;
   text-align: center;
@@ -304,7 +298,7 @@ a:hover { text-decoration: underline; }
 
 .lp-hero-eyebrow {
   font-size: 0.75rem;
-  color: #93c5fd;
+  color: #9fb0c2;
   font-weight: 700;
   letter-spacing: .08em;
   margin-bottom: 0.75rem;
@@ -320,7 +314,7 @@ a:hover { text-decoration: underline; }
 
 .lp-hero-sub {
   font-size: 0.95rem;
-  color: #bfdbfe;
+  color: #cdd6e0;
   line-height: 1.75;
   max-width: 480px;
   margin: 0 auto 1.5rem;
@@ -430,7 +424,7 @@ a:hover { text-decoration: underline; }
 
 /* LP CTA ブロック */
 .lp-cta-block {
-  background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+  background: linear-gradient(135deg, #14304D, #1B3A5B);
   border-radius: var(--radius);
   padding: 2rem 1.25rem;
   text-align: center;
@@ -447,7 +441,7 @@ a:hover { text-decoration: underline; }
 
 .lp-cta-block p {
   font-size: 0.88rem;
-  color: #bfdbfe;
+  color: #cdd6e0;
   margin-bottom: 1.25rem;
 }
 

@@ -24,7 +24,7 @@ const {
 } = Astro.props;
 const siteUrl = 'https://ren-money.com';
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
-const siteName = 'FX口座比較ナビ';
+const siteName = 'tsumiba';
 const pageTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 const absoluteImageUrl = new URL(image, siteUrl);
 const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';
@@ -55,7 +55,7 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
   <meta property="og:locale" content="ja_JP" />
   {article && pubDate && <meta property="article:published_time" content={pubDate.toISOString()} />}
   {article && updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />}
-  {article && <meta property="article:author" content="FX口座比較ナビ編集部" />}
+  {article && <meta property="article:author" content="tsumiba編集部" />}
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
@@ -110,12 +110,12 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
   )}
 </head>
 <style is:global>
-  /* ─── Design Tokens（記事ページ共通） ─── */
+  /* ─── Design Tokens（tsumiba：紺#1B3A5B 主 / 琥珀#E0A458 CTAのみ） ─── */
   :root {
-    --ink:    #1a1a1a; --paper:  #ffffff;
-    --navy:   #1a1a1a; --amber:  #2563eb;
-    --amber-warm: #2563eb; --amber-pale: #f3f4f6;
-    --green: #2563eb; --green-soft: #eff6ff;
+    --ink:    #1F2937; --paper:  #ffffff;
+    --navy:   #1B3A5B; --amber:  #E0A458;
+    --amber-warm: #E0A458; --amber-pale: #F8F9FA;
+    --green: #1B3A5B; --green-soft: #F8F9FA;
     --gray:   #6b7280; --border: #e5e7eb;
     --cream:  #ffffff; --white:  #FFFFFF;
     --serif: "Noto Serif JP", "Hiragino Mincho ProN", serif;
@@ -131,7 +131,7 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
     font-size: 11.5px; color: #6b7280;
     text-align: center; font-weight: 500;
   }
-  .bl-announce strong { color: var(--amber); }
+  .bl-announce strong { color: var(--navy); }
 
   /* ─── Header ─── */
   .bl-header {
@@ -151,9 +151,14 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
     text-decoration: none;
   }
   .bl-brand-text {
-    font-family: var(--serif);
-    font-weight: 700; font-size: 15px;
-    color: var(--ink); letter-spacing: .03em; white-space: nowrap;
+    font-family: var(--sans);
+    font-weight: 700; font-size: 18px;
+    color: var(--navy); letter-spacing: .01em; white-space: nowrap;
+  }
+  .bl-brand-cat {
+    font-size: 12px; font-weight: 500; color: var(--gray);
+    border-left: 1px solid var(--border);
+    padding-left: 8px; margin-left: 2px;
   }
   .bl-nav { display: flex; gap: 22px; }
   .bl-nav a {
@@ -175,12 +180,12 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
 
   /* ─── Footer ─── */
   .bl-footer {
-    background: #1a1a1a; color: #d1d5db;
+    background: var(--navy); color: #cdd6e0;
     padding: 36px 28px 20px; text-align: center; font-size: 12px;
   }
   .bl-footer-brand {
     display: inline-flex; align-items: center; gap: 8px;
-    color: #fff; font-family: var(--serif); font-weight: 700; font-size: 14px;
+    color: #fff; font-family: var(--sans); font-weight: 700; font-size: 15px;
     margin-bottom: 12px;
   }
   .bl-footer-nav {
@@ -204,15 +209,14 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
   <header class="bl-header">
     <div class="bl-header-inner">
       <a class="bl-brand" href="/">
-        <!-- Bar-chart + trend logo -->
-        <svg width="26" height="26" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-          <rect x="4"  y="22" width="6" height="14" rx="1" fill="#1a1a1a"/>
-          <rect x="13" y="16" width="6" height="20" rx="1" fill="#1a1a1a"/>
-          <rect x="22" y="10" width="6" height="26" rx="1" fill="#1a1a1a"/>
-          <path d="M6 22 L16 14 L24 18 L36 6" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M30 6 L36 6 L36 12" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- tsumiba ロゴ：3段積みブロック -->
+        <svg width="28" height="28" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <rect x="6"  y="26" width="28" height="7" rx="1.5" fill="#1B3A5B"/>
+          <rect x="10" y="17" width="20" height="7" rx="1.5" fill="#1B3A5B"/>
+          <rect x="14" y="8"  width="12" height="7" rx="1.5" fill="#1B3A5B"/>
         </svg>
-        <span class="bl-brand-text">FX口座比較ナビ</span>
+        <span class="bl-brand-text">tsumiba</span>
+        <span class="bl-brand-cat">FX</span>
       </a>
       <nav class="bl-nav">
         <a href="/#articles">FX口座比較</a>
@@ -232,14 +236,12 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
   <!-- Footer -->
   <footer class="bl-footer">
     <div class="bl-footer-brand">
-      <svg width="20" height="20" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-        <rect x="4"  y="22" width="6" height="14" rx="1" fill="#fff"/>
-        <rect x="13" y="16" width="6" height="20" rx="1" fill="#fff"/>
-        <rect x="22" y="10" width="6" height="26" rx="1" fill="#fff"/>
-        <path d="M6 22 L16 14 L24 18 L36 6" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M30 6 L36 6 L36 12" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg width="22" height="22" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <rect x="6"  y="26" width="28" height="7" rx="1.5" fill="#fff"/>
+        <rect x="10" y="17" width="20" height="7" rx="1.5" fill="#fff"/>
+        <rect x="14" y="8"  width="12" height="7" rx="1.5" fill="#fff"/>
       </svg>
-      FX口座比較ナビ
+      tsumiba ｜ FX
     </div>
     <p style="font-size:10px;color:#9CA3AF;margin-bottom:10px;letter-spacing:.06em;">PR・アフィリエイト広告を含みます</p>
     <nav class="bl-footer-nav">

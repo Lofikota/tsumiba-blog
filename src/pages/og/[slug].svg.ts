@@ -12,12 +12,12 @@ export const GET: APIRoute = ({ props }) => {
   const category: string = post.data.category ?? '';
 
   const catColor: Record<string, string> = {
-    'NISA・投資': '#3B82F6',
+    'NISA・投資': '#1B3A5B',
     '副業・節税': '#16A34A',
     'お得情報':   '#D97706',
-    'FX・外貨':   '#DC2626',
+    'FX・外貨':   '#E0A458',
   };
-  const accent = catColor[category] ?? '#2563EB';
+  const accent = catColor[category] ?? '#1B3A5B';
 
   // タイトルを24文字で折り返す
   const words = title.split('');
@@ -33,8 +33,8 @@ export const GET: APIRoute = ({ props }) => {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1E3A8A"/>
-      <stop offset="100%" stop-color="#2563EB"/>
+      <stop offset="0%" stop-color="#14304D"/>
+      <stop offset="100%" stop-color="#1B3A5B"/>
     </linearGradient>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)"/>
@@ -58,7 +58,7 @@ export const GET: APIRoute = ({ props }) => {
   <rect x="140" y="390" width="80" height="4" rx="2" fill="#FBBF24"/>
 
   <!-- サイト名 -->
-  <text x="140" y="460" font-family="'Noto Sans JP', sans-serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.75)">FX口座比較ナビ</text>
+  <text x="140" y="460" font-family="'Noto Sans JP', sans-serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.75)">tsumiba</text>
   <text x="1060" y="460" font-family="sans-serif" font-size="20" fill="rgba(255,255,255,0.45)" text-anchor="end">ren-money.com</text>
 
   <!-- ロゴ -->

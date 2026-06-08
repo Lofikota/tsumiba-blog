@@ -5,7 +5,7 @@ import type { APIContext } from 'astro';
 export async function GET(context: APIContext) {
   const posts = await getCollection('blog', (e) => !e.data.draft);
   return rss({
-    title: 'FX口座比較ナビ',
+    title: 'tsumiba',
     description: 'JFX・FXTFを優先し、DMM FXはリンク確認中の参考情報として、会社員目線でFX口座の条件・スプレッド・リスクを比較するFX口座比較メディア',
     site: context.site!,
     items: posts

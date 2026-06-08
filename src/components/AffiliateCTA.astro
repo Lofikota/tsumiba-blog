@@ -19,12 +19,12 @@ const ctaHref = isStoppedDmmFx ? getAffiliatePath('jfx') : product ? getAffiliat
 const ctaText = isStoppedDmmFx ? 'JFXの公式条件を確認する（DMM FXはリンク確認中）' : text;
 const ctaLabel = isStoppedDmmFx ? 'dmm-fx:reroute-jfx' : product ?? href ?? text;
 
-// ボタンは視認性のため全て青に統一（color指定は受け取るが青に正規化）
+// CTAボタンは tsumiba の琥珀(#E0A458)に統一（color指定は受け取るが琥珀に正規化）
 const colorMap: Record<string, string> = {
-  blue:   'background:#2563EB;',
-  green:  'background:#2563EB;',
-  orange: 'background:#2563EB;',
-  red:    'background:#2563EB;',
+  blue:   'background:#E0A458;',
+  green:  'background:#E0A458;',
+  orange: 'background:#E0A458;',
+  red:    'background:#E0A458;',
 };
 const bg = colorMap[color] ?? colorMap.blue;
 ---

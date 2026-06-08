@@ -27,7 +27,7 @@ const adSourceRef = Astro.url.searchParams.get('ref')?.trim();
 const resolvedLineRef = lineRef ? lineRef.ref : 'blog-main';
 const lineAddUrl = getLineAddUrl(adSourceRef ? `${resolvedLineRef}__${adSourceRef}` : resolvedLineRef);
 const SITE_URL = 'https://ren-money.com';
-const AUTHOR = { '@type': 'Organization', name: 'FX口座比較ナビ編集部', url: `${SITE_URL}/about/` };
+const AUTHOR = { '@type': 'Organization', name: 'tsumiba編集部', url: `${SITE_URL}/about/` };
 
 // BreadcrumbList スキーマ
 const breadcrumbJsonLd = JSON.stringify({
@@ -94,12 +94,12 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
   <article>
     <!-- パンくずリスト -->
     <nav aria-label="パンくずリスト" style="font-size:0.78rem;color:#9ca3af;margin-bottom:0.75rem;display:flex;gap:0.35rem;flex-wrap:wrap;align-items:center;">
-      <a href="/" style="color:#6b7280;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#2563eb'" onmouseout="this.style.color='#6b7280'">ホーム</a>
+      <a href="/" style="color:#6b7280;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#1B3A5B'" onmouseout="this.style.color='#6b7280'">ホーム</a>
       <span aria-hidden="true">›</span>
-      <a href="/blog/" style="color:#6b7280;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#2563eb'" onmouseout="this.style.color='#6b7280'">記事一覧</a>
+      <a href="/blog/" style="color:#6b7280;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#1B3A5B'" onmouseout="this.style.color='#6b7280'">記事一覧</a>
       {catInfo && <>
         <span aria-hidden="true">›</span>
-        <a href={`/blog/category/${catInfo.slug}/`} style="color:#6b7280;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#2563eb'" onmouseout="this.style.color='#6b7280'">{category}</a>
+        <a href={`/blog/category/${catInfo.slug}/`} style="color:#6b7280;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#1B3A5B'" onmouseout="this.style.color='#6b7280'">{category}</a>
       </>}
       <span aria-hidden="true">›</span>
       <span style="color:#1f2937;font-weight:500;">{title.length > 30 ? title.slice(0, 30) + '…' : title}</span>
@@ -109,7 +109,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
       <span style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.8rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:4px;">{category}</span>
     </div>
 
-    <h1 style="font-size:clamp(1.75rem, 4vw, 2.45rem);font-weight:900;line-height:1.35;margin-bottom:0.75rem;color:#1a1a1a;">{title}</h1>
+    <h1 style="font-size:clamp(1.75rem, 4vw, 2.45rem);font-weight:900;line-height:1.35;margin-bottom:0.75rem;color:#1F2937;">{title}</h1>
 
     <div style="font-size:0.8rem;color:var(--color-text-muted);margin-bottom:1.25rem;">
       <time datetime={pubDate.toISOString()}>公開：{dateStr}</time>
@@ -164,16 +164,15 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     <aside class="author-box">
       <div class="author-box-avatar">
         <svg width="56" height="56" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-          <rect width="40" height="40" rx="8" fill="#EEF1F7"/>
-          <rect x="9"  y="22" width="4.5" height="9" rx="1" fill="#1a1a1a"/>
-          <rect x="17" y="17" width="4.5" height="14" rx="1" fill="#1a1a1a"/>
-          <rect x="25" y="11" width="4.5" height="20" rx="1" fill="#1a1a1a"/>
-          <path d="M10 22 L19 15 L26 18 L31 10" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect width="40" height="40" rx="8" fill="#F8F9FA"/>
+          <rect x="11" y="24" width="18" height="5" rx="1.5" fill="#1B3A5B"/>
+          <rect x="13" y="17.5" width="14" height="5" rx="1.5" fill="#1B3A5B"/>
+          <rect x="15" y="11" width="10" height="5" rx="1.5" fill="#1B3A5B"/>
         </svg>
       </div>
       <div class="author-box-body">
         <p class="author-box-label">この記事を書いた人</p>
-        <p class="author-box-name">FX口座比較ナビ 編集部</p>
+        <p class="author-box-name">tsumiba 編集部</p>
         <p class="author-box-bio">国内・海外FX口座のスプレッド・スワップ・約定力・取引単位・各種条件を、公式情報ベースで比較・整理する編集部です。会社員や初心者がFX口座を選ぶときの判断材料を、できるだけ中立にまとめています。</p>
       </div>
     </aside>
@@ -236,7 +235,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
   .toc-title {
     font-size: 0.82rem;
     font-weight: 800;
-    color: #2563eb;
+    color: #1B3A5B;
     letter-spacing: 0.06em;
     margin: 0 0 0.85rem;
     display: flex;
@@ -248,7 +247,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     display: inline-block;
     width: 14px;
     height: 14px;
-    background: #2563eb;
+    background: #1B3A5B;
     border-radius: 3px;
     flex-shrink: 0;
   }
@@ -266,7 +265,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     align-items: baseline;
     gap: 0.6rem;
     font-size: 0.88rem;
-    color: #1a1a1a;
+    color: #1F2937;
     text-decoration: none;
     line-height: 1.55;
     padding: 0.3rem 0.5rem;
@@ -281,7 +280,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     flex-shrink: 0;
     width: 1.4rem;
     height: 1.4rem;
-    background: #2563eb;
+    background: #1B3A5B;
     color: #fff;
     border-radius: 50%;
     font-size: 0.7rem;
@@ -342,8 +341,8 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     width: 1.45rem;
     height: 1.45rem;
     border-radius: 999px;
-    background: #dbeafe;
-    color: #1d4ed8;
+    background: #F8F9FA;
+    color: #1B3A5B;
     font-size: 0.75rem;
     font-weight: 900;
   }
@@ -372,7 +371,7 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     height: 60px;
     border-radius: 50%;
     overflow: hidden;
-    border: 2px solid #eff6ff;
+    border: 2px solid #F8F9FA;
   }
   .author-box-avatar svg { display: block; }
   .author-box-label {
@@ -456,8 +455,8 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
       justify-content: center;
       padding: 0.7rem 0.5rem;
       border-radius: 8px;
-      background: #2563eb;
-      color: #fff;
+      background: #E0A458;
+      color: #1B3A5B;
       font-size: 0.92rem;
       font-weight: 700;
       text-decoration: none;
