@@ -26,7 +26,7 @@ const lineRef = getLineRef(getLineRefForArticle(slug, category));
 const adSourceRef = Astro.url.searchParams.get('ref')?.trim();
 const resolvedLineRef = lineRef ? lineRef.ref : 'blog-main';
 const lineAddUrl = getLineAddUrl(adSourceRef ? `${resolvedLineRef}__${adSourceRef}` : resolvedLineRef);
-const SITE_URL = 'https://ren-money.com';
+const SITE_URL = 'https://tsumiba.com';
 const AUTHOR = { '@type': 'Organization', name: 'tsumiba編集部', url: `${SITE_URL}/about/` };
 
 // BreadcrumbList スキーマ
@@ -52,7 +52,7 @@ const articleJsonLd = JSON.stringify({
   author: AUTHOR,
   publisher: {
     '@type': 'Organization',
-    name: 'ren-money.com',
+    name: 'tsumiba.com',
     logo: { '@type': 'ImageObject', url: `${SITE_URL}/favicon.svg` },
   },
   url: `${SITE_URL}/blog/${slug}/`,

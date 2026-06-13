@@ -59,7 +59,7 @@ export const GET: APIRoute = ({ props }) => {
 
   <!-- サイト名 -->
   <text x="140" y="460" font-family="'Noto Sans JP', sans-serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.75)">tsumiba</text>
-  <text x="1060" y="460" font-family="sans-serif" font-size="20" fill="rgba(255,255,255,0.45)" text-anchor="end">ren-money.com</text>
+  <text x="1060" y="460" font-family="sans-serif" font-size="20" fill="rgba(255,255,255,0.45)" text-anchor="end">tsumiba.com</text>
 
   <!-- ロゴ -->
   <g transform="translate(140, 490)">

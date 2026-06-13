@@ -19,7 +19,7 @@ const posts = allPosts
   .filter(p => p.data.category === categoryName || matchSlugs.includes(p.id))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-const SITE_URL = 'https://ren-money.com';
+const SITE_URL = 'https://tsumiba.com';
 const canonicalUrl = `${SITE_URL}/blog/category/${slug}/`;
 
 const breadcrumbJsonLd = JSON.stringify({
