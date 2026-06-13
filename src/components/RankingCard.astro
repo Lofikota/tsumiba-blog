@@ -17,6 +17,8 @@ interface Props {
   specs?: Spec[];
   href: string;
   reviewHref?: string;
+  score?: number;
+  comment?: string;
   ctaText?: string;
   featured?: boolean;
   trackLabel?: string;
@@ -32,6 +34,8 @@ const {
   specs = [],
   href,
   reviewHref,
+  score,
+  comment,
   ctaText = '公式サイトで口座開設（無料）',
   featured = false,
   trackLabel = name,
@@ -54,8 +58,9 @@ const fullStars = Math.round(rating);
       <small>{catchCopy}</small>
     </div>
     <div class="rc-rate">
+      {score !== undefined && <span class="rc-score">{score}<small>点</small></span>}
       <span class="rc-stars" aria-hidden="true">{'★'.repeat(fullStars)}{'☆'.repeat(5 - fullStars)}</span>
-      <span class="rc-rate-num">{rating.toFixed(1)}</span>
+      <span class="rc-rate-num">総合 {rating.toFixed(1)}</span>
     </div>
   </header>
 
@@ -77,6 +82,10 @@ const fullStars = Math.round(rating);
         </div>
       ))}
     </div>
+  )}
+
+  {comment && (
+    <p class="rc-comment"><span class="rc-comment-by">編集部</span>{comment}</p>
   )}
 
   <div class="rc-actions">
@@ -151,7 +160,20 @@ const fullStars = Math.round(rating);
   .rc-id small { color: #6b7280; font-size: 12px; }
   .rc-rate { text-align: right; }
   .rc-stars { color: #E0A458; font-size: 13px; letter-spacing: -1px; }
-  .rc-rate-num { display: block; font-size: 13px; font-weight: 700; color: #1B3A5B; }
+  .rc-rate-num { display: block; font-size: 11px; font-weight: 500; color: #6b7280; }
+  .rc-score { display: block; font-size: 23px; font-weight: 700; color: #1B3A5B; line-height: 1.1; }
+  .rc-score small { font-size: 11px; font-weight: 500; color: #6b7280; }
+  .rc-comment {
+    font-size: 12px;
+    color: #374151;
+    border: 1px solid #E5E7EB;
+    border-left: 3px solid #1B3A5B;
+    padding: 8px 11px;
+    margin: 0 0 12px;
+    line-height: 1.7;
+    background: #fff;
+  }
+  .rc-comment-by { font-weight: 700; color: #1B3A5B; margin-right: 6px; }
   .rc-bars { margin-bottom: 12px; }
   .rc-bar { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
   .rc-bar-label { font-size: 11px; color: #6b7280; width: 56px; }

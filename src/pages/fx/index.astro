@@ -11,6 +11,8 @@ const ranking = [
     initial: 'J',
     catch: '約定力No.1・スキャルピング歓迎',
     rating: 4.9,
+    score: 92,
+    comment: '約定スピードとスキャルピング歓迎が強み。コストも業界最狭水準で、1社目に選んで後悔しにくい万能型です。',
     bars: [
       { label: 'コスト', pct: 88 },
       { label: '約定力', pct: 98 },
@@ -32,6 +34,8 @@ const ranking = [
     initial: 'F',
     catch: 'MT4・自動売買が使える',
     rating: 4.6,
+    score: 88,
+    comment: 'MT4と自動売買を使いたい人に最適。裁量よりも仕組みで取引したい中級者に向きます。',
     bars: [
       { label: '自動売買', pct: 92 },
       { label: 'コスト', pct: 84 },
@@ -46,6 +50,8 @@ const ranking = [
     initial: 'セ',
     catch: '老舗の信頼性・スワップに強い',
     rating: 4.5,
+    score: 86,
+    comment: '1909年創業の老舗。スワップと情報量に強く、長期保有・安心感を重視する人向けです。',
     bars: [
       { label: '信頼性', pct: 95 },
       { label: 'スワップ', pct: 86 },
@@ -55,21 +61,27 @@ const ranking = [
     trackLabel: 'central-tanshi',
   },
 ];
+
+const howto = [
+  { icon: 'コスト重視', title: 'とにかくコストを抑えたい', body: 'スプレッドが狭いJFX・FXTFが有力。少額で始めるなら1,000通貨対応を選びましょう。', pick: 'JFX / FXTF' },
+  { icon: '約定力', title: '短期売買・スキャルがしたい', body: '約定スピードとスキャル公認のJFXが安心。滑りにくさが利益に直結します。', pick: 'JFX' },
+  { icon: '自動売買', title: '仕組みで放置運用したい', body: 'MT4・自動売買が使えるFXTF。スワップ長期ならセントラル短資FXも候補です。', pick: 'FXTF / セントラル短資FX' },
+];
 ---
 
 <BaseLayout
   title="国内FX口座比較ランキング【2026年最新】"
-  description="国内FX口座をコスト・約定力・初心者向けやすさで毎週比較。JFX・FXTF・セントラル短資FXを編集部が正直に評価し、今いちばんお得に始められる一社を最速で見つけます。"
+  description="国内FX口座をコスト・約定力・初心者向けやすさで毎週比較。JFX・FXTF・セントラル短資FXを編集部が総合スコアで正直に評価し、今いちばんお得に始められる一社を最速で見つけます。"
   wide={true}
 >
   <section class="fx-hero">
     <div class="fx-hero-text">
       <span class="fx-hero-badge">2026年上半期 編集部総合ランキング</span>
       <h1>資産は、一段ずつ。<br />国内FXの“今いちばんお得”を最速で。</h1>
-      <p class="fx-hero-lead">キャンペーン・コスト・使いやすさを毎週更新。あなたが損しない一社を、編集部が選びます。</p>
+      <p class="fx-hero-lead">キャンペーン・コスト・使いやすさを毎週更新。あなたが損しない一社を、編集部が総合スコアで選びます。</p>
       <div class="fx-hero-trust">
         <span><span class="fx-stars">★★★★★</span> <b>4.8</b> <span class="fx-muted">(312件)</span></span>
-        <span>15社を比較</span>
+        <span>15社を調査・比較</span>
       </div>
       <a href="#ranking" class="fx-hero-cta">無料で比較して始める →</a>
     </div>
@@ -89,19 +101,27 @@ const ranking = [
     <strong>今週のキャンペーン速報</strong>　JFX 最大<b>5万円</b>キャッシュバック中／FXTF 口座開設で<b>最大3万円</b>
   </div>
 
+  <nav class="fx-toc" aria-label="目次">
+    <span class="fx-toc-label">目次</span>
+    <a href="#ranking">総合ランキング</a>
+    <a href="#table">比較表</a>
+    <a href="#howto">タイプ別の選び方</a>
+    <a href="#criteria">評価基準・出典</a>
+  </nav>
+
   <section class="fx-diag" aria-label="30秒診断">
     <div class="fx-diag-head"><strong>30秒診断</strong><span>何を重視しますか？</span></div>
     <div class="fx-diag-chips">
-      <a href="#ranking" class="fx-chip">コストの安さ</a>
-      <a href="#ranking" class="fx-chip">約定力・スキャル</a>
-      <a href="#ranking" class="fx-chip">自動売買</a>
-      <a href="#ranking" class="fx-chip">初心者向け</a>
+      <a href="#howto" class="fx-chip">コストの安さ</a>
+      <a href="#howto" class="fx-chip">約定力・スキャル</a>
+      <a href="#howto" class="fx-chip">自動売買</a>
+      <a href="#howto" class="fx-chip">初心者向け</a>
     </div>
   </section>
 
   <section id="ranking" class="fx-rank-sec">
     <div class="fx-sech"><h2>編集部総合ランキング</h2><span class="fx-updated">{updated} 更新</span></div>
-    <p class="fx-sub">約定力・コスト・初心者向けやすさを5段階で独自評価</p>
+    <p class="fx-sub">コスト・約定力・初心者向けやすさを100点満点で総合評価（基準は<a href="#criteria">こちら</a>）</p>
 
     <RankingCard {...ranking[0]} />
     <div class="fx-rank-grid">
@@ -110,28 +130,65 @@ const ranking = [
     </div>
   </section>
 
-  <section class="fx-table-sec">
+  <section id="table" class="fx-table-sec">
     <div class="fx-sech"><h2>スペック比較表</h2></div>
     <div class="fx-table-wrap">
       <table class="fx-table">
         <thead>
-          <tr><th>会社</th><th>米ドル/円</th><th>最小通貨</th><th>キャンペーン</th></tr>
+          <tr><th>会社</th><th>総合</th><th>米ドル/円</th><th>最小通貨</th><th>取引ツール</th><th>キャンペーン</th></tr>
         </thead>
         <tbody>
-          <tr><td>JFX</td><td>0.2銭</td><td>1,000</td><td>最大5万円</td></tr>
-          <tr><td>FXTF</td><td>0.2銭</td><td>1,000</td><td>最大3万円</td></tr>
-          <tr><td>セントラル短資FX</td><td>0.2銭</td><td>1,000</td><td>条件あり</td></tr>
+          <tr><td>JFX</td><td><b class="fx-score-cell">92</b></td><td><b>0.2銭</b></td><td>1,000</td><td>MATRIX・MT4</td><td><b>最大5万円</b></td></tr>
+          <tr><td>FXTF</td><td><b class="fx-score-cell">88</b></td><td><b>0.2銭</b></td><td>1,000</td><td>MT4</td><td><b>最大3万円</b></td></tr>
+          <tr><td>セントラル短資FX</td><td><b class="fx-score-cell">86</b></td><td><b>0.2銭</b></td><td>1,000</td><td>独自ツール</td><td>条件あり</td></tr>
         </tbody>
       </table>
     </div>
     <p class="fx-note">※スプレッドは原則固定（例外あり）。キャンペーン金額・条件は変動します。申込前に必ず各社公式の最新情報をご確認ください。</p>
   </section>
 
+  <section id="howto" class="fx-howto-sec">
+    <div class="fx-sech"><h2>タイプ別の選び方</h2></div>
+    <p class="fx-sub">迷ったら、自分が一番重視するものから選ぶのが失敗しにくいです。</p>
+    <div class="fx-howto-grid">
+      {howto.map((h) => (
+        <div class="fx-howto-card">
+          <span class="fx-howto-tag">{h.icon}</span>
+          <strong>{h.title}</strong>
+          <p>{h.body}</p>
+          <span class="fx-howto-pick">おすすめ：{h.pick}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section id="criteria" class="fx-criteria-sec">
+    <div class="fx-sech"><h2>評価基準と出典</h2></div>
+    <div class="fx-criteria-grid">
+      <div class="fx-criteria-box">
+        <strong>総合スコアの内訳</strong>
+        <ul>
+          <li><b>コスト</b>（スプレッド・手数料）… 40%</li>
+          <li><b>約定力</b>（スピード・滑りにくさ）… 30%</li>
+          <li><b>始めやすさ</b>（最小通貨・ツール・サポート）… 30%</li>
+        </ul>
+      </div>
+      <div class="fx-criteria-box">
+        <strong>調査方法・出典</strong>
+        <ul>
+          <li>国内FX <b>15社</b>を対象に毎週見直し</li>
+          <li>数値は各社<b>公式サイト</b>の公開情報を参照</li>
+          <li>キャンペーンは告知ページの条件を確認のうえ掲載</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <footer class="fx-editor">
     <span class="fx-editor-avatar">編</span>
     <div>
       <strong>tsumiba編集部</strong>
-      <p>国内FXのコスト・約定力を毎週検証しています。FXは元本保証のない投機的取引で、損失が生じる可能性があります。投資判断はご自身の責任で行ってください。</p>
+      <p>国内FXのコスト・約定力を毎週検証しています。広告（PR）を含みますが、評価は上記の基準に基づいて公平に行います。FXは元本保証のない投機的取引で、損失が生じる可能性があります。投資判断はご自身の責任で行ってください。</p>
     </div>
   </footer>
 </BaseLayout>
@@ -156,7 +213,7 @@ const ranking = [
     font-weight: 700;
   }
   .fx-hero h1 {
-    font-size: 26px;
+    font-size: 28px;
     line-height: 1.4;
     color: #1B3A5B;
     margin: 12px 0 8px;
@@ -188,11 +245,26 @@ const ranking = [
   }
   .fx-ticker strong, .fx-ticker b { color: #1B3A5B; }
 
+  .fx-toc {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    border: 1px solid #E5E7EB;
+    border-radius: 11px;
+    padding: 12px 16px;
+    margin-bottom: 1.75rem;
+    font-size: 13px;
+  }
+  .fx-toc-label { font-weight: 700; color: #1B3A5B; }
+  .fx-toc a { color: #1B3A5B; text-decoration: none; position: relative; padding-left: 14px; }
+  .fx-toc a::before { content: '›'; position: absolute; left: 2px; color: #E0A458; }
+
   .fx-diag {
     border: 1px solid #E5E7EB;
     border-radius: 13px;
     padding: 14px 16px;
-    margin-bottom: 1.75rem;
+    margin-bottom: 2rem;
   }
   .fx-diag-head { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
   .fx-diag-head strong { color: #1B3A5B; font-size: 14px; }
@@ -210,9 +282,10 @@ const ranking = [
 
   .fx-sech { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
   .fx-sech::before { content: ''; width: 4px; height: 20px; background: #1B3A5B; border-radius: 2px; }
-  .fx-sech h2 { font-size: 18px; color: #1B3A5B; margin: 0; }
+  .fx-sech h2 { font-size: 19px; color: #1B3A5B; margin: 0; }
   .fx-updated { font-size: 11px; color: #9ca3af; margin-left: auto; }
-  .fx-sub { font-size: 11px; color: #9ca3af; margin: 2px 0 14px; }
+  .fx-sub { font-size: 12px; color: #6b7280; margin: 4px 0 16px; }
+  .fx-sub a { color: #1B3A5B; }
 
   .fx-rank-grid {
     display: grid;
@@ -220,15 +293,70 @@ const ranking = [
     gap: 12px;
     margin-top: 14px;
   }
-  .fx-rank-sec { margin-bottom: 2rem; }
+  .fx-rank-sec { margin-bottom: 2.5rem; }
 
-  .fx-table-sec { margin-bottom: 2rem; }
+  .fx-table-sec { margin-bottom: 2.5rem; }
   .fx-table-wrap { overflow-x: auto; margin-top: 10px; }
   .fx-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .fx-table th, .fx-table td { border-bottom: 1px solid #E5E7EB; padding: 9px 8px; text-align: center; }
+  .fx-table th, .fx-table td { border-bottom: 1px solid #E5E7EB; padding: 10px 8px; text-align: center; }
   .fx-table th { background: #F7F8FA; color: #1B3A5B; font-weight: 700; font-size: 12px; }
+  .fx-table tbody tr:nth-child(even) { background: #F7F8FA; }
   .fx-table td:first-child, .fx-table th:first-child { text-align: left; color: #1B3A5B; font-weight: 500; }
-  .fx-note { font-size: 11px; color: #9ca3af; margin: 6px 0 0; line-height: 1.7; }
+  .fx-table td b { color: #1B3A5B; }
+  .fx-score-cell {
+    display: inline-grid;
+    place-items: center;
+    min-width: 30px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: #1B3A5B;
+    color: #fff !important;
+    font-size: 13px;
+  }
+  .fx-note { font-size: 11px; color: #9ca3af; margin: 8px 0 0; line-height: 1.7; }
+
+  .fx-howto-sec { margin-bottom: 2.5rem; }
+  .fx-howto-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .fx-howto-card {
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .fx-howto-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #1B3A5B;
+    border: 1px solid #E5E7EB;
+    border-left: 3px solid #1B3A5B;
+    padding: 3px 9px;
+    margin-bottom: 8px;
+  }
+  .fx-howto-card strong { display: block; font-size: 14px; color: #1B3A5B; margin-bottom: 6px; }
+  .fx-howto-card p { font-size: 12px; color: #6b7280; margin: 0 0 10px; line-height: 1.7; }
+  .fx-howto-pick { font-size: 12px; font-weight: 700; color: #412402; background: #fff; border: 1px solid #E0A458; border-radius: 6px; padding: 4px 8px; display: inline-block; }
+
+  .fx-criteria-sec { margin-bottom: 2.5rem; }
+  .fx-criteria-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .fx-criteria-box {
+    border: 1px solid #E5E7EB;
+    border-left: 3px solid #1B3A5B;
+    padding: 12px 16px;
+    background: #fff;
+  }
+  .fx-criteria-box strong { display: block; font-size: 13px; color: #1B3A5B; margin-bottom: 8px; }
+  .fx-criteria-box ul { margin: 0; padding-left: 18px; }
+  .fx-criteria-box li { font-size: 12px; color: #374151; line-height: 1.9; }
+  .fx-criteria-box b { color: #1B3A5B; }
 
   .fx-editor {
     display: flex;
@@ -251,5 +379,7 @@ const ranking = [
     .fx-hero { grid-template-columns: 1fr; }
     .fx-hero-art { max-width: 280px; }
     .fx-rank-grid { grid-template-columns: 1fr; }
+    .fx-howto-grid { grid-template-columns: 1fr; }
+    .fx-criteria-grid { grid-template-columns: 1fr; }
   }
 </style>
