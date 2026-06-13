@@ -1,0 +1,255 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import RankingCard from '../../components/RankingCard.astro';
+
+const updated = '2026年6月13日';
+
+const ranking = [
+  {
+    rank: 1,
+    name: 'JFX',
+    initial: 'J',
+    catch: '約定力No.1・スキャルピング歓迎',
+    rating: 4.9,
+    bars: [
+      { label: 'コスト', pct: 88 },
+      { label: '約定力', pct: 98 },
+      { label: '初心者', pct: 80 },
+    ],
+    specs: [
+      { v: '0.2銭', k: '米ドル/円' },
+      { v: '1,000', k: '最小通貨' },
+      { v: '5万円', k: 'CB上限' },
+    ],
+    href: '/go/jfx/',
+    reviewHref: '/blog/jfx-review/',
+    featured: true,
+    trackLabel: 'jfx',
+  },
+  {
+    rank: 2,
+    name: 'FXTF',
+    initial: 'F',
+    catch: 'MT4・自動売買が使える',
+    rating: 4.6,
+    bars: [
+      { label: '自動売買', pct: 92 },
+      { label: 'コスト', pct: 84 },
+    ],
+    href: '/go/fxtf/',
+    reviewHref: '/blog/fxtf-review/',
+    trackLabel: 'fxtf',
+  },
+  {
+    rank: 3,
+    name: 'セントラル短資FX',
+    initial: 'セ',
+    catch: '老舗の信頼性・スワップに強い',
+    rating: 4.5,
+    bars: [
+      { label: '信頼性', pct: 95 },
+      { label: 'スワップ', pct: 86 },
+    ],
+    href: '/blog/central-tanshi-fx-review/',
+    reviewHref: '/blog/central-tanshi-fx-review/',
+    trackLabel: 'central-tanshi',
+  },
+];
+---
+
+<BaseLayout
+  title="国内FX口座比較ランキング【2026年最新】"
+  description="国内FX口座をコスト・約定力・初心者向けやすさで毎週比較。JFX・FXTF・セントラル短資FXを編集部が正直に評価し、今いちばんお得に始められる一社を最速で見つけます。"
+  wide={true}
+>
+  <section class="fx-hero">
+    <div class="fx-hero-text">
+      <span class="fx-hero-badge">2026年上半期 編集部総合ランキング</span>
+      <h1>資産は、一段ずつ。<br />国内FXの“今いちばんお得”を最速で。</h1>
+      <p class="fx-hero-lead">キャンペーン・コスト・使いやすさを毎週更新。あなたが損しない一社を、編集部が選びます。</p>
+      <div class="fx-hero-trust">
+        <span><span class="fx-stars">★★★★★</span> <b>4.8</b> <span class="fx-muted">(312件)</span></span>
+        <span>15社を比較</span>
+      </div>
+      <a href="#ranking" class="fx-hero-cta">無料で比較して始める →</a>
+    </div>
+    <svg class="fx-hero-art" viewBox="0 0 230 165" role="img" aria-label="積み上がるブロックと上昇チャート">
+      <rect x="0" y="0" width="230" height="165" rx="12" fill="#F7F8FA"></rect>
+      <rect x="26" y="120" width="40" height="28" rx="3" fill="#1B3A5B"></rect>
+      <rect x="74" y="98" width="40" height="50" rx="3" fill="#1B3A5B"></rect>
+      <rect x="122" y="72" width="40" height="76" rx="3" fill="#1B3A5B"></rect>
+      <rect x="170" y="44" width="40" height="104" rx="3" fill="#274C73"></rect>
+      <polyline points="30,118 88,96 138,70 196,42" fill="none" stroke="#E0A458" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <circle cx="196" cy="42" r="11" fill="#E0A458"></circle>
+      <text x="196" y="46" text-anchor="middle" font-size="11" font-weight="700" fill="#412402">¥</text>
+    </svg>
+  </section>
+
+  <div class="fx-ticker">
+    <strong>今週のキャンペーン速報</strong>　JFX 最大<b>5万円</b>キャッシュバック中／FXTF 口座開設で<b>最大3万円</b>
+  </div>
+
+  <section class="fx-diag" aria-label="30秒診断">
+    <div class="fx-diag-head"><strong>30秒診断</strong><span>何を重視しますか？</span></div>
+    <div class="fx-diag-chips">
+      <a href="#ranking" class="fx-chip">コストの安さ</a>
+      <a href="#ranking" class="fx-chip">約定力・スキャル</a>
+      <a href="#ranking" class="fx-chip">自動売買</a>
+      <a href="#ranking" class="fx-chip">初心者向け</a>
+    </div>
+  </section>
+
+  <section id="ranking" class="fx-rank-sec">
+    <div class="fx-sech"><h2>編集部総合ランキング</h2><span class="fx-updated">{updated} 更新</span></div>
+    <p class="fx-sub">約定力・コスト・初心者向けやすさを5段階で独自評価</p>
+
+    <RankingCard {...ranking[0]} />
+    <div class="fx-rank-grid">
+      <RankingCard {...ranking[1]} />
+      <RankingCard {...ranking[2]} />
+    </div>
+  </section>
+
+  <section class="fx-table-sec">
+    <div class="fx-sech"><h2>スペック比較表</h2></div>
+    <div class="fx-table-wrap">
+      <table class="fx-table">
+        <thead>
+          <tr><th>会社</th><th>米ドル/円</th><th>最小通貨</th><th>キャンペーン</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>JFX</td><td>0.2銭</td><td>1,000</td><td>最大5万円</td></tr>
+          <tr><td>FXTF</td><td>0.2銭</td><td>1,000</td><td>最大3万円</td></tr>
+          <tr><td>セントラル短資FX</td><td>0.2銭</td><td>1,000</td><td>条件あり</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fx-note">※スプレッドは原則固定（例外あり）。キャンペーン金額・条件は変動します。申込前に必ず各社公式の最新情報をご確認ください。</p>
+  </section>
+
+  <footer class="fx-editor">
+    <span class="fx-editor-avatar">編</span>
+    <div>
+      <strong>tsumiba編集部</strong>
+      <p>国内FXのコスト・約定力を毎週検証しています。FXは元本保証のない投機的取引で、損失が生じる可能性があります。投資判断はご自身の責任で行ってください。</p>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  .fx-hero {
+    display: grid;
+    grid-template-columns: 1.45fr 1fr;
+    gap: 20px;
+    align-items: center;
+    margin: 1rem 0 1.5rem;
+  }
+  .fx-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid #E5E7EB;
+    border-left: 3px solid #E0A458;
+    padding: 5px 11px;
+    font-size: 12px;
+    color: #1B3A5B;
+    font-weight: 700;
+  }
+  .fx-hero h1 {
+    font-size: 26px;
+    line-height: 1.4;
+    color: #1B3A5B;
+    margin: 12px 0 8px;
+  }
+  .fx-hero-lead { color: #6b7280; font-size: 14px; margin: 0 0 14px; }
+  .fx-hero-trust { display: flex; gap: 18px; font-size: 12px; color: #6b7280; margin-bottom: 14px; }
+  .fx-hero-trust b { color: #1B3A5B; }
+  .fx-stars { color: #E0A458; letter-spacing: -1px; }
+  .fx-muted { color: #9ca3af; }
+  .fx-hero-cta {
+    display: inline-block;
+    background: #E0A458;
+    color: #412402;
+    font-weight: 700;
+    padding: 11px 22px;
+    border-radius: 9px;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  .fx-hero-art { width: 100%; height: auto; }
+
+  .fx-ticker {
+    border: 1px solid #E5E7EB;
+    border-left: 3px solid #E0A458;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #1F2937;
+    margin-bottom: 1.5rem;
+  }
+  .fx-ticker strong, .fx-ticker b { color: #1B3A5B; }
+
+  .fx-diag {
+    border: 1px solid #E5E7EB;
+    border-radius: 13px;
+    padding: 14px 16px;
+    margin-bottom: 1.75rem;
+  }
+  .fx-diag-head { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+  .fx-diag-head strong { color: #1B3A5B; font-size: 14px; }
+  .fx-diag-head span { font-size: 11px; color: #9ca3af; }
+  .fx-diag-chips { display: flex; gap: 9px; flex-wrap: wrap; }
+  .fx-chip {
+    border: 1px solid #E5E7EB;
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-size: 12px;
+    color: #1B3A5B;
+    text-decoration: none;
+  }
+  .fx-chip:hover { border-color: #1B3A5B; }
+
+  .fx-sech { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
+  .fx-sech::before { content: ''; width: 4px; height: 20px; background: #1B3A5B; border-radius: 2px; }
+  .fx-sech h2 { font-size: 18px; color: #1B3A5B; margin: 0; }
+  .fx-updated { font-size: 11px; color: #9ca3af; margin-left: auto; }
+  .fx-sub { font-size: 11px; color: #9ca3af; margin: 2px 0 14px; }
+
+  .fx-rank-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .fx-rank-sec { margin-bottom: 2rem; }
+
+  .fx-table-sec { margin-bottom: 2rem; }
+  .fx-table-wrap { overflow-x: auto; margin-top: 10px; }
+  .fx-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .fx-table th, .fx-table td { border-bottom: 1px solid #E5E7EB; padding: 9px 8px; text-align: center; }
+  .fx-table th { background: #F7F8FA; color: #1B3A5B; font-weight: 700; font-size: 12px; }
+  .fx-table td:first-child, .fx-table th:first-child { text-align: left; color: #1B3A5B; font-weight: 500; }
+  .fx-note { font-size: 11px; color: #9ca3af; margin: 6px 0 0; line-height: 1.7; }
+
+  .fx-editor {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    border-top: 1px solid #E5E7EB;
+    padding-top: 16px;
+  }
+  .fx-editor-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #1B3A5B; color: #fff;
+    display: grid; place-items: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .fx-editor strong { font-size: 13px; color: #1B3A5B; }
+  .fx-editor p { font-size: 12px; color: #6b7280; margin: 3px 0 0; line-height: 1.7; }
+
+  @media (max-width: 720px) {
+    .fx-hero { grid-template-columns: 1fr; }
+    .fx-hero-art { max-width: 280px; }
+    .fx-rank-grid { grid-template-columns: 1fr; }
+  }
+</style>
