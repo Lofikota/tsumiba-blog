@@ -1,0 +1,41 @@
+backend:
+  name: github
+  repo: Lofikota/ren-blog-
+  branch: main
+  base_url: https://sveltia-cms-auth.yoshikou888.workers.dev
+
+publish_mode: editorial_workflow
+media_folder: public/images/articles
+public_folder: /images/articles
+locale: ja
+
+collections:
+  - name: blog
+    label: 記事
+    label_singular: 記事
+    folder: src/content/blog
+    create: true
+    extension: mdx
+    format: frontmatter
+    slug: '{{slug}}'
+    preview_path: blog/{{slug}}
+    fields:
+      - { name: title, label: タイトル, widget: string }
+      - { name: description, label: ディスクリプション, widget: text }
+      - { name: pubDate, label: 公開日, widget: datetime, date_format: 'YYYY-MM-DD', time_format: false }
+      - { name: updatedDate, label: 更新日, widget: datetime, date_format: 'YYYY-MM-DD', time_format: false, required: false }
+      - name: category
+        label: カテゴリ
+        widget: select
+        options: ['口座比較', 'キャンペーン速報', 'スワップ', '自動売買', '税金・確定申告', '初心者ガイド']
+      - { name: tags, label: タグ, widget: list, required: false }
+      - { name: heroImage, label: サムネイル, widget: image, required: false }
+      - name: articleType
+        label: 記事タイプ
+        widget: select
+        required: false
+        options: ['review', 'guide', 'comparison', 'news']
+      - { name: rating, label: 評価（1-5）, widget: number, required: false, value_type: float, min: 1, max: 5 }
+      - { name: affiliate, label: アフィリエイト記事, widget: boolean, default: true }
+      - { name: draft, label: 下書き, widget: boolean, default: true }
+      - { name: body, label: 本文, widget: markdown }
