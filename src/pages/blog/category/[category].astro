@@ -75,7 +75,7 @@ const cc = catColors[categoryName] ?? { bg: '#E5E7EB', text: '#374151' };
           onmouseout="this.style.boxShadow='none';this.style.transform='translateY(0)'"
         >
           <img
-            src={post.data.heroImage ?? `/thumbnails/${post.id}.svg`}
+            src={`/thumb/${post.id}.svg`}
             alt=""
             aria-hidden="true"
             width="96"

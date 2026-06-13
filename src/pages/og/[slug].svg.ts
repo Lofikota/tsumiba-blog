@@ -68,7 +68,7 @@ export const GET: APIRoute = ({ props }) => {
     <rect x="24" y="0"  width="8"  height="30" rx="1" fill="rgba(255,255,255,0.6)"/>
     <path d="M3 12 L15 6 L27 2 L44 -4" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round" fill="none"/>
   </g>
-  <text x="200" y="513" font-family="sans-serif" font-size="18" fill="rgba(255,255,255,0.5)">会社員目線でFX口座を比較する32歳のリアル</text>
+  <text x="200" y="513" font-family="sans-serif" font-size="18" fill="rgba(255,255,255,0.5)">国内FXのコスト・約定力を毎週検証する編集部</text>
 </svg>`;
 
   return new Response(svg, {

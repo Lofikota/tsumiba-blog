@@ -26,7 +26,7 @@ const catColors: Record<string, { bg: string; text: string }> = {
     {posts.map(post => {
       const cat = catColors[post.data.category] ?? { bg: '#E5E7EB', text: '#374151' };
       const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
-      const ogSrc = `/thumbnails/${post.id}.svg`;
+      const ogSrc = `/thumb/${post.id}.svg`;
       return (
         <a
           href={`/blog/${post.id}/`}
@@ -35,7 +35,7 @@ const catColors: Record<string, { bg: string; text: string }> = {
           onmouseout="this.style.boxShadow='none';this.style.transform='translateY(0)'"
         >
           <img
-            src={post.data.heroImage ?? ogSrc}
+            src={ogSrc}
             alt=""
             aria-hidden="true"
             width="96"
