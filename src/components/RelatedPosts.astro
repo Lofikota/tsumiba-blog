@@ -44,7 +44,7 @@ const cc = catColors[category] ?? { bg: '#E5E7EB', text: '#374151' };
         return (
           <a href={`/blog/${post.id}/`} class="related-card">
             <div class="related-thumb" style={`background:${cc.bg}`}>
-              <img src={`/thumb/${post.id}.svg`} alt={post.data.title} width="240" height="135" loading="lazy" />
+              <img src={post.data.heroImage ?? `/thumb/${post.id}.svg`} alt={post.data.title} width="240" height="135" loading="lazy" />
             </div>
             <div class="related-body">
               <span class="related-cat" style={`background:${cc.bg};color:${cc.text}`}>{category}</span>
