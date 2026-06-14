@@ -409,9 +409,11 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "MACD・RSI・ボリンジャーバンドなど主要テクニカル指標の使い方を初心者向けに解説。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "published",
     "priority": 18,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-06-14T07:12:48.943Z",
+    "note_publish": "draft:true でCMS下書きへ。人間レビュー後に公開判定。"
   },
   {
     "slug": "fx-auto-trade-shoshinsha",
