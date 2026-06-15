@@ -73,5 +73,20 @@
       "ctr": 0,
       "position": 0
     }
+  },
+  {
+    "weekKey": "2026-W25",
+    "date": "2026-06-15",
+    "weekRange": "6/15〜6/21",
+    "xFollowers": 14,
+    "tweetCount": 111,
+    "xUsername": "tedori_asset",
+    "lineFollowers": null,
+    "gsc": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "position": 0
+    }
   }
 ]
