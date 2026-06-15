@@ -320,9 +320,11 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "デモ口座の活用法・実口座との違い・練習期間の目安を初心者向けに解説。口座開設CTAへ誘導。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "published",
     "priority": 9,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-06-15T00:00:00.000Z",
+    "_note": "committed locally 16ac61f; push pending（sandboxにgit認証情報なし）。要・手動pushまたはGitHub Actions側で確認"
   },
   {
     "slug": "fx-swap-hikaku",
