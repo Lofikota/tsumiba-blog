@@ -20,6 +20,8 @@ const ALLOWED_STATUSES = new Set([
   'quality_failed',
   'draft',
   'needs_review',
+  'done',
+  'suspended', // FX単軸ピボット(2026-05-31)で撤退ジャンルを保留にした状態
 ]);
 
 function setOutput(key, value) {
