@@ -132,6 +132,24 @@ function checkHandoff() {
   else infos.push(`handoff.md 最終更新: ${age} 日前`);
 }
 
+// ── 6. 記憶構造の腐敗（保存≠想起。2026-07-02 構造監査で発見した2パターン）──
+function checkStructure() {
+  const handoffPath = path.join(AFFILIATE_ROOT, 'AI運用/handoff.md');
+  if (fs.existsSync(handoffPath)) {
+    const kb = Math.round(fs.statSync(handoffPath).size / 1024);
+    if (kb > 50) warnings.push(`handoff.md が ${kb}KB。50KB超は実質読めず形骸化する → 古いエントリを AI運用/archive/ へ退避（7/2に236KB放置が発生した事故と同型）。`);
+    else infos.push(`handoff.md サイズ: ${kb}KB`);
+  }
+  const queuePath = path.join(AFFILIATE_ROOT, 'AI運用/Codex委譲キュー.md');
+  if (fs.existsSync(queuePath)) {
+    const body = fs.readFileSync(queuePath, 'utf-8').replace(/```[\s\S]*?```/g, ''); // テンプレ例文（コードフェンス内）は数えない
+    const open = body.match(/^- (状態|ステータス): 未着手/gm)?.length ?? 0;
+    const age = daysAgo(fs.statSync(queuePath).mtime);
+    if (open > 0 && age >= 14) warnings.push(`Codex委譲キューに未着手 ${open} 件が ${age} 日放置。撤退済み戦略のタスクが混ざる前に棚卸しを（7/2に保険タスク47日放置が発生）。`);
+    else infos.push(`Codex委譲キュー: 未着手 ${open} 件 / 最終更新 ${age} 日前`);
+  }
+}
+
 // ── 実行 ────────────────────────────────────────────────────────
 console.log('🩺 ops-doctor — 事業システム健康診断\n');
 checkGit();
@@ -139,6 +157,7 @@ await checkActions();
 checkQueue();
 checkDrafts();
 checkHandoff();
+checkStructure();
 
 if (critical.length) {
   console.log('🚨 要対応（今日中に潰す）');
