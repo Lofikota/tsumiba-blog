@@ -332,9 +332,10 @@
     "type": "comparison",
     "category": "FX・外貨",
     "notes": "南アランド・トルコリラ・メキシコペソなど高金利通貨のスワップポイントを比較。リスクも正直に記載。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+田中蓮実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
-    "status": "pending",
+    "status": "published",
     "priority": 10,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-02"
   },
   {
     "slug": "fx-chart-yomikata",
