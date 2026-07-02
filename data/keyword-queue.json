@@ -974,5 +974,25 @@
     "priority": 10,
     "channel": "seo_x_organic",
     "suspendedReason": "低単価カテゴリ除外（戦略転換2026-05-22: FX/保険特化）"
+  },
+  {
+    "slug": "fx-kouza-campaign-hikaku",
+    "keyword": "FX口座開設 キャンペーン 比較 最新",
+    "type": "収益記事",
+    "category": "FX・外貨",
+    "priority": 1,
+    "status": "pending",
+    "channel": "seo_x_organic",
+    "notes": "【CV直結・鮮度勝負】国内FX口座開設キャンペーンの最新比較まとめ。稼働リンクのあるJFX・セントラル短資FXを比較上位に置き、各社の公式キャンペーン（キャッシュバック条件・期限・達成条件）を一次情報で正確に。達成条件の落とし穴（取引量条件等）を正直に書くのが差別化。月1更新前提の常設ページ設計。CTAはJFX主導線。リスク表記必須。"
+  },
+  {
+    "slug": "jfx-kouza-kaisetsu-tejun",
+    "keyword": "JFX 口座開設 やり方 最短 必要書類",
+    "type": "収益記事",
+    "category": "FX・外貨",
+    "priority": 2,
+    "status": "pending",
+    "channel": "seo_x_organic",
+    "notes": "【CV直前KW】JFX MATRIX TRADERの口座開設手順を画面の流れ・必要書類・最短日数・審査のつまずきポイントまで具体的に。既存jfx-reviewから内部リンクで受ける口座開設直前ユーザー向け。CTAはJFX（afi-b稼働リンク）。キャンペーン達成条件（新規30万通貨取引）も正直に記載。リスク表記必須。"
   }
 ]
