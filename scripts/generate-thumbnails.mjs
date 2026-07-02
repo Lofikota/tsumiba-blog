@@ -86,7 +86,7 @@ function makeOgImage(title, style) {
   <text x="60" y="${titleY1}" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="64" fill="#FFFFFF">${line1}</text>
   ${line2 ? `<text x="60" y="${titleY2}" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="64" fill="#FFFFFF">${line2}</text>` : ''}
   <!-- フッター -->
-  <text x="60" y="580" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="500" font-size="28" fill="rgba(255,255,255,0.65)">田中蓮のマネーブログ | ren-money.com</text>
+  <text x="60" y="580" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="500" font-size="28" fill="rgba(255,255,255,0.65)">編集部のマネーブログ | ren-money.com</text>
 </svg>`;
 }
 

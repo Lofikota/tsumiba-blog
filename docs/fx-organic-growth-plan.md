@@ -61,7 +61,7 @@ FX投稿は売り込みではなく、不安解消と経験談から入る。
 | 曜日 | 投稿テーマ | 主導線 |
 |---|---|---|
 | 月 | FX初心者の誤解・やめとけ論 | `fx-shoshinsha-guide` |
-| 水 | 田中蓮の少額体験・失敗談 | `fx-kouza-hikaku` |
+| 水 | 編集部の少額体験・失敗談 | `fx-kouza-hikaku` |
 | 金 | 口座比較・条件整理 | `dmm-fx-review` / `jfx-review` / `fxtf-review` |
 | 土 | 税金・会社員の注意点 | `fx-kakuteishinkoku-guide` |
 

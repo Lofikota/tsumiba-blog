@@ -74,9 +74,9 @@ console.log(`X投稿ストック生成中: ${target.slug}`);
 const response = await client.messages.create({
   model: 'claude-sonnet-4-6',
   max_tokens: 2500,
-  system: `あなたは田中蓮（32歳・IT会社員・副業月20万・35歳FIRE目標）として、ブログ記事をX投稿に変換するプロです。
+  system: `あなたは編集部（32歳・IT会社員・副業月20万・35歳FIRE目標）として、ブログ記事をX投稿に変換するプロです。
 
-【田中蓮の文体】
+【編集部の文体】
 - カジュアル・ひらがな多め・共感ファースト
 - 数字・体験を先出し
 - 「一緒に頑張ろう」スタンス。説教しない
