@@ -38,7 +38,8 @@
     "go": "op run --env-file .env.1password -- node scripts/run-local.mjs",
     "go:dry": "op run --env-file .env.1password -- node scripts/run-local.mjs --dry-run",
     "go:no-push": "op run --env-file .env.1password -- node scripts/run-local.mjs --no-push",
-    "go:add": "op run --env-file .env.1password -- node scripts/add-to-queue.mjs"
+    "go:add": "op run --env-file .env.1password -- node scripts/add-to-queue.mjs",
+    "doctor": "node scripts/ops-doctor.mjs"
   },
   "license": "ISC",
   "dependencies": {
