@@ -36,7 +36,7 @@ jobs:
         id: queue-check
         run: npm run queue:check
 
-      - name: 記事生成・直接公開
+      - name: 記事生成（draft:true＝CMS下書き・人間レビュー後に公開）
         id: article
         if: steps.queue-check.outputs.has_pending == 'true'
         env:

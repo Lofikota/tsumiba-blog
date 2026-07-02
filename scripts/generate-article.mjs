@@ -216,7 +216,14 @@ if (!qcResult.ok) {
 
 const savePath = draftMode ? draftPath : articlePath;
 fs.mkdirSync(path.dirname(savePath), { recursive: true });
-fs.writeFileSync(savePath, generatedContent, 'utf-8');
+// YMYL/FX記事は必ずCMS下書き（draft:true）で保存し、人間レビュー後にCMSで公開する
+// （feedback_cms_draft_workflow 2026-06-13 準拠。LLM出力に依存せずコード側で強制）
+let outputContent = generatedContent;
+const fmMatch = outputContent.match(/^---\n([\s\S]*?)\n---/);
+if (fmMatch && !/^draft:/m.test(fmMatch[1])) {
+  outputContent = outputContent.replace(/^---\n([\s\S]*?)\n---/, `---\n$1\ndraft: true\n---`);
+}
+fs.writeFileSync(savePath, outputContent, 'utf-8');
 
 const reportPath = path.join(runReportDir, `${today}-${pending.slug}-daily-article.md`);
 writeRunReport({ pending, qcResult, reportPath, status: draftMode ? 'draft' : 'published' });
