@@ -60,7 +60,7 @@ jobs:
             | sed 's|src/content/blog/||; s|\.mdx$||' \
             | tr '\n' ' ' \
             | xargs)
-          echo "list=$SLUGS" >> $GITHUB_OUTPUT
+          echo "list=$SLUGS" >> "$GITHUB_OUTPUT"
           echo "変更スラッグ: $SLUGS"
 
       - name: 画像生成（push — slug単位）
@@ -95,16 +95,16 @@ jobs:
           INPUT_OVERWRITE: ${{ inputs.overwrite }}
           INPUT_LIMIT: ${{ inputs.limit }}
         run: |
-          ARGS="--all --all-categories"
+          ARGS=(--all --all-categories)
           if [ -n "$INPUT_SLUG" ]; then
-            ARGS="--slug $INPUT_SLUG"
+            ARGS=(--slug "$INPUT_SLUG")
           fi
           if [ "$INPUT_OVERWRITE" = "true" ]; then
-            ARGS="$ARGS --overwrite"
+            ARGS+=(--overwrite)
           fi
-          ARGS="$ARGS --limit $INPUT_LIMIT"
-          echo "実行コマンド: node scripts/generate-article-images.mjs $ARGS"
-          node scripts/generate-article-images.mjs $ARGS
+          ARGS+=(--limit "$INPUT_LIMIT")
+          echo "実行コマンド: node scripts/generate-article-images.mjs ${ARGS[*]}"
+          node scripts/generate-article-images.mjs "${ARGS[@]}"
 
       # ── 共通：生成結果をコミット・プッシュ ─────────────
       - name: 生成した画像とheroImage更新をコミット・プッシュ
