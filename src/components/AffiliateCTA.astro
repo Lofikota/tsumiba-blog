@@ -14,10 +14,9 @@ interface Props {
 }
 
 const { href, product, text = '公式サイトで確認する', label = 'PR', color = 'blue', note, badge, compact = false, external = true } = Astro.props;
-const isStoppedDmmFx = product === 'dmm-fx';
-const ctaHref = isStoppedDmmFx ? getAffiliatePath('jfx') : product ? getAffiliatePath(product) : href ?? '#';
-const ctaText = isStoppedDmmFx ? 'JFXの公式条件を確認する（DMM FXはリンク確認中）' : text;
-const ctaLabel = isStoppedDmmFx ? 'dmm-fx:reroute-jfx' : product ?? href ?? text;
+const ctaHref = product ? getAffiliatePath(product) : href ?? '#';
+const ctaText = text;
+const ctaLabel = product ?? href ?? text;
 
 // CTAボタンは tsumiba の琥珀(#E0A458)に統一（color指定は受け取るが琥珀に正規化）
 const colorMap: Record<string, string> = {
@@ -40,7 +39,7 @@ const bg = colorMap[color] ?? colorMap.blue;
     <span class="acta-arrow">→</span>
     {ctaText}
   </a>
-  <p class={`acta-sub${compact ? ' acta-sub-compact' : ''}`}><span class={`acta-pr${compact ? ' acta-pr-compact' : ''}`}>{label}</span> {isStoppedDmmFx ? '確認済みの公式サイトへ移動します' : '公式サイトへ移動します'}</p>
+  <p class={`acta-sub${compact ? ' acta-sub-compact' : ''}`}><span class={`acta-pr${compact ? ' acta-pr-compact' : ''}`}>{label}</span> 公式サイトへ移動します</p>
 </div>
 
 <style>

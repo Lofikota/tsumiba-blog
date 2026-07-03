@@ -5,8 +5,8 @@ interface Props {
 }
 
 const {
-  heading = 'まず2口座を比較する',
-  lead = 'FX口座はJFXとFXTFを優先して確認してください。JFXは取引機能・MT4重視、FXTFはコスト・商品幅重視と特性が異なります。',
+  heading = 'まず3口座を比較する',
+  lead = 'FX口座はDMM FX・JFX・FXTFを優先して確認してください。DMM FXは総合力とキャンペーン、JFXは取引機能・MT4重視、FXTFはコスト・商品幅重視と特性が異なります。',
 } = Astro.props;
 ---
 
@@ -14,14 +14,19 @@ const {
   <p class="fx-priority-kicker">PR</p>
   <h2>{heading}</h2>
   <p class="fx-priority-lead">{lead}</p>
-  <div class="fx-priority-grid fx-priority-grid-2">
-    <a href="/go/jfx/" class="fx-priority-card fx-priority-main" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-jfx">
+  <div class="fx-priority-grid">
+    <a href="/go/dmm-fx/" class="fx-priority-card fx-priority-main" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-dmm-fx">
       <span class="fx-priority-rank">1</span>
+      <strong>DMM FX</strong>
+      <small>FX取引高4年連続世界第1位（ファイナンス・マグネイト社調べ 2022〜2025年）。新規口座開設キャンペーン実施中（条件は公式サイトで要確認）。</small>
+    </a>
+    <a href="/go/jfx/" class="fx-priority-card" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-jfx">
+      <span class="fx-priority-rank">2</span>
       <strong>JFX</strong>
       <small>オリコン顧客満足度FX総合1位。MT4対応・約定力重視の短期売買に強い。</small>
     </a>
     <a href="/go/fxtf/" class="fx-priority-card" data-google-event="affiliate_click" data-google-category="affiliate" data-google-label="fx-priority-fxtf">
-      <span class="fx-priority-rank">2</span>
+      <span class="fx-priority-rank">3</span>
       <strong>FXTF</strong>
       <small>ゼロスプ・CFD・ノックアウトオプションまで扱える。コストと商品幅を細かく見たい人向け。</small>
     </a>
