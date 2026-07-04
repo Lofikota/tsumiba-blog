@@ -14,7 +14,9 @@ const blog = defineCollection({
     draft: z.boolean().default(false),
     affiliate: z.boolean().default(true),
     articleType: z.enum(['review', 'guide', 'comparison', 'news']).optional(),
-    rating: z.number().min(1).max(5).optional(),
+    // CMS(Sveltia)が未入力時に rating: null を書き込むため、nullはundefined扱いにする
+    // （2026-06-15/07-04に計5記事で null がスキーマ違反となりビルド全体が停止した再発防止）
+    rating: z.preprocess((v) => (v === null ? undefined : v), z.number().min(1).max(5).optional()),
   }),
 });
 
