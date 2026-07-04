@@ -24,7 +24,7 @@ export async function getStaticPaths() {
 
 const { draft } = Astro.props as { draft: DraftEntry };
 const pageDir = dirname(fileURLToPath(import.meta.url));
-const root = resolve(pageDir, '../../../..');
+const root = resolve(pageDir, '../../..');
 const content = await readFile(join(root, draft.draftPath), 'utf-8');
 ---
 
