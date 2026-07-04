@@ -1,0 +1,309 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// リベ大型ロードマップ（正本: AI運用/戦略/ブログ視認性デザイン基準_リベ大型.md 原則1・3）
+// 全記事がこのハブに紐づく。ステップ順序 = 学習順序 = 内部リンク動線。
+const steps = [
+  {
+    num: 1,
+    title: 'FXの仕組みを知る',
+    lead: '通貨を交換して差益を狙う仕組みと、専門用語の最低限だけを先に押さえます。ここを飛ばすと口座選びで迷子になります。',
+    links: [{ href: '/blog/fx-shoshinsha-guide/', text: 'FX初心者ガイドを読む' }],
+  },
+  {
+    num: 2,
+    title: 'リスクを先に知る',
+    lead: 'レバレッジの仕組みと「いくらまで損しうるか」を先に確認します。向いていない人がやめておく判断も、この段階で正しくできます。',
+    links: [
+      { href: '/blog/fx-leverage-risk-guide/', text: 'レバレッジとリスクを確認する' },
+      { href: '/blog/fx-yametoke-reason/', text: '「FXやめとけ」と言われる理由を見る' },
+    ],
+  },
+  {
+    num: 3,
+    title: '口座を選ぶ',
+    lead: 'スプレッド・取引単位・ツールを表で比較して、自分の取引スタイルに合う口座を1つ決めます。ここが一番差がつくステップです。',
+    links: [{ href: '/blog/fx-kouza-hikaku/', text: 'FX口座比較を見る' }],
+    cta: { href: '/blog/fx-kouza-hikaku/', text: '比較表で口座を選ぶ' },
+  },
+  {
+    num: 4,
+    title: '口座を開設する',
+    lead: '本人確認書類を用意すれば申し込み自体は10分程度です。つまずきやすい入力項目を手順記事で確認しながら進めます。',
+    links: [{ href: '/blog/fx-kouza-kaishi-tejun/', text: '口座開設の手順を確認する' }],
+  },
+  {
+    num: 5,
+    title: '少額で始める',
+    lead: 'いきなり大きく張らず、1,000通貨（数千円〜）の少額取引で発注と決済の流れに慣れます。デモ口座での練習も選択肢です。',
+    links: [
+      { href: '/blog/fx-small-start-guide/', text: '少額スタートの方法を見る' },
+      { href: '/blog/fx-demo-tsukaikata/', text: 'デモ口座の使い方を見る' },
+    ],
+  },
+  {
+    num: 6,
+    title: 'チャートと相場を学ぶ',
+    lead: 'ローソク足の読み方と基本のテクニカル指標を覚えると、値動きのニュースが自分ごとになります。取引時間帯の癖も押さえます。',
+    links: [
+      { href: '/blog/fx-chart-yomikata/', text: 'チャートの読み方を学ぶ' },
+      { href: '/blog/fx-technical-indicator/', text: 'テクニカル指標の基本を見る' },
+    ],
+  },
+  {
+    num: 7,
+    title: '続ける・守る',
+    lead: '利益が出たら税金の申告が必要です。会社員の確定申告と、勤務先に知られたくない場合の注意点まで確認して長く続けます。',
+    links: [
+      { href: '/blog/fx-kakuteishinkoku-guide/', text: 'FXの確定申告ガイドを読む' },
+      { href: '/blog/fx-company-barenai/', text: '会社に知られたくない人の注意点を見る' },
+    ],
+  },
+];
+
+const SITE_URL = 'https://tsumiba.com';
+const breadcrumbJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'ホーム', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'FXを始める7ステップ', item: `${SITE_URL}/start/` },
+  ],
+});
+---
+
+<BaseLayout
+  title="FXを始める7ステップ｜はじめての方へ"
+  description="FXの仕組み・リスク・口座選び・開設・少額スタート・チャート学習・税金まで、会社員がFXを始める手順を7ステップで整理したロードマップです。"
+>
+  <script is:inline type="application/ld+json" set:html={breadcrumbJsonLd} />
+
+  <p class="pr-note">当ページはアフィリエイト広告を含みます。リンク近くにPRを明記しています。</p>
+
+  <header class="roadmap-hero">
+    <p class="eyebrow">はじめての方へ</p>
+    <h1>FXを始める7ステップ</h1>
+    <p class="lead">
+      「何から読めばいいか分からない」を無くすための地図です。
+      上から順に読めば、仕組みの理解から口座開設、税金まで迷わず進めます。
+      すでに進んでいる人は、途中のステップから読んでください。
+    </p>
+    <ol class="step-jump" aria-label="ステップ一覧">
+      {steps.map((s) => (
+        <li><a href={`#step-${s.num}`}><span>{s.num}</span>{s.title}</a></li>
+      ))}
+    </ol>
+  </header>
+
+  <ol class="step-list">
+    {steps.map((s) => (
+      <li class="step-card" id={`step-${s.num}`}>
+        <div class="step-head">
+          <span class="step-num">STEP {s.num}</span>
+          <h2>{s.title}</h2>
+        </div>
+        <p class="step-lead">{s.lead}</p>
+        <ul class="step-links">
+          {s.links.map((l) => (
+            <li><a href={l.href}>{l.text} »</a></li>
+          ))}
+        </ul>
+        {s.cta && (
+          <div class="step-cta-wrap">
+            <span class="step-pr">PR</span>
+            <a class="step-cta" href={s.cta.href}>{s.cta.text}</a>
+          </div>
+        )}
+      </li>
+    ))}
+  </ol>
+
+  <section class="roadmap-next">
+    <h2>7ステップを読み終えたら</h2>
+    <p>
+      口座選びで迷ったら比較表に戻るのが最短です。取引条件は変わるため、申し込み前に各社公式サイトの最新情報を必ず確認してください。
+    </p>
+    <a class="next-cta" href="/blog/fx-kouza-hikaku/">FX口座比較を見る</a>
+  </section>
+
+  <p class="risk-note">
+    FXは元本保証のない金融商品です。レバレッジにより、預け入れた資金を上回る損失が発生する可能性があります。取引はご自身の判断と責任で行ってください。
+  </p>
+</BaseLayout>
+
+<style>
+  .pr-note {
+    margin: 0 0 1rem;
+    color: #9ca3af;
+    font-size: 0.74rem;
+  }
+  .roadmap-hero {
+    padding: 1.5rem 1.5rem 1.25rem;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #1B3A5B;
+    border-radius: 6px;
+    background: #fff;
+  }
+  .eyebrow {
+    margin: 0 0 6px;
+    color: #1B3A5B;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+  .roadmap-hero h1 {
+    margin: 0;
+    color: #1F2937;
+    font-size: clamp(1.7rem, 4vw, 2.3rem);
+    line-height: 1.3;
+  }
+  .lead {
+    margin: 0.85rem 0 0;
+    color: #4b5563;
+    font-size: 0.95rem;
+    line-height: 1.9;
+  }
+  .step-jump {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+    margin: 1.1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .step-jump a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    color: #1F2937;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .step-jump a:hover { border-color: #1B3A5B; text-decoration: none; }
+  .step-jump span {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #1B3A5B;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 900;
+  }
+  .step-list {
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 14px;
+  }
+  .step-card {
+    padding: 1.25rem 1.4rem;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #1B3A5B;
+    border-radius: 6px;
+    background: #fff;
+    scroll-margin-top: 80px;
+  }
+  .step-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .step-num {
+    display: inline-flex;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #F8F9FA;
+    color: #1B3A5B;
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+  }
+  .step-head h2 {
+    margin: 0;
+    color: #1F2937;
+    font-size: 1.2rem;
+    line-height: 1.4;
+  }
+  .step-lead {
+    margin: 0.7rem 0 0;
+    color: #4b5563;
+    font-size: 0.92rem;
+    line-height: 1.85;
+  }
+  .step-links {
+    margin: 0.8rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 6px;
+  }
+  .step-links a {
+    color: #1B3A5B;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .step-links a:hover { text-decoration: underline; }
+  .step-cta-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 1rem;
+  }
+  .step-pr {
+    color: #9ca3af;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .step-cta,
+  .next-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 20px;
+    border-radius: 4px;
+    background: #E0A458;
+    color: #1B3A5B;
+    font-weight: 900;
+    text-decoration: none;
+    box-shadow: 0 10px 20px rgba(180, 120, 40, 0.24);
+  }
+  .step-cta:hover,
+  .next-cta:hover { text-decoration: none; transform: translateY(-2px); }
+  .roadmap-next {
+    margin-top: 1.5rem;
+    padding: 1.25rem 1.4rem;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #E0A458;
+    border-radius: 6px;
+    background: #fff;
+  }
+  .roadmap-next h2 {
+    margin: 0;
+    color: #1F2937;
+    font-size: 1.15rem;
+  }
+  .roadmap-next p {
+    margin: 0.6rem 0 0.9rem;
+    color: #4b5563;
+    font-size: 0.9rem;
+    line-height: 1.85;
+  }
+  .risk-note {
+    margin: 1.25rem 0 0;
+    color: #9ca3af;
+    font-size: 0.76rem;
+    line-height: 1.7;
+  }
+</style>

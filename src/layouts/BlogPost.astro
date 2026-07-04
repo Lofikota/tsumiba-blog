@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import { getLineAddUrl, getLineRef, getLineRefForArticle } from '../data/lineLinks';
 import { getArticleFaqs } from '../data/articleFaqs';
+import { getNextRead } from '../data/nextRead';
 import { CATEGORIES } from '../data/categories';
 import RelatedPosts from '../components/RelatedPosts.astro';
 
@@ -88,6 +89,9 @@ const tocHeadings = headings.filter(h => h.depth === 2);
 
 // モバイル追従CTA（FX記事のみ・控えめ）。サイト優先順位#1のFXTFへ送客（FxPriorityCTAと整合）。
 const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無料で比較', label: 'sticky-fxtf' } : null;
+
+// 「次に読む」1本指定（リベ大型 原則7）。7ステップの学習順序に沿って次の一歩へ送る。
+const nextRead = getNextRead(slug);
 ---
 
 <BaseLayout title={title} description={description} image={ogImage} article={true} pubDate={pubDate} updatedDate={updatedDate}>
@@ -175,6 +179,14 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
         <p class="author-box-name">tsumiba 編集部</p>
         <p class="author-box-bio">国内・海外FX口座のスプレッド・スワップ・約定力・取引単位・各種条件を、公式情報ベースで比較・整理する編集部です。会社員や初心者がFX口座を選ぶときの判断材料を、できるだけ中立にまとめています。</p>
       </div>
+    </aside>
+
+    <aside class="next-read" aria-label="次に読む記事">
+      <p class="next-read-label">次の一歩</p>
+      <a class="next-read-card" href={nextRead.href}>
+        <span class="next-read-note">{nextRead.note}</span>
+        <strong>{nextRead.label} »</strong>
+      </a>
     </aside>
 
     <RelatedPosts currentSlug={slug} category={category} />
@@ -352,6 +364,45 @@ const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無
     color: var(--color-text-muted);
     font-size: 0.9rem;
     line-height: 1.75;
+  }
+
+  /* ── 次の一歩（リベ大型 原則7・白地＋左ボーダー） ── */
+  .next-read {
+    margin-top: 2rem;
+  }
+  .next-read-label {
+    margin: 0 0 0.5rem;
+    color: #1B3A5B;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+  .next-read-card {
+    display: block;
+    padding: 1rem 1.15rem;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #E0A458;
+    border-radius: 6px;
+    background: #fff;
+    color: #1F2937;
+    text-decoration: none;
+    transition: transform 0.15s ease;
+  }
+  .next-read-card:hover {
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+  .next-read-note {
+    display: block;
+    margin-bottom: 4px;
+    color: #6b7280;
+    font-size: 0.76rem;
+    font-weight: 700;
+  }
+  .next-read-card strong {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #1B3A5B;
   }
 
   /* ── 著者プロフィールボックス ── */
