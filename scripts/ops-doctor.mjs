@@ -59,7 +59,8 @@ function checkGit() {
 // ── 2. GitHub Actions 実行結果（公開APIのみ・認証不要）──────────
 async function checkActions() {
   if (noNet) return;
-  const workflows = ['daily-article.yml', 'x-post.yml', 'x-generate.yml', 'kpi-update.yml'];
+  // kpi-update.yml は手動入力専用(workflow_dispatchのみ)のため監視対象外（実行0件が正常）
+  const workflows = ['daily-article.yml', 'x-post.yml', 'x-generate.yml', 'weekly-kpi.yml'];
   for (const wf of workflows) {
     try {
       const res = await fetch(`${REPO_API}/actions/workflows/${wf}/runs?per_page=5`);
