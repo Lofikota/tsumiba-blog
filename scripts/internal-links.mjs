@@ -101,6 +101,9 @@ function splitSafeRegions(content) {
         i = end + 3;
         continue;
       }
+      // 閉じが無い場合は残り全体を非安全として終了（無限ループ防止）
+      regions.push({ start: i, end: len, safe: false });
+      break;
     }
     // インラインコード `
     if (text[i] === '`') {
@@ -110,6 +113,9 @@ function splitSafeRegions(content) {
         i = end + 1;
         continue;
       }
+      regions.push({ start: i, end: i + 1, safe: false });
+      i += 1;
+      continue;
     }
     // 既存リンク [text](url) or JSXコンポーネント <...>
     if (text[i] === '[') {
@@ -119,6 +125,10 @@ function splitSafeRegions(content) {
         i = end + 1;
         continue;
       }
+      // リンク形式でない裸の [ は1文字だけ非安全として前進（無限ループ防止）
+      regions.push({ start: i, end: i + 1, safe: false });
+      i += 1;
+      continue;
     }
     if (text[i] === '<') {
       const end = text.indexOf('>', i);
@@ -127,10 +137,18 @@ function splitSafeRegions(content) {
         i = end + 1;
         continue;
       }
+      // 閉じ > の無い裸の < （例:「利益<損失」）は1文字だけ非安全として前進
+      regions.push({ start: i, end: i + 1, safe: false });
+      i += 1;
+      continue;
     }
     // import行
     if (text.slice(i).match(/^import /)) {
       const end = text.indexOf('\n', i);
+      if (end === -1) {
+        regions.push({ start: i, end: len, safe: false });
+        break;
+      }
       regions.push({ start: i, end: end + 1, safe: false });
       i = end + 1;
       continue;
@@ -157,6 +175,10 @@ function splitSafeRegions(content) {
     }
     if (i > start) {
       regions.push({ start, end: i, safe: true });
+    } else {
+      // どの分岐でも前進しなかった場合の最終ガード（無限ループ絶対防止）
+      regions.push({ start: i, end: i + 1, safe: false });
+      i += 1;
     }
   }
 
