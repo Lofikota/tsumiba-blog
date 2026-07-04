@@ -112,8 +112,10 @@ if (!Array.isArray(queue)) {
   });
 }
 
-const pendingItems = Array.isArray(queue) ? queue.filter((item) => item?.status === 'pending') : [];
-const next = pendingItems[0];
+const pendingItems = Array.isArray(queue)
+  ? queue.filter((item) => item?.status === 'pending').sort((a, b) => (a.priority ?? 50) - (b.priority ?? 50))
+  : [];
+const next = pendingItems[0]; // generate-article.mjs と同じ選定順（priority昇順）
 
 setOutput('has_pending', pendingItems.length > 0 ? 'true' : 'false');
 setOutput('pending_count', pendingItems.length);

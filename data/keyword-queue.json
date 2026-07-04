@@ -998,5 +998,105 @@
     "channel": "seo_x_organic",
     "notes": "【CV直前KW】JFX MATRIX TRADERの口座開設手順を画面の流れ・必要書類・最短日数・審査のつまずきポイントまで具体的に。既存jfx-reviewから内部リンクで受ける口座開設直前ユーザー向け。CTAはJFX（afi-b稼働リンク）。キャンペーン達成条件（新規30万通貨取引）も正直に記載。リスク表記必須。 【自動実行2026-07-04】記事執筆・品質チェック・ビルド検証済み、ローカルコミット済み(6f85c21)。GitHub push は本セッションの認証・ネットワーク制約により未実施。ユーザー環境からのpushが必要。",
     "completedAt": "2026-07-04"
+  },
+  {
+    "slug": "dmm-fx-kouza-kaisetsu-tejun",
+    "keyword": "DMM FX 口座開設 やり方 手順 審査",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "CV直結最優先。DMM FX（afi-b・特単クラス）の口座開設を画面の流れで解説。必要書類・スマホ本人確認・審査日数・つまずきポイント。数値/キャンペーン条件は公式確認前提で検証日を本文に記す。",
+    "status": "pending",
+    "priority": 1,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fxtf-kouza-kaisetsu-tejun",
+    "keyword": "FXTF 口座開設 やり方 手順",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "CV直結。FXTF口座開設手順。既存レビュー(fxtf-review)への内部リンクとセットで導線を作る。",
+    "status": "pending",
+    "priority": 2,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "central-tanshi-fx-kouza-kaisetsu",
+    "keyword": "セントラル短資FX 口座開設 手順",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "CV直結。セントラル短資FXの口座開設手順。既存レビュー記事と内部リンク。",
+    "status": "pending",
+    "priority": 3,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "dmm-fx-vs-gmo-click",
+    "keyword": "DMM FX GMOクリック証券 FX 比較",
+    "type": "comparison",
+    "category": "FX・外貨",
+    "notes": "CV直前層。2大口座の比較（スプレッド/ツール/キャンペーン/サポート）。両方のCTAを置き取りこぼしを防ぐ。",
+    "status": "pending",
+    "priority": 4,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-kouza-fukusuu-merit",
+    "keyword": "FX口座 複数開設 メリット 使い分け",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "CV直結（複数CV狙い）。用途別使い分け（メイン/スワップ/情報収集）でDMM FX・JFX・FXTF・セントラル短資へ自然導線。",
+    "status": "pending",
+    "priority": 5,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "dmm-fx-tsukaikata",
+    "keyword": "DMM FX 使い方 アプリ 初心者",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "開設直後層＋開設前の不安解消。アプリ画面の使い方→未開設読者には開設手順記事へ内部リンク。",
+    "status": "pending",
+    "priority": 6,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "dmm-cfd-hajimekata",
+    "keyword": "DMM CFD 始め方 初心者",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "CV直結（DMM CFDはafi-b稼働案件）。CFDとFXの違い→始め方→リスク。",
+    "status": "pending",
+    "priority": 7,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-kouza-kaisetsu-shinsa",
+    "keyword": "FX口座開設 審査 落ちる理由 在籍確認",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "CV阻害要因の除去記事。審査基準・落ちる理由・在籍確認の実態→不安解消して開設手順記事へ流す。",
+    "status": "pending",
+    "priority": 8,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "jfx-campaign-jouken",
+    "keyword": "JFX キャンペーン キャッシュバック 条件",
+    "type": "guide",
+    "category": "FX・外貨",
+    "notes": "キャンペーン速報層（マスター戦略の即効層）。条件・達成手順・注意点。数値は公式確認前提・検証日明記。",
+    "status": "pending",
+    "priority": 9,
+    "channel": "seo_x_organic"
+  },
+  {
+    "slug": "fx-app-osusume-shoshinsha",
+    "keyword": "FX アプリ おすすめ 初心者 スマホ",
+    "type": "comparison",
+    "category": "FX・外貨",
+    "notes": "スマホ完結層の入口。稼働案件のアプリを比較しレビュー記事・開設手順へ内部リンク。",
+    "status": "pending",
+    "priority": 10,
+    "channel": "seo_x_organic"
   }
 ]
