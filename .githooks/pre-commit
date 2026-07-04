@@ -4,6 +4,24 @@
 # 手動で書いた記事を意図的にコミットする場合は:
 #   ALLOW_ARTICLE_COMMIT=1 git commit ...
 
+# 【draftガード】新規記事は draft:true 必須（人間レビュー前の公開事故を機械的に防ぐ）
+# 実例: 2026-06-15 / 07-02 / 07-04 と3回、draft無し新規記事のpush寸前事故が発生。
+# レビュー済みで直接公開する場合のみ: ALLOW_PUBLISH=1 git commit ...
+if [ "${ALLOW_PUBLISH:-0}" != "1" ]; then
+  new_articles=$(git diff --cached --name-only --diff-filter=A | grep '^src/content/blog/.*\.mdx$')
+  for f in $new_articles; do
+    if ! git show ":$f" | sed -n '/^---$/,/^---$/p' | grep -q '^draft: true'; then
+      echo ""
+      echo "❌ [pre-commit] 新規記事に draft: true がありません: $f"
+      echo "   YMYL記事はCMS人間レビュー後に公開する運用です（2026-06-13確定）。"
+      echo "   frontmatterに draft: true を追加してください。"
+      echo "   レビュー済みで直接公開する場合のみ: ALLOW_PUBLISH=1 git commit ..."
+      echo ""
+      exit 1
+    fi
+  done
+fi
+
 if [ "${ALLOW_ARTICLE_COMMIT:-0}" = "1" ]; then
   exit 0
 fi
