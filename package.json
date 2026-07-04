@@ -39,7 +39,8 @@
     "go:dry": "op run --env-file .env.1password -- node scripts/run-local.mjs --dry-run",
     "go:no-push": "op run --env-file .env.1password -- node scripts/run-local.mjs --no-push",
     "go:add": "op run --env-file .env.1password -- node scripts/add-to-queue.mjs",
-    "doctor": "node scripts/ops-doctor.mjs"
+    "doctor": "node scripts/ops-doctor.mjs",
+    "x:sync-d1": "wrangler d1 execute x-tweet-queue --file=x-automation/data/d1_sync.sql --remote"
   },
   "license": "ISC",
   "dependencies": {

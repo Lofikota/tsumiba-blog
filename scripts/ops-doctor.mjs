@@ -70,7 +70,10 @@ async function checkActions() {
       const failures = runs.filter((r) => r.conclusion === 'failure').length;
       const latest = runs[0];
       if (latest.conclusion === 'failure' && failures >= 3) {
-        critical.push(`${wf}: 直近${runs.length}回中${failures}回失敗（最新: ${latest.created_at.slice(0, 10)}）。連続失敗＝沈黙障害。ログ: ${latest.html_url}`);
+        const hint = wf === 'x-generate.yml'
+          ? ' 応急処置: このMacで npm run x:sync-d1（wrangler OAuthでD1同期。GitHub Secret不要）。恒久対応: CLOUDFLARE_API_TOKEN 再発行。'
+          : '';
+        critical.push(`${wf}: 直近${runs.length}回中${failures}回失敗（最新: ${latest.created_at.slice(0, 10)}）。連続失敗＝沈黙障害。ログ: ${latest.html_url}${hint}`);
       } else if (latest.conclusion === 'failure') {
         warnings.push(`${wf}: 最新実行が失敗（${latest.created_at.slice(0, 10)}）。ログ: ${latest.html_url}`);
       } else {
