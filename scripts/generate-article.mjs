@@ -212,7 +212,45 @@ const response = await client.messages.create({
   messages: [{ role: 'user', content: user }],
 });
 
-const generatedContent = response.content[0].text;
+// LLM生成本文のMDX構文検証＋外科的自動修復。
+// 実例(2026-07-05): 「{50万円}」等の裸ブレースがacornパース不能でビルド全体を落とした。
+// エラーが出た行だけ { } をエスケープし、正常なJSXコンポーネントには触れない。
+async function sanitizeMdxExpressions(content) {
+  const { compile } = await import('@mdx-js/mdx');
+  let text = content;
+  for (let attempt = 0; attempt < 20; attempt++) {
+    try {
+      await compile(text.replace(/^---\n[\s\S]*?\n---\n/, '')); // frontmatterはMDX対象外
+      return text;
+    } catch (e) {
+      const line = e.line ?? e.place?.start?.line ?? e.place?.line;
+      if (!line) throw e;
+      const fmLines = (text.match(/^---\n[\s\S]*?\n---\n/) || [''])[0].split('\n').length - 1;
+      const lines = text.split('\n');
+      const idx = fmLines + line - 1;
+      if (idx < 0 || idx >= lines.length) throw e;
+      const fixed = lines[idx].replace(/([{}])/g, '\\$1');
+      if (fixed === lines[idx]) throw e; // ブレース起因でない→修復不能として上位へ
+      lines[idx] = fixed;
+      text = lines.join('\n');
+      console.log(`[MDX自動修復] ${idx + 1}行目の { } をエスケープ`);
+    }
+  }
+  return text;
+}
+
+let generatedContent = response.content[0].text;
+try {
+  generatedContent = await sanitizeMdxExpressions(generatedContent);
+} catch (e) {
+  pending.status = 'quality_failed';
+  pending.failReason = `MDX構文修復不能: ${String(e.message).slice(0, 120)}`;
+  fs.writeFileSync(queuePath, `${JSON.stringify(queue, null, 2)}\n`, 'utf-8');
+  setOutput('status', 'quality_failed');
+  setOutput('slug', pending.slug);
+  console.error(`MDX構文エラー（自動修復不能）: ${e.message}`);
+  process.exit(1);
+}
 const qcResult = checkArticle(generatedContent, pending.slug);
 console.log(`[品質チェック] 文字数: ${qcResult.charCount.toLocaleString()}字`);
 if (!qcResult.ok) {
