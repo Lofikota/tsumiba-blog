@@ -125,6 +125,21 @@ function checkDrafts() {
   } else {
     infos.push('レビュー待ちdraftなし');
   }
+
+  // article-drafts（管理画面ルートの下書き）の滞留も見る。
+  // 2026-07-04: ここを見ていなかったため fx-kouza-campaign-hikaku の滞留を見逃した
+  const draftIndexPath = path.join(ROOT, 'data/article-drafts/index.json');
+  if (fs.existsSync(draftIndexPath)) {
+    try {
+      const entries = JSON.parse(fs.readFileSync(draftIndexPath, 'utf-8')).filter((e) => e.status === 'draft');
+      if (entries.length) {
+        const list = entries.map((e) => `${e.slug}（${e.draftedAt ? daysAgo(e.draftedAt) : '?'}日）`).join(' / ');
+        warnings.push(`article-drafts に滞留draft ${entries.length}本: ${list}\n      → /admin/drafts でレビューし publish-draft フローで公開するか破棄する。`);
+      }
+    } catch {
+      warnings.push('data/article-drafts/index.json が読めない（JSON破損の疑い）。');
+    }
+  }
 }
 
 // ── 5. handoff.md の鮮度 ────────────────────────────────────────
