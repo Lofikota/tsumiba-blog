@@ -64,6 +64,9 @@ jobs:
             echo "committed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "feat(article): 記事公開 ${ARTICLE_SLUG}"
+            # 実行中にCMS編集や別セッションのpushが入ると fast-forward 拒否で
+            # 生成記事ごと消失する（2026-07-05に実発生）。rebaseしてからpushする
+            git pull --rebase origin main
             git push
             echo "committed=true" >> "$GITHUB_OUTPUT"
           fi
