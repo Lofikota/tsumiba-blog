@@ -1,6 +1,5 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import { getLineAddUrl, getLineRef, getLineRefForArticle } from '../data/lineLinks';
 import { getArticleFaqs } from '../data/articleFaqs';
 import { getNextRead } from '../data/nextRead';
 import { CATEGORIES } from '../data/categories';
@@ -23,10 +22,6 @@ const { title, description, pubDate, updatedDate, heroImage, category, affiliate
 const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 const catInfo = CATEGORIES[category];
 const ogImage = heroImage ?? `/og/${slug}.svg`;
-const lineRef = getLineRef(getLineRefForArticle(slug, category));
-const adSourceRef = Astro.url.searchParams.get('ref')?.trim();
-const resolvedLineRef = lineRef ? lineRef.ref : 'blog-main';
-const lineAddUrl = getLineAddUrl(adSourceRef ? `${resolvedLineRef}__${adSourceRef}` : resolvedLineRef);
 const SITE_URL = 'https://tsumiba.com';
 const AUTHOR = { '@type': 'Organization', name: 'tsumiba編集部', url: `${SITE_URL}/about/` };
 
@@ -87,8 +82,8 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
 
 const tocHeadings = headings.filter(h => h.depth === 2);
 
-// モバイル追従CTA（FX記事のみ・控えめ）。サイト優先順位#1のFXTFへ送客（FxPriorityCTAと整合）。
-const stickyCta = category === 'FX' ? { href: '/go/fxtf/', text: 'FX口座を無料で比較', label: 'sticky-fxtf' } : null;
+// モバイル追従CTA（FX記事のみ・控えめ）。サイト優先順位#1のDMM FXへ送客（FxPriorityCTAと整合）。
+const stickyCta = category === 'FX・外貨' ? { href: '/go/dmm-fx/', text: 'DMM FXのキャンペーン条件を見る', label: 'sticky-dmm-fx' } : null;
 
 // 「次に読む」1本指定（リベ大型 原則7）。7ステップの学習順序に沿って次の一歩へ送る。
 const nextRead = getNextRead(slug);
@@ -190,15 +185,6 @@ const nextRead = getNextRead(slug);
     </aside>
 
     <RelatedPosts currentSlug={slug} category={category} />
-
-    <section class="line-cta">
-      <h2>{lineRef ? lineRef.headline : '気になった内容をLINEで整理する'}</h2>
-      <p>{lineRef ? lineRef.description : '登録後に4択から1つ選ぶと、悩みに合わせた情報をまとめて受け取れます。不要なときはすぐ解除できます。'}</p>
-      <a class="line-cta-button" href={lineAddUrl} rel="noopener noreferrer"
-         data-google-event="line_click"
-         data-google-category="lead"
-         data-google-label={resolvedLineRef}>LINEで受け取る（無料）</a>
-    </section>
 
     <div class="disclaimer">
       <strong>【免責事項】</strong>
@@ -443,37 +429,6 @@ const nextRead = getNextRead(slug);
     color: #64748b;
     line-height: 1.7;
     margin: 0;
-  }
-
-  .line-cta {
-    margin-top: 2rem;
-    padding: 1.2rem 1.25rem;
-    border: 1px solid #e5e7eb;
-    border-radius: var(--radius);
-    background: linear-gradient(180deg, #f6f7f9 0%, #ffffff 100%);
-  }
-  .line-cta h2 {
-    font-size: 1.1rem;
-    line-height: 1.4;
-    margin-bottom: 0.5rem;
-    color: var(--color-text);
-  }
-  .line-cta p {
-    font-size: 0.9rem;
-    line-height: 1.75;
-    color: var(--color-text-muted);
-    margin-bottom: 0.9rem;
-  }
-  .line-cta-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.85rem 1.25rem;
-    border-radius: 10px;
-    background: #06c755;
-    color: #fff;
-    font-weight: 800;
-    text-decoration: none;
   }
 
   /* ── モバイル追従CTA（控えめ・FX記事のみ） ── */
