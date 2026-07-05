@@ -1004,9 +1004,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "CV直結最優先。DMM FX（afi-b・特単クラス）の口座開設を画面の流れで解説。必要書類・スマホ本人確認・審査日数・つまずきポイント。数値/キャンペーン条件は公式確認前提で検証日を本文に記す。",
-    "status": "pending",
+    "status": "published",
     "priority": 1,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-05T01:17:30.504Z"
   },
   {
     "slug": "fxtf-kouza-kaisetsu-tejun",
