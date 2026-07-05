@@ -132,6 +132,19 @@ export function checkArticle(content, slug) {
     warnings.push('categoryがない');
   }
 
+  // frontmatterスキーマ検証（正: src/content.config.ts のZodスキーマ）
+  // 実例(2026-07-05): articleType「収益記事」(enum外)と実在しないheroImageがこのゲートを素通りしビルドを落とした
+  const fm = (content.match(/^---\n([\s\S]*?)\n---/) || [])[1] || '';
+  const VALID_ARTICLE_TYPES = ['review', 'guide', 'comparison', 'news'];
+  const articleType = fm.match(/^articleType:\s*['"]?([^'"\n]+?)['"]?\s*$/m)?.[1]?.trim();
+  if (articleType && !VALID_ARTICLE_TYPES.includes(articleType)) {
+    errors.push(`articleType「${articleType}」はスキーマ外（${VALID_ARTICLE_TYPES.join('/')}のいずれか）`);
+  }
+  const heroImage = fm.match(/^heroImage:\s*['"]?([^'"\n]+?)['"]?\s*$/m)?.[1]?.trim();
+  if (heroImage && heroImage.startsWith('/') && !fs.existsSync(path.join(ROOT, 'public', heroImage))) {
+    errors.push(`heroImage「${heroImage}」が public/ に存在しない`);
+  }
+
   return {
     ok: errors.length === 0,
     errors,
@@ -140,9 +153,22 @@ export function checkArticle(content, slug) {
   };
 }
 
+// generate-article.mjsの自動修復を通らない経路（publish-draft・CLI）用のMDX構文検証。
+// 実例(2026-07-05): MDX非対応の `{#id}` アンカー構文がビルド全体を落とした
+export async function checkMdxCompile(content) {
+  const { compile } = await import('@mdx-js/mdx');
+  try {
+    await compile(content.replace(/^---\n[\s\S]*?\n---\n/, ''));
+    return null;
+  } catch (e) {
+    const line = e.line ?? e.place?.start?.line ?? e.place?.line;
+    return `MDXコンパイル不能${line ? `（本文${line}行目付近）` : ''}: ${String(e.message).slice(0, 160)}`;
+  }
+}
+
 // CLI直接実行時
-if (process.argv[1].endsWith('quality-gate.mjs')) {
-  import('fs').then(({ readFileSync }) => {
+if (process.argv[1]?.endsWith('quality-gate.mjs')) {
+  import('fs').then(async ({ readFileSync }) => {
     const filePath = process.argv[2];
     if (!filePath) {
       console.error('Usage: node scripts/quality-gate.mjs <path/to/article.mdx>');
@@ -151,6 +177,11 @@ if (process.argv[1].endsWith('quality-gate.mjs')) {
     const content = readFileSync(filePath, 'utf-8');
     const slug = filePath.split('/').pop().replace('.mdx', '');
     const result = checkArticle(content, slug);
+    const mdxError = await checkMdxCompile(content);
+    if (mdxError) {
+      result.errors.push(mdxError);
+      result.ok = false;
+    }
     console.log(`\n[品質チェック] ${slug}`);
     console.log(`文字数: ${result.charCount.toLocaleString()}字`);
     if (result.errors.length > 0) {

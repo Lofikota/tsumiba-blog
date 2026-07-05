@@ -8,7 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkArticle } from './quality-gate.mjs';
+import { checkArticle, checkMdxCompile } from './quality-gate.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -37,6 +37,11 @@ if (fs.existsSync(articlePath)) {
 
 const content = fs.readFileSync(draftPath, 'utf-8');
 const qcResult = checkArticle(content, slug);
+const mdxError = await checkMdxCompile(content);
+if (mdxError) {
+  qcResult.errors.push(mdxError);
+  qcResult.ok = false;
+}
 
 console.log(`[公開前チェック] ${slug}`);
 console.log(`文字数: ${qcResult.charCount.toLocaleString()}字`);
