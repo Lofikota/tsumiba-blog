@@ -1,0 +1,47 @@
+name: LINE UserID Diagnostic
+
+# LINE_USER_ID の取得・疎通確認用（一時診断ワークフロー）
+# mode=get-userid: 友だちのuserId一覧とbot情報を出力（Business ID連携不要でuserIdを取得できる）
+# mode=test-push : Secrets設定後の疎通確認（実際にLINEへテスト通知を送る）
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "get-userid | test-push"
+        required: false
+        default: "get-userid"
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bot info（トークンがどのチャネルのものか確認）
+        run: |
+          status=$(curl -s -o bot.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}" \
+            https://api.line.me/v2/bot/info)
+          echo "HTTP $status"
+          cat bot.json
+          echo
+
+      - name: Followers（友だちのuserId一覧＝LINE_USER_IDに設定すべき値）
+        if: ${{ github.event.inputs.mode == 'get-userid' }}
+        run: |
+          status=$(curl -s -o followers.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}" \
+            "https://api.line.me/v2/bot/followers/ids?limit=1000")
+          echo "HTTP $status"
+          cat followers.json
+          echo
+          if [ "$status" != "200" ]; then
+            echo "::warning::followers取得失敗。403の場合はアカウント種別制限の可能性→webhook方式にフォールバック"
+          fi
+
+      - name: Test push（LINE_USER_ID設定後の疎通確認）
+        if: ${{ github.event.inputs.mode == 'test-push' }}
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: node scripts/notify-line.mjs --type info --message "LINE通知テスト成功。LINE_USER_ID修正が完了しました。"
