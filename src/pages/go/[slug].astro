@@ -14,14 +14,14 @@ interface Props {
 
 const { link } = Astro.props;
 const fallbackByCategory: Partial<Record<AffiliateLink['category'], string>> = {
-  FX: '/go/jfx/',
-  クレカ: '/go/rakuten-card/',
-  証券: '/line/blog-nisa-mistake/',
-  会計: '/line/blog-tax-basic/',
-  保険: '/line/blog-main/',
+  FX: '/go/dmm-fx/',
+  会計: '/blog/fx-kakuteishinkoku-guide/',
 };
 const isPending = link.status === 'pending';
-const destinationUrl = isPending ? fallbackByCategory[link.category] ?? '/line/blog-main/' : link.destinationUrl;
+const rawFallback = fallbackByCategory[link.category] ?? '/start/';
+// pending案件自身がフォールバック先だと自己参照リダイレクトループになるため回避
+const fallbackUrl = rawFallback === `/go/${link.slug}/` ? '/go/jfx/' : rawFallback;
+const destinationUrl = isPending ? fallbackUrl : link.destinationUrl;
 const eventLabel = isPending ? `${link.slug}:fallback` : link.slug;
 const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';
 const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_SEND_TO ?? '';
