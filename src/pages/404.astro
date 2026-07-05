@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="ページが見つかりません"
+  description="お探しのページは削除されたか、URLが変更された可能性があります。"
+  robots="noindex,follow"
+>
+  <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;">404 ページが見つかりません</h1>
+
+  <div class="prose">
+    <p>お探しのページは削除されたか、URLが変更された可能性があります。</p>
+    <p>お手数ですが、以下のリンクからお探しください。</p>
+    <ul>
+      <li><a href="/">トップページ</a></li>
+      <li><a href="/blog/">記事一覧</a></li>
+    </ul>
+  </div>
+</BaseLayout>
