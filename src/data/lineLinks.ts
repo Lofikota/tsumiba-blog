@@ -8,8 +8,9 @@ export interface LineRef {
 }
 
 export const lineOfficial = {
-  accountId: '@610htila',
-  addFriendUrl: 'https://line.me/R/ti/p/@610htila',
+  // 2026-07-05: 旧ペルソナ時代の @610htila から tsumibaブランド新アカウントへ切替
+  accountId: '@016kmece',
+  addFriendUrl: 'https://line.me/R/ti/p/@016kmece',
   harnessAuthBaseUrl: import.meta.env.PUBLIC_LINE_LINK_MODE === 'harness'
     ? import.meta.env.PUBLIC_LINE_HARNESS_AUTH_BASE_URL || ''
     : '',
@@ -29,8 +30,8 @@ export const lineRefs: LineRef[] = [
     label: 'Xプロフィール常設',
     source: 'x',
     intent: 'general',
-    headline: 'お金の設定ミスを減らすLINE',
-    description: 'NISA、副業税金、クレカ、キャンペーン条件を悩み別に整理して届けます。',
+    headline: 'FX口座の「お得」を見落とさないLINE',
+    description: '各社キャンペーンの条件・締切と、口座開設前の確認ポイントを速報で届けます。',
   },
   {
     ref: 'x-post-nisa',
@@ -77,24 +78,24 @@ export const lineRefs: LineRef[] = [
     label: 'ブログ クレカ記事CTA',
     source: 'blog',
     intent: 'card',
-    headline: 'クレカ・ポイントの条件をLINEで整理する',
-    description: '年会費、還元率、キャンペーン条件を見返しやすくまとめて届けます。最初の送客先は三井住友カードゴールド（NL）を優先します。',
+    headline: 'お金の条件確認をLINEで続ける',
+    description: '見落としやすい条件・期限の確認ポイントをまとめて届けます。',
   },
   {
     ref: 'blog-fx-roundup',
     label: 'ブログ FX記事CTA',
     source: 'blog',
     intent: 'fx',
-    headline: '口座を開く前に3分だけ確認してほしいこと',
-    description: 'JFX → FXTFの順で、比較ポイント、初心者が見落としやすい条件、開設後に最初にやることを整理して届けます。DMM FXはリンク確認後に再開します。',
+    headline: '口座開設の「お得なタイミング」を逃さないLINE',
+    description: '各社キャンペーンの条件・締切と、開設前の失敗チェックリストを速報で届けます。特典額だけで選んで後悔しないための確認ポイント付き。',
   },
   {
     ref: 'lp-manga-main',
     label: '漫画LP',
     source: 'lp',
     intent: 'general',
-    headline: '失敗しない順番を整理するLINE',
-    description: '副業・FX・保険のどこから始めるべきか、7日間で順番に整理して届けます。',
+    headline: 'FXを失敗しない順番で始めるLINE',
+    description: '口座選び→開設→最初の取引まで、失敗しない順番と各段階のお得情報を整理して届けます。',
   },
   {
     ref: 'lp-fx-main',
@@ -102,15 +103,15 @@ export const lineRefs: LineRef[] = [
     source: 'lp',
     intent: 'fx',
     headline: 'FX口座を作る前に3分だけ確認するLINE',
-    description: '特典額だけで選んで失敗しないように、JFX → FXTFの順で条件、リスク、見るポイントを整理して届けます。DMM FXはリンク確認後に再開します。',
+    description: '特典額だけで選んで失敗しないように、キャンペーンの対象条件・リスク・見るポイントを先に整理して届けます。',
   },
   {
     ref: 'campaign-dmm-fx',
-    label: 'DMM FX確認中（JFX・FXTF優先）',
+    label: '案件 DMM FX',
     source: 'campaign',
     intent: 'campaign',
-    headline: 'DMM FXは現在リンク確認中です',
-    description: 'DMM FXはASPリンク確認中のため、申込導線は確認済みのJFX・FXTFを優先します。条件比較だけ確認したい人向けの入口です。',
+    headline: 'DMM FXのキャンペーン条件を整理するLINE',
+    description: 'キャッシュバックの対象条件・入金額・取引量・期限を、申し込む前に整理して届けます。',
   },
   {
     ref: 'campaign-jfx',
