@@ -169,6 +169,33 @@ function checkStructure() {
   }
 }
 
+// ── 7. CV動線の退行（2026-07-05 直CV転換。正本: AI運用/戦略/CV動線構造_2026-07-05.md）──
+async function checkCvFunnel() {
+  // 7-1. リテラル分岐の腐敗検知（sticky死亡・旧優先順位FXTF残存はこのパターンで2度腐った実績）
+  const blogPost = path.join(ROOT, 'src/layouts/BlogPost.astro');
+  if (fs.existsSync(blogPost)) {
+    const src = fs.readFileSync(blogPost, 'utf-8');
+    if (!src.includes("category === 'FX・外貨'")) critical.push("BlogPost.astro のsticky CTAカテゴリ判定が実カテゴリ値 'FX・外貨' と不一致（全記事でモバイルCTAが非表示になる退行）。");
+    if (!src.includes('/go/dmm-fx/')) warnings.push('BlogPost.astro のsticky送客先が最高単価のDMM FXでない（優先順位の退行疑い）。');
+  }
+  const lineRefPage = path.join(ROOT, 'src/pages/line/[ref].astro');
+  if (fs.existsSync(lineRefPage)) {
+    const src = fs.readFileSync(lineRefPage, 'utf-8');
+    if (/確認中. DMM|リンク確認後に再開/.test(src)) warnings.push('/line/[ref].astro にDMM迂回の旧戦略文言が復活している（2026-07-05に除去済みのはず）。');
+  }
+  // 7-2. 本番計測タグの無言退行（Pages環境変数が消えるとフォールバックのAW-タグに戻り、GA4計測が静かに消える）
+  if (!noNet) {
+    try {
+      const res = await fetch('https://tsumiba.com/', { signal: AbortSignal.timeout(8000) });
+      const html = await res.text();
+      const m = html.match(/gtag\/js\?id=([A-Za-z0-9-]+)/);
+      if (!m) warnings.push('本番トップにgtagタグが見つからない（計測消失の疑い）。');
+      else if (!m[1].startsWith('G-')) warnings.push(`本番の計測タグが ${m[1]}（GA4のG-でない）。Pages環境変数 PUBLIC_GOOGLE_TAG_ID の消失疑い（正: G-TXDSQQQ77M）。`);
+      else infos.push(`本番計測タグ: ${m[1]}（GA4稼働）`);
+    } catch { warnings.push('本番サイトの計測タグ確認に失敗（ネットワーク不通 or サイトダウン）。'); }
+  }
+}
+
 // ── 実行 ────────────────────────────────────────────────────────
 console.log('🩺 ops-doctor — 事業システム健康診断\n');
 checkGit();
@@ -177,6 +204,7 @@ checkQueue();
 checkDrafts();
 checkHandoff();
 checkStructure();
+await checkCvFunnel();
 
 if (critical.length) {
   console.log('🚨 要対応（今日中に潰す）');
