@@ -7,10 +7,12 @@
     "channel": "seo_x_organic",
     "priority": 1,
     "charCount": 9406,
-    "status": "draft",
+    "status": "published",
     "draftedAt": "2026-07-03T10:56:05.551Z",
     "draftPath": "data/article-drafts/fx-kouza-campaign-hikaku.mdx",
     "reportPath": "KPI管理/automation-runs/2026-07-03-fx-kouza-campaign-hikaku-daily-article.md",
-    "warnings": []
+    "warnings": [],
+    "publishedAt": "2026-07-05T06:46:28.965Z",
+    "articlePath": "src/content/blog/fx-kouza-campaign-hikaku.mdx"
   }
 ]

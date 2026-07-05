@@ -982,10 +982,10 @@
     "type": "収益記事",
     "category": "FX・外貨",
     "priority": 1,
-    "status": "draft",
+    "status": "published",
     "channel": "seo_x_organic",
     "notes": "【CV直結・鮮度勝負】国内FX口座開設キャンペーンの最新比較まとめ。稼働リンクのあるDMM FX（33,000円・最高単価）・JFX・セントラル短資FXの3社を比較し、各社の公式キャンペーン（キャッシュバック条件・期限・達成条件）を一次情報で正確に。達成条件の落とし穴（取引量条件等）を正直に書くのが差別化。月1更新前提の常設ページ設計。CTAはJFX主導線（達成しやすさ軸）＋DMM FXは取引環境軸で紹介。リスク表記必須。※2026-07-03更新：DMM FXリンク稼働（7/2実装）を反映。旧notesはDMM承認前の指示だった",
-    "draftedAt": "2026-07-03T10:56:05.551Z"
+    "publishedAt": "2026-07-05T06:46:28.963Z"
   },
   {
     "slug": "jfx-kouza-kaisetsu-tejun",
