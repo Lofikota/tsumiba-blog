@@ -1015,9 +1015,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "CV直結。FXTF口座開設手順。既存レビュー(fxtf-review)への内部リンクとセットで導線を作る。",
-    "status": "pending",
+    "status": "published",
     "priority": 2,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-05T04:49:26.724Z"
   },
   {
     "slug": "central-tanshi-fx-kouza-kaisetsu",
