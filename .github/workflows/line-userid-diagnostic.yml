@@ -61,6 +61,14 @@ jobs:
             https://api.line.me/v2/bot/channel/webhook/endpoint)
           echo "GET HTTP $status"; cat info.json; echo
 
+      - name: Get webhook endpoint（GETのみ・状態を変更しない）
+        if: ${{ github.event.inputs.mode == 'get-webhook' }}
+        run: |
+          status=$(curl -s -o info.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}" \
+            https://api.line.me/v2/bot/channel/webhook/endpoint)
+          echo "GET HTTP $status"; cat info.json; echo
+
       - name: Clear webhook endpoint（後片付け）
         if: ${{ github.event.inputs.mode == 'clear-webhook' }}
         run: |
