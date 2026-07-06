@@ -1026,9 +1026,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "CV直結。セントラル短資FXの口座開設手順。既存レビュー記事と内部リンク。",
-    "status": "pending",
+    "status": "published",
     "priority": 3,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-06T05:04:06.836Z"
   },
   {
     "slug": "dmm-fx-vs-gmo-click",
