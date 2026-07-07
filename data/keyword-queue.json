@@ -1040,9 +1040,10 @@
     "type": "comparison",
     "category": "FX・外貨",
     "notes": "CV直前層。2大口座の比較（スプレッド/ツール/キャンペーン/サポート）。両方のCTAを置き取りこぼしを防ぐ。",
-    "status": "pending",
+    "status": "published",
     "priority": 4,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-07T04:42:53.764Z"
   },
   {
     "slug": "fx-kouza-fukusuu-merit",
