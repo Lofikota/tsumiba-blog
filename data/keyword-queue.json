@@ -1051,9 +1051,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "CV直結（複数CV狙い）。用途別使い分け（メイン/スワップ/情報収集）でDMM FX・JFX・FXTF・セントラル短資へ自然導線。",
-    "status": "pending",
+    "status": "published",
     "priority": 5,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-08T04:03:00.379Z"
   },
   {
     "slug": "dmm-fx-tsukaikata",
