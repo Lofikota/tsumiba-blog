@@ -1062,9 +1062,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "開設直後層＋開設前の不安解消。アプリ画面の使い方→未開設読者には開設手順記事へ内部リンク。",
-    "status": "pending",
+    "status": "published",
     "priority": 6,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-09T04:47:11.604Z"
   },
   {
     "slug": "dmm-cfd-hajimekata",
