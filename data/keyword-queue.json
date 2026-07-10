@@ -1073,9 +1073,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "CV直結（DMM CFDはafi-b稼働案件）。CFDとFXの違い→始め方→リスク。",
-    "status": "pending",
+    "status": "published",
     "priority": 7,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-10T04:45:01.906Z"
   },
   {
     "slug": "fx-kouza-kaisetsu-shinsa",
