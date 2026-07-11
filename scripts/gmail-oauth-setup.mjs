@@ -91,7 +91,7 @@ const server = http.createServer(async (req, res) => {
     console.log('');
     console.log('✅ トークン取得成功！');
     console.log('');
-    console.log('以下を ren-blog-/.env に追加してください:');
+    console.log('以下を tsumiba-blog/.env に追加してください:');
     console.log('─────────────────────────────────────');
     console.log(`GMAIL_REFRESH_TOKEN=${tokens.refresh_token}`);
     console.log('─────────────────────────────────────');

@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: Lofikota/ren-blog-
+  repo: Lofikota/tsumiba-blog
   branch: main
   base_url: https://sveltia-cms-auth.yoshikou888.workers.dev
 

@@ -9,7 +9,7 @@ env:
 
 # 他の自動化ジョブと同一 concurrency group で衝突防止
 concurrency:
-  group: ren-blog-automation-${{ github.ref }}
+  group: tsumiba-blog-automation-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:

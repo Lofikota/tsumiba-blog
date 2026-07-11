@@ -188,7 +188,7 @@ if (NO_PUSH) {
         console.log(`✅ プッシュ完了: ${pending.slug}`);
       } else {
         console.warn('⚠️  git push に失敗しました。手動でプッシュしてください:');
-        console.warn('   cd /Users/kudokota/Affiliate/ren-blog- && git push');
+        console.warn('   cd /Users/kudokota/Affiliate/tsumiba-blog && git push');
       }
     }
   }

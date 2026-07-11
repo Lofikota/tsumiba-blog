@@ -3,16 +3,16 @@
 ## 1. GitHubリポジトリ作成
 
 ```bash
-cd /Users/kudokota/Sites/ren-blog
+cd /Users/kudokota/Sites/tsumiba-blog
 git init
 git add .
 git commit -m "initial: Astroブログ初期構築"
 ```
 
-GitHubで `ren-blog` という名前のリポジトリを作成して：
+GitHubで `tsumiba-blog` という名前のリポジトリを作成して：
 
 ```bash
-git remote add origin https://github.com/[あなたのGitHubユーザー名]/ren-blog.git
+git remote add origin https://github.com/[あなたのGitHubユーザー名]/tsumiba-blog.git
 git push -u origin main
 ```
 
@@ -21,7 +21,7 @@ git push -u origin main
 1. https://dash.cloudflare.com にログイン
 2. 左メニュー「Workers & Pages」→「Create application」→「Pages」
 3. 「Connect to Git」→ GitHubと連携
-4. `ren-blog` リポジトリを選択
+4. `tsumiba-blog` リポジトリを選択
 5. ビルド設定：
    - Framework preset: `Astro`
    - Build command: `npm run build`

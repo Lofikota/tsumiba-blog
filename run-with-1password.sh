@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run ren-blog commands with secrets loaded from 1Password.
+# Run tsumiba-blog commands with secrets loaded from 1Password.
 
 set -euo pipefail
 

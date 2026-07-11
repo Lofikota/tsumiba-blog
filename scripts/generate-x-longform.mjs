@@ -55,7 +55,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const AFFILIATE_ROOT = path.join(ROOT, '..');
 
-// ANTHROPIC_API_KEY を探す（X自動化/.env → ren-blog-/.env の順）
+// ANTHROPIC_API_KEY を探す（X自動化/.env → tsumiba-blog/.env の順）
 loadEnv(
   path.join(AFFILIATE_ROOT, 'X自動化/.env'),
   path.join(ROOT, '.env'),

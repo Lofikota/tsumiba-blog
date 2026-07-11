@@ -11,7 +11,7 @@ echo "$VERIFY" | grep -q '"success":true' || { echo "❌ トークン無効: $VE
 echo "✅ トークン有効"
 
 GH_TOKEN=$(printf "protocol=https\nhost=github.com\n" | git credential fill | grep '^password=' | cut -d= -f2)
-REPO="Lofikota/ren-blog-"
+REPO="Lofikota/tsumiba-blog"
 
 [ -x /tmp/ghsec-venv/bin/python ] || { python3 -m venv /tmp/ghsec-venv && /tmp/ghsec-venv/bin/pip install --quiet pynacl; }
 

@@ -22,7 +22,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
-// ren-blog- の隣にある Affiliate/AI運用/ を参照
+// tsumiba-blog の隣にある Affiliate/AI運用/ を参照
 const ASP_STATUS_PATH = path.join(__dirname, '../../AI運用/asp-status.md');
 
 // ---- CLI 引数 ---------------------------------------------------------------
@@ -30,7 +30,7 @@ const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const DAYS = parseInt(args.find(a => a.startsWith('--days='))?.split('=')[1] ?? '30', 10);
 
-// ---- .env 手動ロード（ren-blog-/.env を参照）--------------------------------
+// ---- .env 手動ロード（tsumiba-blog/.env を参照）--------------------------------
 const envPath = path.join(ROOT, '.env');
 if (fs.existsSync(envPath)) {
   for (const line of fs.readFileSync(envPath, 'utf-8').split('\n')) {

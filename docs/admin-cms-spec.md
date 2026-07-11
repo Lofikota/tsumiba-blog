@@ -81,7 +81,7 @@ X API キーは Cloudflare Environment Variables に保存する。
 |---|---|
 | 入力方式 | ファイル選択ダイアログ + ドラッグ&ドロップ |
 | 対応形式 | JPEG / PNG / WebP（最大5MB）|
-| 保存先 | `ren-blog-/public/images/articles/[slug]/[filename]` |
+| 保存先 | `tsumiba-blog/public/images/articles/[slug]/[filename]` |
 | 保存方法 | GitHub API `PUT /repos/.../contents/...`（base64エンコード）|
 | URL形式 | `/images/articles/[slug]/[filename]` → HTMLに自動挿入 |
 | トップ画像 | フロントマターの `heroImage` を書き換える専用フィールドを用意 |
@@ -216,7 +216,7 @@ POST /api/admin-action
 | `X_ACCESS_TOKEN` | X アクセストークン |
 | `X_ACCESS_TOKEN_SECRET` | X アクセストークンシークレット |
 | `GITHUB_TOKEN` | GitHub API トークン（既存） |
-| `GITHUB_REPO` | `Lofikota/ren-blog-`（既存） |
+| `GITHUB_REPO` | `Lofikota/tsumiba-blog`（既存） |
 
 ---
 
@@ -245,7 +245,7 @@ POST /api/admin-action
 
 1. **GitHub Personal Access Token の権限**: `contents: write`（リポジトリへのコミット）が必要。既に持っているか？
 2. **Cloudflare Environment Variables**: X API キーを Cloudflare Dashboard から設定できるか？（ren-blog の Workers & Pages > Settings）
-3. **リポジトリ名**: `Lofikota/ren-blog-` で正しいか？
+3. **リポジトリ名**: `Lofikota/tsumiba-blog` で正しいか？
 4. **既存 admin-action.ts の GITHUB_TOKEN**: 既に設定済みか？
 
 ---

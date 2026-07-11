@@ -118,7 +118,7 @@ const chartClicks = JSON.stringify(kpi.map(d => d.gsc.clicks));
         <p class="kpi-alerts-title">⚡ 対応が必要なこと</p>
         <div class="kpi-alert-list">
           {noImage > 0 && (
-            <a href="https://github.com/Lofikota/ren-blog-/actions/workflows/article-image-gen.yml" target="_blank" rel="noopener" class="kpi-alert red">
+            <a href="https://github.com/Lofikota/tsumiba-blog/actions/workflows/article-image-gen.yml" target="_blank" rel="noopener" class="kpi-alert red">
               <strong>{noImage}本</strong><span>ヒーロー画像が未生成</span><em>画像生成ワークフローを実行 →</em>
             </a>
           )}
@@ -148,7 +148,7 @@ const chartClicks = JSON.stringify(kpi.map(d => d.gsc.clicks));
 
     <div class="kpi-update-cta">
       <span>毎週月曜にKPIを更新する</span>
-      <a href="https://github.com/Lofikota/ren-blog-/actions/workflows/kpi-update.yml" target="_blank" rel="noopener">KPI入力フォームを開く →</a>
+      <a href="https://github.com/Lofikota/tsumiba-blog/actions/workflows/kpi-update.yml" target="_blank" rel="noopener">KPI入力フォームを開く →</a>
     </div>
   </section>
 
@@ -194,7 +194,7 @@ const chartClicks = JSON.stringify(kpi.map(d => d.gsc.clicks));
       <div class="empty-state">
         <h3>まだ下書きはありません</h3>
         <p>次の pending キューから下書きを作るには、ローカルまたはGitHub Actionsで下書き生成を実行します。</p>
-        <code>cd /Users/kudokota/Affiliate/ren-blog- && npm run draft:generate</code>
+        <code>cd /Users/kudokota/Affiliate/tsumiba-blog && npm run draft:generate</code>
       </div>
     )}
   </section>

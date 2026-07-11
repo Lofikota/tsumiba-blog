@@ -5,7 +5,7 @@ type Env = {
   GITHUB_BRANCH?: string;
 };
 
-const DEFAULT_REPOSITORY = 'Lofikota/ren-blog-';
+const DEFAULT_REPOSITORY = 'Lofikota/tsumiba-blog';
 const DEFAULT_BRANCH = 'main';
 
 function json(data: unknown, status = 200) {
@@ -23,7 +23,7 @@ function ghHeaders(token: string) {
     accept: 'application/vnd.github+json',
     authorization: `Bearer ${token}`,
     'content-type': 'application/json',
-    'user-agent': 'ren-blog-admin',
+    'user-agent': 'tsumiba-blog-admin',
     'x-github-api-version': '2022-11-28',
   };
 }
