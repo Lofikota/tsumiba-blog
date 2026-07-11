@@ -8,3 +8,9 @@ node_modules/
 
 # GitHub Actions が生成するローカルキャッシュ（CI上では不要）
 KPI管理/automation-runs/
+
+# Astro生成キャッシュ（P0-C05でtrack解除）
+.astro/
+
+# Python
+__pycache__/
