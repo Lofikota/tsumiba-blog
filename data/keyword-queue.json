@@ -380,7 +380,8 @@
     "notes": "難平（ナンピン）のリスクを初心者向けに解説。損失拡大のメカニズムを具体例で示し、初心者に推奨しない理由を明記。 【購買心理実装必須】①自分ごと化リード（読者の状況・内的独白・問題三層を冒頭500字で展開） ②損失フレーミング（始めない場合のコストを数字で可視化） ③社会的証明（統計+編集部実体験） ④コミットメント階段（Step1最小行動→Step2自己診断→Step3CTA） ⑤アンカリング（比較では高基準から入る） ⑥現在バイアス克服（今日の最小行動+即時性演出） 目標1万字・最低8,000字。",
     "status": "pending",
     "priority": 14,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "_note": "2026-07-11: 本文は draft:true で src/content/blog/fx-nanpin-risk.mdx に作成済み（約7,300字・06-quality-check.md参照）。ren-blog-/.git に削除不能なstaleロック（index.lock/HEAD.lock）が発生し、ローカルgit commitが一切実行不可だったため未commit（前例のfx-loss-cut-shikumiより悪化した状態。詳細はAI運用/handoff.mdの2026-07-11エントリ参照）。人間がFinderで.gitのstaleロックを削除後、このmdxをcommit/pushしてから status を published に更新する。"
   },
   {
     "slug": "fx-tax-keisan",
