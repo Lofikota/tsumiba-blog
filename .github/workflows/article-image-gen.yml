@@ -1,12 +1,7 @@
 name: 記事ヒーロー画像 自動生成
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'src/content/blog/**/*.mdx'
-  schedule:
-    - cron: '0 22 * * *'   # 毎日 07:00 JST — 画像なし記事を拾う
+  # Phase 0 pause (2026-07-11): push/scheduled image generation disabled. Manual only.
   workflow_dispatch:
     inputs:
       overwrite:

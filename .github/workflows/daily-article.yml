@@ -1,9 +1,8 @@
 name: 毎日記事自動公開
 
 on:
-  schedule:
-    - cron: '0 1 * * *'   # 毎日 10:00 JST
-  workflow_dispatch:        # 手動実行も可能
+  # Phase 0 pause (2026-07-11): scheduled generation disabled. Manual only.
+  workflow_dispatch:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"

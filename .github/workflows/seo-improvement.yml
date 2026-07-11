@@ -1,8 +1,7 @@
 name: 週次SEO自動改善
 
 on:
-  schedule:
-    - cron: '0 2 * * 1'   # 毎週月曜 11:00 JST
+  # Phase 0 pause (2026-07-11): automatic rewrites disabled. Manual only.
   workflow_dispatch:
 
 env:

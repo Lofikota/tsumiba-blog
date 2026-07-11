@@ -6,13 +6,8 @@ name: ASP承認チェック → キュー自動追加
 # Gmail OAuth は不要。
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'data/asp-status.md'      # Claude が更新したときに自動実行
-  schedule:
-    - cron: '0 2 * * *'           # 毎日 11:00 JST に念押しチェック
-  workflow_dispatch:               # 手動実行も可
+  # Phase 0 pause (2026-07-11): push/scheduled queue mutation disabled. Manual only.
+  workflow_dispatch:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"

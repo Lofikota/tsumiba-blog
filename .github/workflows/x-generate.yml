@@ -1,9 +1,7 @@
 name: X投稿自動生成（週次）
 
 on:
-  schedule:
-    # JST 日曜 08:00 = UTC 土曜 23:00
-    - cron: '0 23 * * 6'
+  # Phase 0 pause (2026-07-11): scheduled X generation disabled. Manual only.
   workflow_dispatch:
     inputs:
       week_offset:

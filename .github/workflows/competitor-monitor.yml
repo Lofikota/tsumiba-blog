@@ -1,8 +1,7 @@
 name: 競合モニタリング
 
 on:
-  schedule:
-    - cron: '0 3 * * 3'   # 毎週水曜 12:00 JST
+  # Phase 0 pause (2026-07-11): scheduled commits disabled. Manual only.
   workflow_dispatch:
 
 env:

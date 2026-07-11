@@ -382,7 +382,7 @@
     "priority": 14,
     "channel": "seo_x_organic",
     "draftedAt": "2026-07-11T00:00:00.000+09:00",
-    "_note": "2026-07-11: 本文は draft:true で src/content/blog/fx-nanpin-risk.mdx に作成済み（約7,300字・06-quality-check.md参照）。tsumiba-blogのローカルcommit c8d94c9で記事を追加し、c9e6d77で注記を更新。git pushは未実行。人間レビューとpush後、公開を確認してstatusをpublishedへ更新する。"
+    "_note": "2026-07-11: 本文は draft:true で src/content/blog/fx-nanpin-risk.mdx に作成済み（約7,300字・06-quality-check.md参照）。記事はローカルcommit c8d94c9で追加し、同日のmergeでorigin/mainへpush済み。人間レビュー後、公開を確認してstatusをpublishedへ更新する。"
   },
   {
     "slug": "fx-tax-keisan",
@@ -1042,9 +1042,10 @@
     "type": "comparison",
     "category": "FX・外貨",
     "notes": "CV直前層。2大口座の比較（スプレッド/ツール/キャンペーン/サポート）。両方のCTAを置き取りこぼしを防ぐ。",
-    "status": "pending",
+    "status": "published",
     "priority": 4,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-07T04:42:53.764Z"
   },
   {
     "slug": "fx-kouza-fukusuu-merit",
@@ -1052,9 +1053,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "CV直結（複数CV狙い）。用途別使い分け（メイン/スワップ/情報収集）でDMM FX・JFX・FXTF・セントラル短資へ自然導線。",
-    "status": "pending",
+    "status": "published",
     "priority": 5,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-08T04:03:00.379Z"
   },
   {
     "slug": "dmm-fx-tsukaikata",
@@ -1062,9 +1064,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "開設直後層＋開設前の不安解消。アプリ画面の使い方→未開設読者には開設手順記事へ内部リンク。",
-    "status": "pending",
+    "status": "published",
     "priority": 6,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-09T04:47:11.604Z"
   },
   {
     "slug": "dmm-cfd-hajimekata",
@@ -1072,9 +1075,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "CV直結（DMM CFDはafi-b稼働案件）。CFDとFXの違い→始め方→リスク。",
-    "status": "pending",
+    "status": "published",
     "priority": 7,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-10T04:45:01.906Z"
   },
   {
     "slug": "fx-kouza-kaisetsu-shinsa",
@@ -1082,9 +1086,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "CV阻害要因の除去記事。審査基準・落ちる理由・在籍確認の実態→不安解消して開設手順記事へ流す。",
-    "status": "pending",
+    "status": "published",
     "priority": 8,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-11T04:00:51.319Z"
   },
   {
     "slug": "jfx-campaign-jouken",
