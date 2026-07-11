@@ -63,7 +63,7 @@ console.log(`Xスレッド生成中: ${latest.slug}`);
 const response = await client.messages.create({
   model: 'claude-sonnet-4-6',
   max_tokens: 1500,
-  system: `あなたは編集部（32歳・IT会社員・副業月20万・35歳FIRE目標）です。
+  system: `あなたはtsumiba（FX口座比較メディア）の編集部です。架空の経歴・個人実績は語らず、比較検証と公式情報の確認に基づいて書きます。
 ブログ記事をXのスレッド（3ツイート）に変換します。
 
 【文体】

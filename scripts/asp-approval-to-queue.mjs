@@ -406,7 +406,7 @@ async function generateEntryWithClaude(aspName, programName) {
 ASP: ${aspName}
 プログラム名: ${programName}
 
-このプログラムのレビュー記事を、副業会社員ペルソナ「編集部（32歳・IT会社員・借金200万→副業月20万→FIRE目指し中）」の視点でブログに書く予定です。
+このプログラムのレビュー記事を、FX口座比較メディア「tsumiba」編集部（比較検証・公式情報ベース。架空の個人体験談・運用実績は使わない）の視点でブログに書く予定です。
 
 以下のJSONを返してください（説明文なし、JSONのみ）:
 {
