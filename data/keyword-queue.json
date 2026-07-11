@@ -1084,9 +1084,10 @@
     "type": "guide",
     "category": "FX・外貨",
     "notes": "CV阻害要因の除去記事。審査基準・落ちる理由・在籍確認の実態→不安解消して開設手順記事へ流す。",
-    "status": "pending",
+    "status": "published",
     "priority": 8,
-    "channel": "seo_x_organic"
+    "channel": "seo_x_organic",
+    "publishedAt": "2026-07-11T04:00:51.319Z"
   },
   {
     "slug": "jfx-campaign-jouken",
