@@ -73,6 +73,8 @@ jobs:
 
       - name: LINE通知（公開完了）
         if: steps.commit.outputs.committed == 'true'
+        # 通知の失敗を記事公開の失敗として誤報しない（2026-07-05: LINE_USER_ID無効による偽failが4件発生）
+        continue-on-error: true
         env:
           ARTICLE_SLUG: ${{ steps.article.outputs.slug }}
           CHAR_COUNT: ${{ steps.article.outputs.char_count }}
