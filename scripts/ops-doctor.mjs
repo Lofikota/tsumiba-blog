@@ -21,7 +21,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const AFFILIATE_ROOT = path.join(ROOT, '..');
-const REPO_API = 'https://api.github.com/repos/Lofikota/ren-blog-';
+const REPO_API = 'https://api.github.com/repos/Lofikota/tsumiba-blog';
 const noNet = process.argv.includes('--no-net');
 
 const critical = [];
@@ -61,7 +61,15 @@ async function checkActions() {
   if (noNet) return;
   // kpi-update.yml は手動入力専用(workflow_dispatchのみ)のため監視対象外（実行0件が正常）
   const workflows = ['daily-article.yml', 'x-post.yml', 'x-generate.yml', 'weekly-kpi.yml'];
+  // Phase 0 (2026-07-11): scheduleを削除して意図停止中（正本: AI運用/戦略/媒体修復実行計画_2026-07-11.md、
+  // 停止コミット: 95eeb3c〜039f6ae）。発火しないため過去runの失敗履歴は監視しない（新runが来ない限り
+  // 「直近5回失敗」が永久に残り、偽の🚨になるため）。Phase 0解除で自動化を再開する時はここから外すこと。
+  const paused = ['daily-article.yml', 'x-generate.yml', 'weekly-kpi.yml'];
   for (const wf of workflows) {
+    if (paused.includes(wf)) {
+      infos.push(`${wf}: Phase 0停止中（schedule削除済み・手動実行のみ）`);
+      continue;
+    }
     try {
       const res = await fetch(`${REPO_API}/actions/workflows/${wf}/runs?per_page=5`);
       if (!res.ok) { warnings.push(`${wf}: 実行履歴を取得できない (HTTP ${res.status})`); continue; }
@@ -196,6 +204,64 @@ async function checkCvFunnel() {
   }
 }
 
+// ── 8. 旧戦略の残存汚染スキャン（2026-07-05 recall-audit構造改修）────
+// 戦略転換の波及チェックを「毎回横断grepすること」という善意ルールに任せると毎回1箇所ずつ漏れる
+// （想起ミス台帳①④＋7/5監査で7箇所発見が実証）。検査語は名前ではなくナラティブの固有要素で引く
+// —— 名前だけ「編集部」に置換され中身（借金200万→資産500万）が残った実例があるため。
+// 戦略転換時は RESIDUE_PATTERNS に旧戦略の固有語を追加する（それが転換完了条件の一部）。
+function checkStrategyResidue() {
+  const HOME = process.env.HOME || '';
+  const SELF = fileURLToPath(import.meta.url);
+  const RESIDUE_PATTERNS = [
+    /田中蓮|tanaka_ren/, // 旧ペルソナ名・旧XアカウントID（2026-05-31全廃）
+    /借金200万|32歳・IT会社員|副業月20万|資産500万.{0,12}築/, // 旧ペルソナのナラティブ固有要素
+  ];
+  const NOTE_RE = /廃止|禁止|全廃|撤退|除去済み|使わない|語らない|⛔|残存/; // 廃止注記の行は汚染ではない
+  const EXT_RE = /\.(md|mdx|mjs|js|py|ts|astro|yml|yaml|json|txt)$/;
+  // learning-log/handoff は追記型の履歴（アーカイブ層）なので対象外
+  const targets = [
+    { p: path.join(AFFILIATE_ROOT, 'CLAUDE.md'), level: 'critical' },
+    { p: path.join(HOME, '.claude/CLAUDE.md'), level: 'critical' },
+    { p: path.join(HOME, '.claude/skills'), level: 'critical' },
+    { p: path.join(HOME, '.claude/agents'), level: 'critical' },
+    { p: path.join(ROOT, 'scripts'), level: 'critical' },
+    { p: path.join(ROOT, 'x-automation'), level: 'critical', skip: /\/data\// },
+    { p: path.join(ROOT, 'src/content/blog'), level: 'critical' },
+    { p: path.join(AFFILIATE_ROOT, 'AI運用'), level: 'warning', skip: /archive|learning-log|handoff/ },
+    { p: path.join(AFFILIATE_ROOT, '専門記事'), level: 'warning' },
+    { p: path.join(AFFILIATE_ROOT, 'ブログ運営観点'), level: 'warning' },
+  ];
+  const hits = [];
+  for (const t of targets) {
+    if (!fs.existsSync(t.p)) continue;
+    const files = fs.statSync(t.p).isDirectory()
+      ? fs.readdirSync(t.p, { recursive: true }).map((f) => path.join(t.p, String(f)))
+      : [t.p];
+    for (const f of files) {
+      if (!EXT_RE.test(f) || f === SELF || (t.skip && t.skip.test(f))) continue;
+      let text;
+      try { text = fs.readFileSync(f, 'utf-8'); } catch { continue; }
+      text.split('\n').forEach((line, i) => {
+        if (NOTE_RE.test(line)) return;
+        if (RESIDUE_PATTERNS.some((re) => re.test(line))) hits.push({ f, line: i + 1, level: t.level });
+      });
+    }
+  }
+  // X投稿キューは pending（これから投稿される行）だけ検査。posted/suspended は履歴なので無視
+  const queueCsv = path.join(ROOT, 'x-automation/data/tweet_queue.csv');
+  if (fs.existsSync(queueCsv)) {
+    const bad = fs.readFileSync(queueCsv, 'utf-8').split('\n')
+      .filter((l) => l.includes('pending') && RESIDUE_PATTERNS.some((re) => re.test(l)));
+    if (bad.length) critical.push(`tweet_queue.csv のpending投稿 ${bad.length} 件に旧戦略の残存表現。投稿される前にsuspend化すること。`);
+  }
+  const fmt = (list) => list.slice(0, 5).map((h) => `${path.relative(AFFILIATE_ROOT, h.f)}:${h.line}`).join(' / ') + (list.length > 5 ? ` 他${list.length - 5}箇所` : '');
+  const crit = hits.filter((h) => h.level === 'critical');
+  const warn = hits.filter((h) => h.level === 'warning');
+  if (crit.length) critical.push(`旧戦略の残存表現が常駐層/自動生成系/公開面に ${crit.length} 箇所: ${fmt(crit)}`);
+  if (warn.length) warnings.push(`旧戦略の残存表現が知識ベース/ドキュメントに ${warn.length} 箇所: ${fmt(warn)}`);
+  if (!crit.length && !warn.length) infos.push('旧戦略残存スキャン: クリーン');
+}
+
 // ── 実行 ────────────────────────────────────────────────────────
 console.log('🩺 ops-doctor — 事業システム健康診断\n');
 checkGit();
@@ -205,6 +271,7 @@ checkDrafts();
 checkHandoff();
 checkStructure();
 await checkCvFunnel();
+checkStrategyResidue();
 
 if (critical.length) {
   console.log('🚨 要対応（今日中に潰す）');
