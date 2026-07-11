@@ -1,9 +1,8 @@
 name: 週次KPI自動集計
 
 on:
-  schedule:
-    - cron: '0 0 * * 1'   # 毎週月曜 09:00 JST（UTC 00:00）
-  workflow_dispatch:        # 手動実行（テスト・再取得用）
+  # Phase 0 pause (2026-07-11): scheduled commits disabled. Manual only.
+  workflow_dispatch:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
