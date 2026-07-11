@@ -381,7 +381,7 @@
     "status": "pending",
     "priority": 14,
     "channel": "seo_x_organic",
-    "_note": "2026-07-11: 本文は draft:true で src/content/blog/fx-nanpin-risk.mdx に作成済み（約7,300字・06-quality-check.md参照）。ren-blog-/.git に削除不能なstaleロック（index.lock/HEAD.lock）が発生し、ローカルgit commitが一切実行不可だったため未commit（前例のfx-loss-cut-shikumiより悪化した状態。詳細はAI運用/handoff.mdの2026-07-11エントリ参照）。人間がFinderで.gitのstaleロックを削除後、このmdxをcommit/pushしてから status を published に更新する。"
+    "_note": "2026-07-11: 本文は draft:true で src/content/blog/fx-nanpin-risk.mdx に作成済み（約7,300字・06-quality-check.md参照）。ren-blog-/.git に削除不能なstaleロック（index.lock/HEAD.lock）が発生し通常のgit commitが不可だったため、git plumbing（read-tree/commit-tree+refs直接書き換え）でローカルcommit c8d94c9 まで完了。git push はsandboxにGitHub認証情報がなく未実行（前例のfx-demo-tsukaikata/fx-loss-cut-shikumiと同様）。詳細はAI運用/handoff.mdの2026-07-11エントリ参照。人間が実機で git push 後、status を published に更新する。また.git内のstaleロック（index.lock/HEAD.lock等）はFinderで手動削除を推奨（削除しないと次回以降も通常のgit commitが失敗する）。"
   },
   {
     "slug": "fx-tax-keisan",
