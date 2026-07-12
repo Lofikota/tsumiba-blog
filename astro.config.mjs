@@ -15,7 +15,7 @@ const noindexSlugs = fs.readdirSync('./src/content/blog')
 export default defineConfig({
   site: 'https://tsumiba.com',  // 母艦ドメイン（2026-06-13 Cloudflare Pages紐付け完了・Active）
   integrations: [mdx(), sitemap({
-    filter: (page) => !noindexSlugs.some((slug) => page.includes(`/blog/${slug}/`)),
+    filter: (page) => !page.includes('/admin/') && !page.includes('/go/') && !noindexSlugs.some((slug) => page.includes(`/blog/${slug}/`)),
   })],
   output: 'static',
   // vite キャッシュを外部一時ディレクトリへ退避（マウント環境でのEPERM回避）
