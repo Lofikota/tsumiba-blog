@@ -1,3 +1,5 @@
 # Cloudflare Pages リダイレクトルール
 # /old-path /new-path 301
 /sitemap.xml /sitemap-index.xml 301
+/blog/kaigai-fx-vs-kokunai-fx/ /blog/kaigai-fx-risk/ 301
+/blog/fx-ea-jidoubai-hajimekata/ /blog/fx-auto-trade-shoshinsha/ 301

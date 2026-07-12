@@ -16,9 +16,10 @@ interface Props {
   headings?: { depth: number; slug: string; text: string }[];
   articleType?: 'review' | 'guide' | 'comparison' | 'news';
   rating?: number;
+  noindex?: boolean;
 }
 
-const { title, description, pubDate, updatedDate, heroImage, category, affiliate = true, headings = [], articleType, rating } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, category, affiliate = true, headings = [], articleType, rating, noindex = false } = Astro.props;
 const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 const catInfo = CATEGORIES[category];
 const ogImage = heroImage ?? `/og/${slug}.svg`;
@@ -89,7 +90,7 @@ const stickyCta = category === 'FX・外貨' ? { href: '/go/dmm-fx/', text: 'DMM
 const nextRead = getNextRead(slug);
 ---
 
-<BaseLayout title={title} description={description} image={ogImage} article={true} pubDate={pubDate} updatedDate={updatedDate}>
+<BaseLayout title={title} description={description} image={ogImage} article={true} pubDate={pubDate} updatedDate={updatedDate} robots={noindex ? 'noindex,follow' : undefined}>
   <article>
     <!-- パンくずリスト -->
     <nav aria-label="パンくずリスト" style="font-size:0.78rem;color:#9ca3af;margin-bottom:0.75rem;display:flex;gap:0.35rem;flex-wrap:wrap;align-items:center;">

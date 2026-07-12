@@ -12,6 +12,7 @@ const blog = defineCollection({
     tags: z.array(z.string()).default([]),
     heroImage: z.string().optional(),
     draft: z.boolean().default(false),
+    noindex: z.boolean().default(false),
     affiliate: z.boolean().default(true),
     articleType: z.enum(['review', 'guide', 'comparison', 'news']).optional(),
     // CMS(Sveltia)が未入力時に rating: null を書き込むため、nullはundefined扱いにする
