@@ -65,6 +65,8 @@ function buildLinkMap() {
     const slug = file.replace('.mdx', '');
     const content = fs.readFileSync(path.join(BLOG_DIR, file), 'utf-8');
     const fm = parseFrontmatter(content);
+    // published限定: draft記事はリンク候補に入れない（公開面からのdraft参照禁止）
+    if (fm.draft === 'true') continue;
     const url = `${BASE_URL}/${slug}/`;
 
     if (fm.title) {
