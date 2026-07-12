@@ -6,7 +6,7 @@ export async function GET(context: APIContext) {
   const posts = await getCollection('blog', (e) => !e.data.draft);
   return rss({
     title: 'tsumiba',
-    description: 'DMM FX・JFX・FXTFなど国内FX口座の条件・スプレッド・リスクを会社員目線で比較するFX口座比較メディア',
+    description: 'DMM FX・JFX・FXTFなど国内FX口座の条件・スプレッド・リスクを、少額で始めたい初心者向けに比較するFX口座比較メディア',
     site: context.site!,
     items: posts
       .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
