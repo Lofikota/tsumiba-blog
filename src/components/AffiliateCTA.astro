@@ -32,7 +32,7 @@ const bg = colorMap[color] ?? colorMap.blue;
   {badge && <div class={`acta-badge${compact ? ' acta-badge-compact' : ''}`}>{badge}</div>}
   {note && <p class={`acta-note${compact ? ' acta-note-compact' : ''}`}>{note}</p>}
   <a href={ctaHref} {...(external ? { target: '_blank', rel: 'noopener noreferrer sponsored nofollow' } : {})}
-     data-google-event="affiliate_click"
+     data-google-event="article_cta_click"
      data-google-category="affiliate"
      data-google-label={ctaLabel}
      class={`acta-btn${compact ? ' acta-btn-compact' : ''}`} style={bg}>

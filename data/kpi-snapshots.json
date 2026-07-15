@@ -7,11 +7,12 @@
     "tweetCount": 22,
     "xUsername": "tedori_asset",
     "lineFollowers": null,
-    "gsc": {
-      "clicks": 0,
-      "impressions": 0,
-      "ctr": 0,
-      "position": 0
+    "gsc": null,
+    "gscCollection": {
+      "status": "unavailable",
+      "reason": "legacy_same_day_query_before_gsc_finalization",
+      "period": "2026-05-11〜2026-05-11",
+      "dataDelayDays": 3
     }
   },
   {
@@ -22,11 +23,12 @@
     "tweetCount": 54,
     "xUsername": "tedori_asset",
     "lineFollowers": null,
-    "gsc": {
-      "clicks": 0,
-      "impressions": 0,
-      "ctr": 0,
-      "position": 0
+    "gsc": null,
+    "gscCollection": {
+      "status": "unavailable",
+      "reason": "legacy_same_day_query_before_gsc_finalization",
+      "period": "2026-05-18〜2026-05-18",
+      "dataDelayDays": 3
     }
   },
   {
@@ -42,6 +44,12 @@
       "impressions": 114,
       "ctr": 0,
       "position": 30
+    },
+    "gscCollection": {
+      "status": "partial_measured",
+      "reason": "legacy_window_included_unfinalized_dates",
+      "period": "2026-05-25〜2026-05-30",
+      "dataDelayDays": null
     }
   },
   {
@@ -52,11 +60,12 @@
     "tweetCount": 111,
     "xUsername": "tedori_asset",
     "lineFollowers": null,
-    "gsc": {
-      "clicks": 0,
-      "impressions": 0,
-      "ctr": 0,
-      "position": 0
+    "gsc": null,
+    "gscCollection": {
+      "status": "unavailable",
+      "reason": "legacy_same_day_query_before_gsc_finalization",
+      "period": "2026-06-01〜2026-06-01",
+      "dataDelayDays": 3
     }
   },
   {
@@ -67,11 +76,12 @@
     "tweetCount": 111,
     "xUsername": "tedori_asset",
     "lineFollowers": null,
-    "gsc": {
-      "clicks": 0,
-      "impressions": 0,
-      "ctr": 0,
-      "position": 0
+    "gsc": null,
+    "gscCollection": {
+      "status": "unavailable",
+      "reason": "legacy_same_day_query_before_gsc_finalization",
+      "period": "2026-06-08〜2026-06-08",
+      "dataDelayDays": 3
     }
   },
   {
@@ -82,11 +92,12 @@
     "tweetCount": 111,
     "xUsername": "tedori_asset",
     "lineFollowers": null,
-    "gsc": {
-      "clicks": 0,
-      "impressions": 0,
-      "ctr": 0,
-      "position": 0
+    "gsc": null,
+    "gscCollection": {
+      "status": "unavailable",
+      "reason": "legacy_same_day_query_before_gsc_finalization",
+      "period": "2026-06-15〜2026-06-15",
+      "dataDelayDays": 3
     }
   },
   {
@@ -97,11 +108,12 @@
     "tweetCount": 111,
     "xUsername": "tedori_asset",
     "lineFollowers": null,
-    "gsc": {
-      "clicks": 0,
-      "impressions": 0,
-      "ctr": 0,
-      "position": 0
+    "gsc": null,
+    "gscCollection": {
+      "status": "unavailable",
+      "reason": "legacy_same_day_query_before_gsc_finalization",
+      "period": "2026-06-22〜2026-06-22",
+      "dataDelayDays": 3
     }
   },
   {
@@ -112,11 +124,12 @@
     "tweetCount": 111,
     "xUsername": "tedori_asset",
     "lineFollowers": null,
-    "gsc": {
-      "clicks": 0,
-      "impressions": 0,
-      "ctr": 0,
-      "position": 0
+    "gsc": null,
+    "gscCollection": {
+      "status": "unavailable",
+      "reason": "legacy_same_day_query_before_gsc_finalization",
+      "period": "2026-06-29〜2026-06-29",
+      "dataDelayDays": 3
     }
   },
   {
@@ -127,11 +140,12 @@
     "tweetCount": 111,
     "xUsername": "tedori_asset",
     "lineFollowers": null,
-    "gsc": {
-      "clicks": 0,
-      "impressions": 0,
-      "ctr": 0,
-      "position": 0
+    "gsc": null,
+    "gscCollection": {
+      "status": "unavailable",
+      "reason": "legacy_same_day_query_before_gsc_finalization",
+      "period": "2026-07-06〜2026-07-06",
+      "dataDelayDays": 3
     }
   }
 ]

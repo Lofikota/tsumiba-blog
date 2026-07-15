@@ -48,30 +48,62 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
           gtag('config', googleTagId);
 
           var params = new URLSearchParams(window.location.search);
-          var source = params.get('utm_source') || params.get('ref') || 'direct';
+          var referrerPath = 'none';
+          try {
+            var referrerUrl = document.referrer ? new URL(document.referrer) : null;
+            referrerPath = referrerUrl && referrerUrl.origin === window.location.origin
+              ? referrerUrl.pathname
+              : referrerUrl ? 'external' : 'none';
+          } catch {}
+          var source = params.get('utm_source') || params.get('ref') || (referrerPath.startsWith('/blog/') ? 'internal_article' : 'direct');
           var medium = params.get('utm_medium') || '';
           var campaign = params.get('utm_campaign') || '';
 
           var redirected = false;
-          function go(){ if (redirected) return; redirected = true; window.location.replace(destinationUrl); }
-
-          gtag('event', 'affiliate_click', {
+          gtag('event', 'go_page_view', {
             event_category: 'affiliate',
             event_label: eventLabel,
+            page_path: window.location.pathname,
+            referrer_path: referrerPath,
             traffic_source: source,
             traffic_medium: medium,
             campaign: campaign,
             transport_type: 'beacon',
           });
-          if (googleAdsConversionSendTo) {
-            gtag('event', 'conversion', {
-              send_to: googleAdsConversionSendTo,
+
+          function go(method) {
+            if (redirected) return;
+            redirected = true;
+            gtag('event', 'affiliate_click', {
               event_category: 'affiliate',
               event_label: eventLabel,
+              page_path: window.location.pathname,
+              referrer_path: referrerPath,
+              traffic_source: source,
+              traffic_medium: medium,
+              campaign: campaign,
+              redirect_method: method,
+              transport_type: 'beacon',
             });
+            if (googleAdsConversionSendTo) {
+              gtag('event', 'conversion', {
+                send_to: googleAdsConversionSendTo,
+                event_category: 'affiliate',
+                event_label: eventLabel,
+              });
+            }
+            setTimeout(function(){ window.location.replace(destinationUrl); }, 300);
           }
-          // 計測ビーコン送信の猶予を取ってから遷移（JS無効時はmeta refreshが2秒で発火）
-          setTimeout(go, 600);
+
+          document.addEventListener('DOMContentLoaded', function() {
+            var goButton = document.getElementById('goButton');
+            goButton?.addEventListener('click', function(event) {
+              event.preventDefault();
+              go('manual');
+            });
+          });
+          // /go/到達を記録後にASP送客を1回だけ記録する。JS無効時はmeta refreshが2秒で発火。
+          setTimeout(function(){ go('auto'); }, 600);
         </script>
       </>
     )}
@@ -83,10 +115,7 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
         <h1>{isPending ? '現在使える導線へ移動します' : `${link.name} 公式サイトへ移動します`}</h1>
         <p>{isPending ? `${link.name} はASPリンクの動作確認が完了していないため、確認済みの関連導線へ移動します。` : link.disclosure}</p>
         <p class="go-small">{isPending ? '未確認の外部リンクへは送客しません。申込前には必ず公式条件とリスクをご確認ください。' : '掲載情報やキャンペーン条件は変更される場合があります。申込前に公式サイトで最新情報をご確認ください。'}</p>
-        <a class="go-button" href={destinationUrl} rel="sponsored nofollow noopener noreferrer"
-           data-google-event="affiliate_click"
-           data-google-category="affiliate"
-           data-google-label={isPending ? `${link.slug}:fallback` : link.slug}>{isPending ? '確認済みの導線へ進む' : '公式サイトを開く'}</a>
+        <a class="go-button" id="goButton" href={destinationUrl} rel="sponsored nofollow noopener noreferrer">{isPending ? '確認済みの導線へ進む' : '公式サイトを開く'}</a>
       </section>
     </main>
     <style>

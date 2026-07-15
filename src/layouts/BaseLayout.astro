@@ -10,6 +10,7 @@ interface Props {
   updatedDate?: Date;
   robots?: string;
   wide?: boolean;
+  commercial?: boolean;
 }
 
 const {
@@ -21,6 +22,7 @@ const {
   updatedDate,
   robots = 'index,follow,max-image-preview:large',
   wide = false,
+  commercial = false,
 } = Astro.props;
 const siteUrl = 'https://tsumiba.com';
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
@@ -74,12 +76,22 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
   {googleTagId && (
     <>
       <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}></script>
-      <script define:vars={{ googleTagId, googleAdsConversionSendTo }}>
+      <script define:vars={{ googleTagId, googleAdsConversionSendTo, article, commercial }}>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         window.gtag = window.gtag || gtag;
         gtag('js', new Date());
         gtag('config', googleTagId);
+
+        if (article) {
+          var articleSlug = window.location.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
+          gtag('event', 'article_view', {
+            event_category: 'content',
+            event_label: articleSlug,
+            page_path: window.location.pathname,
+            is_commercial: commercial ? 'true' : 'false',
+          });
+        }
 
         document.addEventListener('click', (event) => {
           const target = event.target;

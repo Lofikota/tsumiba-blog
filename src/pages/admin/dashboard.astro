@@ -34,7 +34,7 @@ const diff = (key: string) => {
 };
 const followerDiff = diff('xFollowers');
 const tweetDiff    = diff('tweetCount');
-const clickDiff    = latest && prev ? latest.gsc.clicks - prev.gsc.clicks : null;
+const clickDiff    = latest?.gsc && prev?.gsc ? latest.gsc.clicks - prev.gsc.clicks : null;
 
 // 緊急アクション：heroImage が未生成の記事
 const noImage = posts.filter(p => {
@@ -62,7 +62,7 @@ function diffClass(n: number | null) {
 // Chart.js 用データを JSON 文字列でクライアントへ渡す
 const chartLabels = JSON.stringify(kpi.map(d => d.weekRange));
 const chartFollowers = JSON.stringify(kpi.map(d => d.xFollowers));
-const chartClicks = JSON.stringify(kpi.map(d => d.gsc.clicks));
+const chartClicks = JSON.stringify(kpi.map(d => d.gsc?.clicks ?? null));
 ---
 
 <BaseLayout
@@ -96,13 +96,13 @@ const chartClicks = JSON.stringify(kpi.map(d => d.gsc.clicks));
       </div>
       <div class="kpi-card">
         <span class="kpi-label">GSCクリック</span>
-        <strong class="kpi-val">{latest?.gsc.clicks ?? '—'}</strong>
+        <strong class="kpi-val">{latest?.gsc?.clicks ?? '—'}</strong>
         {clickDiff !== null && <span class={`kpi-diff ${diffClass(clickDiff)}`}>{diffBadge(clickDiff)}</span>}
         <small>前週比</small>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">GSCインプレ</span>
-        <strong class="kpi-val">{latest?.gsc.impressions ?? '—'}</strong>
+        <strong class="kpi-val">{latest?.gsc?.impressions ?? '—'}</strong>
         <small>直近週計</small>
       </div>
       <div class="kpi-card">

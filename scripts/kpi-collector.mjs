@@ -47,6 +47,8 @@ const fmt = d => d.toISOString().split('T')[0];
 
 const now = toJST();
 const todayStr = fmt(now);
+const GSC_DATA_DELAY_DAYS = 3;
+const GSC_WINDOW_DAYS = 7;
 
 // ISO 週番号
 const getISOWeek = d => {
@@ -68,6 +70,11 @@ const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
 const weekStartStr = fmt(monday);
 const weekEndStr = fmt(sunday < now ? sunday : now); // GSCは今日まで
 const weekRange = `${monday.getMonth() + 1}/${monday.getDate()}〜${sunday.getMonth() + 1}/${sunday.getDate()}`;
+const gscEnd = new Date(now); gscEnd.setDate(gscEnd.getDate() - GSC_DATA_DELAY_DAYS);
+const gscStart = new Date(gscEnd); gscStart.setDate(gscStart.getDate() - GSC_WINDOW_DAYS + 1);
+const gscStartStr = fmt(gscStart);
+const gscEndStr = fmt(gscEnd);
+const gscPeriod = `${gscStartStr}〜${gscEndStr}`;
 
 console.log(`\n🚀 週次KPI集計開始 [${weekKey}] ${weekRange}\n`);
 
@@ -107,9 +114,9 @@ async function fetchXMetrics() {
 // ──────────────────────────────────────────
 async function fetchGSCWeekly() {
   const { GSC_SERVICE_ACCOUNT_JSON, GSC_SITE_URL } = process.env;
-  if (!GSC_SERVICE_ACCOUNT_JSON && !existsSync(join(ROOT, '.env'))) {
+  if (!GSC_SERVICE_ACCOUNT_JSON) {
     console.warn('⚠️  GSC 環境変数未設定 — スキップ');
-    return null;
+    return { status: 'unavailable', reason: 'missing_credentials', period: gscPeriod };
   }
   try {
     const scopes = ['https://www.googleapis.com/auth/webmasters.readonly'];
@@ -128,8 +135,8 @@ async function fetchGSCWeekly() {
       wm.searchanalytics.query({
         siteUrl,
         requestBody: {
-          startDate: weekStartStr,
-          endDate: weekEndStr,
+          startDate: gscStartStr,
+          endDate: gscEndStr,
           dimensions: ['date'],
           rowLimit: 7,
         },
@@ -137,8 +144,8 @@ async function fetchGSCWeekly() {
       wm.searchanalytics.query({
         siteUrl,
         requestBody: {
-          startDate: weekStartStr,
-          endDate: weekEndStr,
+          startDate: gscStartStr,
+          endDate: gscEndStr,
           dimensions: ['page'],
           rowLimit: 10,
         },
@@ -151,8 +158,8 @@ async function fetchGSCWeekly() {
     const avgCtr = totalImpressions > 0
       ? Math.round((totalClicks / totalImpressions) * 10000) / 100
       : 0;
-    const avgPosition = dateRows.length > 0
-      ? Math.round((dateRows.reduce((s, r) => s + r.position, 0) / dateRows.length) * 10) / 10
+    const avgPosition = totalImpressions > 0
+      ? Math.round((dateRows.reduce((s, r) => s + r.position * r.impressions, 0) / totalImpressions) * 10) / 10
       : 0;
 
     const topPages = (pageRes.data.rows || []).slice(0, 5).map(r => ({
@@ -162,11 +169,20 @@ async function fetchGSCWeekly() {
       position: Math.round(r.position * 10) / 10,
     }));
 
-    console.log(`✅ GSC: ${weekStartStr}〜${weekEndStr} | クリック ${totalClicks} / 表示 ${totalImpressions}`);
-    return { clicks: totalClicks, impressions: totalImpressions, ctr: avgCtr, position: avgPosition, topPages, period: `${weekStartStr}〜${weekEndStr}` };
+    console.log(`✅ GSC: ${gscPeriod}（反映待ち${GSC_DATA_DELAY_DAYS}日を除外）| クリック ${totalClicks} / 表示 ${totalImpressions}`);
+    return {
+      status: 'measured',
+      clicks: totalClicks,
+      impressions: totalImpressions,
+      ctr: avgCtr,
+      position: avgPosition,
+      topPages,
+      period: gscPeriod,
+      dataDelayDays: GSC_DATA_DELAY_DAYS,
+    };
   } catch (e) {
     console.warn(`⚠️  GSC API エラー: ${e.message}`);
-    return null;
+    return { status: 'unavailable', reason: 'api_error', period: gscPeriod };
   }
 }
 
@@ -318,7 +334,7 @@ function generateWeeklyReport(snap, prev, gsc) {
 ${gsc.topPages?.map(p =>
   `| \`${p.page}\` | ${p.clicks}クリック | ${p.impressions}表示 | ${p.position}位 |`
 ).join('\n') || 'データなし'}
-` : '\n## 📈 検索パフォーマンス\n\nデータ取得失敗（GSC未設定またはAPIエラー）\n';
+` : `\n## 📈 検索パフォーマンス\n\n未取得（状態: ${snap.gscCollection?.reason ?? 'unknown'} / 対象期間: ${snap.gscCollection?.period ?? '不明'}）。0として集計しません。\n`;
 
   const lineSection = snap.lineFollowers != null
     ? `\n## 💌 LINE友だち数\n\n${delta(snap.lineFollowers, prev?.lineFollowers ?? null, '人')}\n`
@@ -519,11 +535,12 @@ function writeGitHubOutputs(snap, prev, gsc) {
 // ──────────────────────────────────────────
 // メイン処理
 // ──────────────────────────────────────────
-const [xData, gsc, lineData] = await Promise.all([
+const [xData, gscResult, lineData] = await Promise.all([
   fetchXMetrics(),
   fetchGSCWeekly(),
   fetchLINEFollowers(),
 ]);
+const gsc = gscResult?.status === 'measured' ? gscResult : null;
 
 const allSnaps = loadSnapshots();
 const prev = getPrev(allSnaps);
@@ -542,6 +559,12 @@ const snap = {
     ctr: gsc.ctr,
     position: gsc.position,
   } : null,
+  gscCollection: {
+    status: gscResult?.status ?? 'unavailable',
+    reason: gscResult?.reason ?? null,
+    period: gscResult?.period ?? gscPeriod,
+    dataDelayDays: GSC_DATA_DELAY_DAYS,
+  },
 };
 
 const updatedSnaps = saveSnapshot(snap, allSnaps);

@@ -90,7 +90,7 @@ const stickyCta = category === 'FX・外貨' ? { href: '/go/dmm-fx/', text: 'DMM
 const nextRead = getNextRead(slug);
 ---
 
-<BaseLayout title={title} description={description} image={ogImage} article={true} pubDate={pubDate} updatedDate={updatedDate} robots={noindex ? 'noindex,follow' : undefined}>
+<BaseLayout title={title} description={description} image={ogImage} article={true} commercial={affiliate} pubDate={pubDate} updatedDate={updatedDate} robots={noindex ? 'noindex,follow' : undefined}>
   <article>
     <!-- パンくずリスト -->
     <nav aria-label="パンくずリスト" style="font-size:0.78rem;color:#9ca3af;margin-bottom:0.75rem;display:flex;gap:0.35rem;flex-wrap:wrap;align-items:center;">
@@ -198,7 +198,7 @@ const nextRead = getNextRead(slug);
       <div class="sticky-cta" id="stickyCta" hidden>
         <span class="sticky-cta-pr">PR</span>
         <a class="sticky-cta-link" href={stickyCta.href} rel="sponsored nofollow noopener noreferrer"
-           data-google-event="affiliate_click"
+           data-google-event="article_cta_click"
            data-google-category="affiliate"
            data-google-label={stickyCta.label}>{stickyCta.text}</a>
         <button type="button" class="sticky-cta-close" id="stickyCtaClose" aria-label="閉じる">×</button>

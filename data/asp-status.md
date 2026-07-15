@@ -12,7 +12,7 @@ auto_check: scripts/asp-status-checker.mjs
 |-----|----------------|--------|
 | TCSアフィリエイト | サイト（ren-money.com）登録承認 | 2026-05-07 |
 | バリューコマース | 松井証券 MATSUI FX | 2026-05-18 |
-| afb（アフィリエイトB） | サイト（ren-money.com）登録承認 ⚠️ SMS/電話本人認証が必要（期限2026-05-26） 電話認証PIN: 909000 / 電話番号: 03-6387-3424 | 2026-05-19 |
+| afb（アフィリエイトB） | サイト登録承認済み。本人認証はafb管理画面で再確認（認証情報は1Password参照） | 2026-05-19 |
 
 ## 否認
 
@@ -42,7 +42,7 @@ auto_check: scripts/asp-status-checker.mjs
 
 | 優先度 | 内容 | 期限 |
 |--------|------|------|
-| 🔴 最高 | **afb本人認証（SMS or 電話）**: 電話番号 03-6387-3424 に電話してPIN「909000」を入力。SMS再送: https://www.afi-b.com/api/partner/sms/failed | **2026-05-26** |
+| 🔴 最高 | **afb本人認証**: afb管理画面から実施。電話番号・PIN等は1Passwordを参照し、Markdownへ保存しない。 | **要管理画面確認** |
 | 🟠 高 | バリューコマース管理画面で松井証券 MATSUI FX のアフィリエイトリンクを取得 → affiliateLinks.tsに追記 | 今週中 |
 
 ## GitHub Actions 問題（2026-05-13〜継続）

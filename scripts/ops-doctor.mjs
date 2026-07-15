@@ -186,12 +186,32 @@ async function checkCvFunnel() {
     if (!src.includes("category === 'FX・外貨'")) critical.push("BlogPost.astro のsticky CTAカテゴリ判定が実カテゴリ値 'FX・外貨' と不一致（全記事でモバイルCTAが非表示になる退行）。");
     if (!src.includes('/go/dmm-fx/')) warnings.push('BlogPost.astro のsticky送客先が最高単価のDMM FXでない（優先順位の退行疑い）。');
   }
+  // 7-2. 記事CTAとASP送客のイベント分離（同名だと1送客が二重計上される）
+  const articleEventFiles = [
+    blogPost,
+    path.join(ROOT, 'src/components/AffiliateCTA.astro'),
+    path.join(ROOT, 'src/components/FxPriorityCTA.astro'),
+    path.join(ROOT, 'src/components/RankingCard.astro'),
+  ];
+  for (const file of articleEventFiles) {
+    if (!fs.existsSync(file)) continue;
+    const src = fs.readFileSync(file, 'utf-8');
+    if (src.includes('data-google-event="affiliate_click"')) {
+      critical.push(`${path.relative(ROOT, file)} の記事CTAが affiliate_click を使用（/go/側と二重計上）。article_cta_click に分離すること。`);
+    }
+  }
+  const goPage = path.join(ROOT, 'src/pages/go/[slug].astro');
+  if (fs.existsSync(goPage)) {
+    const src = fs.readFileSync(goPage, 'utf-8');
+    if (!src.includes("gtag('event', 'go_page_view'")) critical.push('/go/到達イベント go_page_view がない。');
+    if (!src.includes("gtag('event', 'affiliate_click'")) critical.push('ASP送客イベント affiliate_click がない。');
+  }
   const lineRefPage = path.join(ROOT, 'src/pages/line/[ref].astro');
   if (fs.existsSync(lineRefPage)) {
     const src = fs.readFileSync(lineRefPage, 'utf-8');
     if (/確認中. DMM|リンク確認後に再開/.test(src)) warnings.push('/line/[ref].astro にDMM迂回の旧戦略文言が復活している（2026-07-05に除去済みのはず）。');
   }
-  // 7-2. 本番計測タグの無言退行（Pages環境変数が消えるとフォールバックのAW-タグに戻り、GA4計測が静かに消える）
+  // 7-3. 本番計測タグの無言退行（Pages環境変数が消えるとフォールバックのAW-タグに戻り、GA4計測が静かに消える）
   if (!noNet) {
     try {
       const res = await fetch('https://tsumiba.com/', { signal: AbortSignal.timeout(8000) });
