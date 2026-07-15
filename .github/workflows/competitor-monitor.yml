@@ -39,7 +39,7 @@ jobs:
       - name: 変更をコミット＆プッシュ
         run: |
           git config user.name "ren-bot[bot]"
-          git config user.email "bot@ren-money.com"
+          git config user.email "bot@tsumiba.com"
           git add data/competitor-snapshots.json data/competitor-targets.json KPI管理/competitor-reports/
           git diff --staged --quiet || git commit -m "feat(monitor): 競合モニタリングレポート更新"
           git push

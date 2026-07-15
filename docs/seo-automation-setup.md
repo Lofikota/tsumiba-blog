@@ -39,7 +39,7 @@
 |---|---|---|
 | `ANTHROPIC_API_KEY` | Anthropic API key | https://console.anthropic.com/keys |
 | `GSC_SERVICE_ACCOUNT_JSON` | base64エンコードJSON（後述） | Google Cloud Console |
-| `GSC_SITE_URL` | `https://ren-money.com/` | そのまま入力 |
+| `GSC_SITE_URL` | `https://tsumiba.com/` | そのまま入力 |
 
 ---
 
@@ -57,7 +57,7 @@
 
 ### 2-3. Search Console にサービスアカウントを追加
 1. https://search.google.com/search-console/ を開く
-2. ren-money.com のプロパティ → 設定 → ユーザーと権限
+2. tsumiba.com のプロパティ → 設定 → ユーザーと権限
 3. 「ユーザーを追加」→ サービスアカウントのメールアドレス（`xxx@yyy.iam.gserviceaccount.com`）を「制限付き」で追加
 
 ### 2-4. JSONをbase64に変換してSecretsに登録
@@ -86,10 +86,10 @@ ANTHROPIC_API_KEY=REPLACE_WITH_ANTHROPIC_API_KEY npm run article:generate
 npm run article:check src/content/blog/fx-kouza-hikaku.mdx
 
 # SEO改善を今すぐ実行
-ANTHROPIC_API_KEY=REPLACE_WITH_ANTHROPIC_API_KEY GSC_SERVICE_ACCOUNT_JSON=REPLACE_WITH_BASE64_JSON GSC_SITE_URL=https://ren-money.com/ npm run seo:improve
+ANTHROPIC_API_KEY=REPLACE_WITH_ANTHROPIC_API_KEY GSC_SERVICE_ACCOUNT_JSON=REPLACE_WITH_BASE64_JSON GSC_SITE_URL=https://tsumiba.com/ npm run seo:improve
 
 # GSCデータだけ取得して確認
-GSC_SERVICE_ACCOUNT_JSON=xxx GSC_SITE_URL=https://ren-money.com/ npm run seo:fetch
+GSC_SERVICE_ACCOUNT_JSON=xxx GSC_SITE_URL=https://tsumiba.com/ npm run seo:fetch
 ```
 
 ---

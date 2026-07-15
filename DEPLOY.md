@@ -32,17 +32,17 @@ git push -u origin main
 
 ### ドメイン取得（Cloudflare Registrar）
 1. Cloudflareダッシュボード →「Domain Registration」
-2. `ren-money.com` を検索・購入（約$10/年）
+2. `tsumiba.com` を検索・購入（約$10/年）
 
 ### カスタムドメイン設定
 1. Pagesプロジェクト →「Custom domains」
-2. `ren-money.com` を追加
+2. `tsumiba.com` を追加
 3. 自動的にDNSが設定される（数分で完了）
 
 ## 4. astro.config.mjs のドメインを更新
 
 ```js
-site: 'https://ren-money.com',  // 購入したドメインに変更
+site: 'https://tsumiba.com',  // 購入したドメインに変更
 ```
 
 ## 5. 以降は自動デプロイ

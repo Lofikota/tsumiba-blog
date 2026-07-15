@@ -175,7 +175,7 @@ if (NO_PUSH) {
   step('git コミット & プッシュ');
   if (!DRY_RUN) {
     runGit(['config', 'user.name', 'ren-bot[bot]']);
-    runGit(['config', 'user.email', 'bot@ren-money.com']);
+    runGit(['config', 'user.email', 'bot@tsumiba.com']);
     runGit(['add', 'src/content/blog/', 'public/images/articles/', 'data/keyword-queue.json', 'KPI管理/automation-runs/']);
 
     const diff = runGit(['diff', '--staged', '--quiet']);
@@ -221,7 +221,7 @@ console.log('\n');
 console.log('═'.repeat(50));
 console.log('✅ パイプライン完了');
 console.log(`   記事: src/content/blog/${pending.slug}.mdx`);
-console.log(`   URL : https://ren-money.com/blog/${pending.slug}/`);
+console.log(`   URL : https://tsumiba.com/blog/${pending.slug}/`);
 console.log('═'.repeat(50));
 console.log('\n次のアクション:');
 console.log('  ① 記事確認: npm run preview でローカルサーバー起動');

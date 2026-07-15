@@ -58,7 +58,7 @@ if (!fs.existsSync(mdxPath)) {
 }
 
 const articleContent = fs.readFileSync(mdxPath, 'utf-8').slice(0, 4000);
-const articleUrl = `https://ren-money.com/blog/${target.slug}/`;
+const articleUrl = `https://tsumiba.com/blog/${target.slug}/`;
 
 // 今日から+1〜+5日の予定日を生成
 const today = new Date();

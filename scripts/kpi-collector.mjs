@@ -121,7 +121,7 @@ async function fetchGSCWeekly() {
       auth = new google.auth.GoogleAuth({ scopes });
     }
     const wm = google.webmasters({ version: 'v3', auth });
-    const siteUrl = GSC_SITE_URL || 'https://ren-money.com/';
+    const siteUrl = GSC_SITE_URL || 'https://tsumiba.com/';
 
     // 日別集計で週次合計を算出（集計ズレ防止）
     const [dateRes, pageRes] = await Promise.all([

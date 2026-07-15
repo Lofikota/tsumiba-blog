@@ -134,7 +134,7 @@ if (requestedTopic) {
     || { id: 'custom', emotion: requestedTopic, scene: '', cta_slug: requestedCta, cta_label: requestedTopic };
   target = { slug: macroTopic.id, keyword: macroTopic.emotion, category: 'macro' };
   articleBody = '';
-  articleUrl = `https://ren-money.com/blog/${macroTopic.cta_slug}/`;
+  articleUrl = `https://tsumiba.com/blog/${macroTopic.cta_slug}/`;
 } else {
   // 通常モード: ブログ記事ベース
   const queue = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/keyword-queue.json'), 'utf-8'));
@@ -159,7 +159,7 @@ if (requestedTopic) {
     .replace(/^import.*\n/gm, '')
     .replace(/<[^>]+>/g, '')
     .trim();
-  articleUrl = `https://ren-money.com/blog/${target.slug}/`;
+  articleUrl = `https://tsumiba.com/blog/${target.slug}/`;
 }
 
 // ─── yomi-teacher-prompt.md を読み込む ─────────

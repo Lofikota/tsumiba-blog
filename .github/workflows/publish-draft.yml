@@ -57,7 +57,7 @@ jobs:
           ARTICLE_SLUG: ${{ inputs.slug }}
         run: |
           git config user.name "ren-bot[bot]"
-          git config user.email "bot@ren-money.com"
+          git config user.email "bot@tsumiba.com"
           git add src/content/blog/ data/article-drafts/ data/keyword-queue.json
           if git diff --staged --quiet; then
             echo "committed=false" >> "$GITHUB_OUTPUT"

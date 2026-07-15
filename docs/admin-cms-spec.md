@@ -1,7 +1,7 @@
 # 管理画面 CMS 機能拡張 — 仕様書 v1.0
 
 作成日: 2026-05-30  
-対象: ren-money.com/admin  
+対象: tsumiba.com/admin  
 ステータス: レビュー待ち
 
 ---

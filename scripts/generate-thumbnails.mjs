@@ -59,7 +59,7 @@ function makeThumbnail(slug, style) {
   <rect x="4" y="4" width="88" height="56" rx="4" fill="${style.accent}"/>
   <text x="48" y="22" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="18" fill="#FFFFFF" text-anchor="middle">${style.emoji}</text>
   <text x="48" y="40" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="8" fill="#FFFFFF" text-anchor="middle">${style.label}</text>
-  <text x="48" y="52" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="500" font-size="6.5" fill="rgba(255,255,255,0.8)" text-anchor="middle">ren-money.com</text>
+  <text x="48" y="52" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="500" font-size="6.5" fill="rgba(255,255,255,0.8)" text-anchor="middle">tsumiba.com</text>
 </svg>`;
 }
 
@@ -86,7 +86,7 @@ function makeOgImage(title, style) {
   <text x="60" y="${titleY1}" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="64" fill="#FFFFFF">${line1}</text>
   ${line2 ? `<text x="60" y="${titleY2}" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="64" fill="#FFFFFF">${line2}</text>` : ''}
   <!-- フッター -->
-  <text x="60" y="580" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="500" font-size="28" fill="rgba(255,255,255,0.65)">編集部のマネーブログ | ren-money.com</text>
+  <text x="60" y="580" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="500" font-size="28" fill="rgba(255,255,255,0.65)">編集部のマネーブログ | tsumiba.com</text>
 </svg>`;
 }
 

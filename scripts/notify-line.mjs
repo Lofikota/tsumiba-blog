@@ -7,7 +7,7 @@
  *   node scripts/notify-line.mjs --type publish --slug matsui-fx-review
  *   node scripts/notify-line.mjs --type error --message "品質チェック失敗: ..."
  *   node scripts/notify-line.mjs --type seo --slug ideco-guide --report "順位改善..."
- *   node scripts/notify-line.mjs --type asp --approved "A8.net × 松井証券 (2026-05-12)" --rejected "アクセストレード × ren-money.com (2026-05-12)"
+ *   node scripts/notify-line.mjs --type asp --approved "A8.net × 松井証券 (2026-05-12)" --rejected "アクセストレード × tsumiba.com (2026-05-12)"
  */
 
 const LINE_API = 'https://api.line.me/v2/bot/message/push';

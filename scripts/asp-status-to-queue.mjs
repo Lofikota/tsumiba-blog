@@ -72,6 +72,7 @@ function parseApprovedSection(content) {
 // ── サイト登録（プログラムでなく）を除外 ─────────────────
 const SITE_PATTERNS = [
   /^ren-money\.com/i,
+  /^tsumiba\.com/i,
   /サイト.*登録/,
   /サイト.*承認/,
   /^登録承認/,

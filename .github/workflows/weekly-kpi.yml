@@ -77,7 +77,7 @@ jobs:
           GSC_CLICKS: ${{ steps.kpi.outputs.gsc_clicks }}
         run: |
           git config user.name "ren-bot[bot]"
-          git config user.email "bot@ren-money.com"
+          git config user.email "bot@tsumiba.com"
           git add \
             data/kpi-snapshots.json \
             KPI管理/kpi-dashboard.md \

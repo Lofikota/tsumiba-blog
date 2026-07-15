@@ -54,7 +54,7 @@ if (latest.xPostedAt) {
 }
 
 const articleContent = fs.readFileSync(mdxPath, 'utf-8').slice(0, 3000);
-const articleUrl = `https://ren-money.com/blog/${latest.slug}/`;
+const articleUrl = `https://tsumiba.com/blog/${latest.slug}/`;
 
 // Claudeでスレッド生成
 const client = new Anthropic();
@@ -106,7 +106,7 @@ try {
 }
 
 // URLを3ツイート目に確実に含める
-if (!tweets[2].includes('ren-money.com')) {
+if (!tweets[2].includes('tsumiba.com')) {
   tweets[2] = tweets[2].trimEnd() + `\n\n詳しくはブログで👇\n${articleUrl}`;
 }
 

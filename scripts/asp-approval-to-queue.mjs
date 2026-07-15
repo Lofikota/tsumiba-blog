@@ -45,11 +45,13 @@ function setOutput(key, value) {
 // ── サイト審査メール検出（プログラム承認ではないのでスキップ） ──
 const SITE_APPROVAL_PATTERNS = [
   /^ren-money\.com$/i,
+  /^tsumiba\.com$/i,
   /^note\.com/i,
   /^サイト登録/,
   /^site$/i,
   /審査通過/,
   /^ren-money/i,
+  /^tsumiba/i,
 ];
 
 function isSiteApproval(program) {

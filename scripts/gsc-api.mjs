@@ -2,7 +2,7 @@
 /**
  * Google Search Console API クライアント
  * 環境変数: GSC_SERVICE_ACCOUNT_JSON (base64エンコードされたサービスアカウントJSON)
- *           GSC_SITE_URL (例: https://ren-money.com/)
+ *           GSC_SITE_URL (例: https://tsumiba.com/)
  */
 import { google } from 'googleapis';
 import { readFileSync, existsSync } from 'fs';
@@ -19,7 +19,7 @@ if (existsSync(envPath)) {
   }
 }
 
-const SITE_URL = process.env.GSC_SITE_URL || 'https://ren-money.com/';
+const SITE_URL = process.env.GSC_SITE_URL || 'https://tsumiba.com/';
 
 function getAuth() {
   const scopes = ['https://www.googleapis.com/auth/webmasters.readonly'];

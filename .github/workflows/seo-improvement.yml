@@ -61,7 +61,7 @@ jobs:
         id: commit
         run: |
           git config user.name "ren-bot[bot]"
-          git config user.email "bot@ren-money.com"
+          git config user.email "bot@tsumiba.com"
           git add src/content/blog/ KPI管理/ data/keyword-queue.json
           if git diff --staged --quiet; then
             echo "committed=false" >> "$GITHUB_OUTPUT"
