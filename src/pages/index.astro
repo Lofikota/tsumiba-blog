@@ -108,6 +108,28 @@ const conversionBoxes = [
 const formatDate = (date: Date) => date.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
 // カードは常に生成SVGサムネ（写真は同型が並びやすく、タイトル情報も持たないため一覧では使わない）
 const imageFor = (post: typeof allPosts[number]) => `/thumb/${post.id}.svg`;
+
+// WebSite / Organization スキーマ（トップページのみ。記事側はBlogPost.astroがArticle/FAQ/BreadcrumbListを出力）
+const SITE_URL = 'https://tsumiba.com';
+const websiteJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${SITE_URL}/#website`,
+  name: 'tsumiba',
+  url: `${SITE_URL}/`,
+  description: 'DMM FX・JFX・FXTFなど国内FX口座を、必要資金・最低取引単位・スマホアプリ・損失リスクの順で整理する、少額で始めたい初心者向けのFX口座比較メディア。',
+  inLanguage: 'ja',
+  publisher: { '@id': `${SITE_URL}/#organization` },
+});
+// logoは/favicon.svgが本番404のため、実在するブランド画像og-default.svgを使用
+const orgJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${SITE_URL}/#organization`,
+  name: 'tsumiba編集部',
+  url: `${SITE_URL}/`,
+  logo: { '@type': 'ImageObject', url: `${SITE_URL}/og-default.svg` },
+});
 ---
 
 <BaseLayout
@@ -116,6 +138,8 @@ const imageFor = (post: typeof allPosts[number]) => `/thumb/${post.id}.svg`;
   image="/og/fx-kouza-hikaku.svg"
   wide={true}
 >
+  <script is:inline type="application/ld+json" set:html={websiteJsonLd} />
+  <script is:inline type="application/ld+json" set:html={orgJsonLd} />
   <section class="site-hero">
     <div class="hero-copy">
       <p class="eyebrow">少額から始める国内FX口座比較ブログ</p>
