@@ -121,14 +121,13 @@ const websiteJsonLd = JSON.stringify({
   inLanguage: 'ja',
   publisher: { '@id': `${SITE_URL}/#organization` },
 });
-// logoは/favicon.svgが本番404のため、実在するブランド画像og-default.svgを使用
 const orgJsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'Organization',
   '@id': `${SITE_URL}/#organization`,
   name: 'tsumiba編集部',
   url: `${SITE_URL}/`,
-  logo: { '@type': 'ImageObject', url: `${SITE_URL}/og-default.svg` },
+  logo: { '@type': 'ImageObject', url: `${SITE_URL}/favicon.svg` },
 });
 ---
 
