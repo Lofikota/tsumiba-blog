@@ -47,6 +47,100 @@ const BANNED_PATTERNS = [
 
 const FINANCIAL_KEYWORDS = ['FX', '投資', 'NISA', 'iDeCo', '証券', '株', '外国為替', 'レバレッジ'];
 
+// ── 生成再注入ゲート（C10C-G 2026-07-17・P0-C10実体検証§3(b)対応）──
+// LLM生成物がscope外推奨・JFX誤情報・未証明体験・ASP内部報酬額を持ち込むのを
+// 最終ゲートで決定論的に拒否する。語句の言及自体は注意喚起記事で正当なため、
+// 文単位で「推奨・可能形の文脈」との共起だけを拒否し、否定形・注意喚起文は通す。
+
+// 1. scope外語句（海外FX・CFD・KO・FXスクール・EA運用）の推奨・誘導文脈
+const SCOPE_TERMS = [
+  { re: /海外\s*FX/i, label: '海外FX' },
+  { re: /(?<![A-Za-z])CFD(?![A-Za-z])/, label: 'CFD' },
+  { re: /ノックアウト・?オプション|ノックアウト注文/, label: 'ノックアウトオプション' },
+  { re: /FX\s*スクール/i, label: 'FXスクール' },
+  { re: /自動売買|(?<![A-Za-z])EA(?![A-Za-z])|システムトレード|シストレ/i, label: 'EA・自動売買' },
+];
+const RECOMMEND_RE = /おすすめ|オススメ|お勧め|推奨|推せる|向いてい(?:る|ます)|最適(?!化)|狙い目|チャンス|(?:使っ|試し|始め|挑戦し)てみ(?:ましょう|よう|てください|る価値|るのも)|始め(?:ましょう|るなら)|活用(?:しましょう|するのが)|選(?:びましょう|ぶべき)|通(?:いましょう|うのが最短)|検討(?:する価値|しましょう|してみ)/;
+// 推奨語の直後が否定なら推奨ではない（「おすすめしません」等）
+const RECOMMEND_NEG_TAIL_RE = /^(?:は)?(?:しません|しない|できません|できない|されません|しづらい|しにくい|(?:を行う|する)もの(?:で(?:は)?)?ありません)/;
+// 文全体が明確な注意喚起・却下なら通す（言及＝正当な比較・警告記事）
+const DISSUADE_RE = /おすすめ(?:しません|できません|しない|できない)|推奨(?:しません|できません|しない|されていません|(?:を行う|する)もの(?:で(?:は)?)?ありません)|やめ(?:ておきましょう|た方が|ておいた方が|るべき)|避け(?:ましょう|るべき|てください|た方が)|手を出さない|扱いません|対象外|取り上げません|紹介していません|当サイトでは(?:紹介|推奨)しません|危険性|注意点|リスクが(?:大き|高)|違法|詐欺|トラブル/;
+
+// 2. JFX不変条件: MT4はチャート分析専用（発注・ポジション管理・EA自動売買は不可）
+const JFX_CONTEXT_RE = /JFX|MATRIX\s*TRADER|マトリックス・?トレーダー/i;
+// 「チャート分析対応」は正しい主張（分析専用が正）なので lookbehind で除外。
+// 「対応状況/可否」等の中立な言及、「使えばいい？」等の疑問形、「できず」等の否定形も除外。
+const JFX_MT4_CAPABLE_RE = /MT4[^、,]{0,16}?(?:(?<!分析)に対応|(?<!チャート分析)(?<!分析)対応(?!状況|可否|状態|一覧|の(?:違い|有無))|が使え(?!ない|ません|ず|ば)|を使え(?!ない|ません|ず|ば)|で(?:発注|注文|取引|売買|自動売買)|でも?EA|を?動かせ(?!ない|ません|ず|ば))/i;
+const JFX_EA_CAPABLE_RE = /(?:EA|自動売買)[^、,]{0,24}?(?:動かせ(?!ない|ません|ず)|使え(?!ない|ません|ず|ば)|でき(?!ない|ません|ず)|可能|に対応|向いてい)/i;
+const JFX_NEG_RE = /不可|できない|できません|できず|使えない|使えません|使えず|動かせない|動かせません|動かせず|非対応|対応していません|対応しません|(?:チャート)?分析専用|とは?違い|とは異なり|一方/;
+
+// 3. 未証明の一人称利用体験・第三者の成果表現
+const UNPROVEN_EXPERIENCE_PATTERNS = [
+  // 「自分」は読者への呼びかけ（「自分が取引したい通貨ペア」等）で頻出するため主語に含めない
+  { re: /(?:編集部|筆者|私|僕)(?:が|は|も|たち|一同)?[^。\n]{0,24}?(?:口座を?開設(?:し|して)|使っ(?:た|て(?:み|きた|いる))|試し(?:た|て)|取引し(?:た|て)|運用し(?:た|て)|儲かっ|損し(?:た|て))/, label: '編集部・筆者の一人称利用体験' },
+  { re: /編集部(?:の|が試した)?体験談/, label: '編集部の体験談' },
+  { re: /(?:読者|フォロワー|知人|友人|ユーザー|受講生)の?\s*[A-ZＡ-Ｚa-zａ-ｚ]?\s*さん[^。\n]{0,40}?(?:利益|勝ち|勝て|稼(?:い|げ)|儲(?:か|け)|プラスに|資産(?:が|を)増)/, label: '読者・第三者の成果表現' },
+];
+
+// 4. ASP報酬額（内部管理値。読者向けページに載せてはならない）
+const ASP_REWARD_PATTERNS = [
+  { re: /\d[\d,，]*\s*円\s*[/／]\s*件/, label: '「◯円/件」形式の報酬額' },
+  { re: /(?:成果報酬|報酬単価|アフィリエイト報酬|承認報酬)[^。\n]{0,16}?\d[\d,，]*\s*円/, label: '報酬語＋金額' },
+  { re: /1件(?:あたり|につき)[^。\n]{0,8}?\d[\d,，]*\s*円/, label: '「1件あたり◯円」形式の報酬額' },
+];
+
+// 本文を文単位に分割（frontmatter・import・リンクURL・HTMLタグを除去してから）
+function splitSentences(content) {
+  const text = content
+    .replace(/^---[\s\S]*?---/m, '')
+    .replace(/^import .+$/gm, '')
+    .replace(/\]\([^)]*\)/g, ']')
+    .replace(/<[^>]+>/g, '');
+  return text.split(/[。\n]/).map(s => s.trim()).filter(Boolean);
+}
+
+// 生成再注入チェック本体。拒否理由の配列を返す（空=通過）
+export function checkInjectionSafety(content) {
+  const errors = [];
+  const sentences = splitSentences(content);
+
+  for (const s of sentences) {
+    // 1. scope外語句の推奨文脈
+    for (const { re, label } of SCOPE_TERMS) {
+      if (!re.test(s)) continue;
+      const m = RECOMMEND_RE.exec(s);
+      if (!m) continue;
+      if (RECOMMEND_NEG_TAIL_RE.test(s.slice(m.index + m[0].length))) continue;
+      if (DISSUADE_RE.test(s)) continue;
+      errors.push(`scope外語句「${label}」の推奨・誘導文脈: 「${s.slice(0, 60)}」`);
+    }
+
+    // 2. JFX不変条件（MT4はチャート分析専用）
+    if (JFX_CONTEXT_RE.test(s) && !JFX_NEG_RE.test(s)) {
+      if (JFX_MT4_CAPABLE_RE.test(s)) {
+        errors.push(`JFX不変条件違反（MT4は分析専用・発注/EA不可が正）: 「${s.slice(0, 60)}」`);
+      } else if (JFX_EA_CAPABLE_RE.test(s)) {
+        errors.push(`JFX不変条件違反（EA・自動売買は不可が正）: 「${s.slice(0, 60)}」`);
+      }
+    }
+
+    // 3. 未証明の一人称利用体験・第三者成果
+    for (const { re, label } of UNPROVEN_EXPERIENCE_PATTERNS) {
+      if (re.test(s)) {
+        errors.push(`未証明の利用体験・成果表現（${label}）: 「${s.slice(0, 60)}」`);
+      }
+    }
+
+    // 4. ASP報酬額
+    for (const { re, label } of ASP_REWARD_PATTERNS) {
+      if (re.test(s)) {
+        errors.push(`ASP報酬額の露出（${label}・内部管理値は本文に書かない）: 「${s.slice(0, 60)}」`);
+      }
+    }
+  }
+  return errors;
+}
+
 export function checkArticle(content, slug) {
   const errors = [];
   const warnings = [];
@@ -85,6 +179,9 @@ export function checkArticle(content, slug) {
       errors.push(`禁止表現「${label}」が含まれている`);
     }
   }
+
+  // 生成再注入チェック（scope外推奨・JFX不変条件・未証明体験・ASP報酬額）
+  errors.push(...checkInjectionSafety(content));
 
   // 金融記事のリスク表記チェック
   const isFinancial = FINANCIAL_KEYWORDS.some(kw => content.includes(kw));
