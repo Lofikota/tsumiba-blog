@@ -10,15 +10,12 @@ Claude API × 学習データ による翌週ツイート自動生成
 編集すればするほど生成精度が上がる設計になっている。
 """
 import os
+import argparse
 import csv
 import json
-import tempfile
-import shutil
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
-
-import anthropic
-from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
@@ -29,41 +26,105 @@ FIELDNAMES = [
     "text", "original_text", "status", "posted_at", "tweet_id", "error",
 ]
 
-POSTING_SCHEDULE = [
-    ("07:30", "型C"),  # 朝：入口づくり
-    ("12:00", "型B"),  # 昼：共感・迷い潰し
-    ("19:00", "型A"),  # 夕方：比較・保存
-    ("21:00", "型D"),  # 夜：ストーリー・回収
+OUT_OF_SCOPE_TERMS = [
+    re.compile(pattern, re.IGNORECASE)
+    for pattern in (
+        r"海外\s*FX", r"(?<![A-Za-z])CFD(?![A-Za-z])", r"ノックアウト(?:オプション)?",
+        r"FXスクール", r"(?<![A-Za-z])NISA(?![A-Za-z])", r"(?<![A-Za-z])iDeCo(?![A-Za-z])",
+        r"証券口座", r"保険相談|保険見直し|生命保険|損害保険", r"クレジットカード",
+        r"自動売買|シストレ|(?<![A-Za-z])EA(?![A-Za-z])",
+    )
+]
+RECOMMEND_PATTERN = re.compile(
+    r"おすすめ|オススメ|推奨|向いてい(?:る|ます)|最適(?!化)|使える|対応している|"
+    r"始め(?:よう|ましょう|るなら)|試してみ|挑戦してみ|選ぶべき|活用しよう"
+)
+DISSUADE_PATTERN = re.compile(
+    r"おすすめし(?:ない|ません)|推奨し(?:ない|ません)|対象外|扱わない|紹介しない|"
+    r"避ける|手を出さない|危険|注意|リスク|できない|できません|不可|非対応|分析専用"
+)
+UNVERIFIED_EXPERIENCE_PATTERNS = [
+    re.compile(pattern)
+    for pattern in (
+        r"(?:編集部|筆者|僕|私).{0,24}(?:使った|使って|試した|取引した|口座(?:を)?開設(?:した|して)|運用した|儲かった|損した)",
+        r"(?:使って|試して|取引して|口座開設して).{0,24}(?:わかった|分かった|気づいた)",
+        r"編集部(?:の|が試した)?体験談",
+        r"(?:読者|フォロワー|知人|友人|ユーザー)の?\s*[A-ZＡ-Ｚa-zａ-ｚ]?\s*さん.{0,40}(?:利益|勝ち|稼い|儲か|資産が増)",
+        r"最初はみんな|読者から(?:よく|一番多く|多く)聞",
+        r"(?:読者|初心者|人).{0,30}(?:口座開設|FXを始め).{0,40}(?:人生が変わ|利益|稼げ|できるようにな)",
+    )
+]
+ASP_REWARD_PATTERNS = [
+    re.compile(pattern)
+    for pattern in (
+        r"\d[\d,，]*\s*円\s*[/／]\s*件",
+        r"(?:成果報酬|報酬単価|アフィリエイト報酬|承認報酬).{0,20}\d[\d,，]*\s*円",
+        r"1件(?:あたり|につき).{0,12}\d[\d,，]*\s*円",
+    )
+]
+JFX_CONTEXT_PATTERN = re.compile(r"JFX|MATRIX\s*TRADER|マトリックス・?トレーダー", re.IGNORECASE)
+JFX_FALSE_CAPABILITY_PATTERNS = [
+    re.compile(r"MT4.{0,18}(?:で(?:発注|注文|取引|売買|自動売買)|が?使える|を?動かせる)", re.IGNORECASE),
+    re.compile(r"(?:EA|自動売買).{0,24}(?:できる|動かせる|使える|可能|向いている|に対応)", re.IGNORECASE),
+]
+JFX_SAFE_PATTERN = re.compile(
+    r"不可|できない|できません|使えない|使えません|動かせない|動かせません|非対応|分析専用"
+)
+
+
+def unsafe_content_reason(text: str) -> str | None:
+    """危険な生成物をCSV/D1用データの作成前に決定論的に拒否する。"""
+    for sentence in filter(None, re.split(r"[。\n]", text)):
+        if any(pattern.search(sentence) for pattern in OUT_OF_SCOPE_TERMS):
+            if RECOMMEND_PATTERN.search(sentence) and not DISSUADE_PATTERN.search(sentence):
+                return "scope外テーマの推奨・誘導"
+        if JFX_CONTEXT_PATTERN.search(sentence) and not JFX_SAFE_PATTERN.search(sentence):
+            ambiguous_mt4_support = re.search(r"MT4\s*(?:に)?対応", sentence, re.IGNORECASE)
+            chart_analysis_support = re.search(r"チャート分析.{0,8}対応", sentence)
+            if (
+                any(pattern.search(sentence) for pattern in JFX_FALSE_CAPABILITY_PATTERNS)
+                or (ambiguous_mt4_support and not chart_analysis_support)
+            ):
+                return "JFX不変条件違反（MT4は分析専用・発注/EA不可）"
+        for pattern in UNVERIFIED_EXPERIENCE_PATTERNS:
+            if pattern.search(sentence):
+                return f"未確認体験・読者反応: {pattern.pattern}"
+        for pattern in ASP_REWARD_PATTERNS:
+            if pattern.search(sentence):
+                return "ASP内部報酬額"
+    return None
+
+WEEK1_PLAN = [
+    {"day": 1, "time": "21:00", "type": "共感", "mako_type": "型A"},
+    {"day": 2, "time": "07:30", "type": "チェックリスト", "mako_type": "型D"},
+    {"day": 3, "time": "12:00", "type": "公式解説", "mako_type": "型B"},
+    {"day": 4, "time": "19:00", "type": "質問応答", "mako_type": "型E"},
+    {"day": 5, "time": "21:00", "type": "比較", "mako_type": "型C"},
+    {"day": 6, "time": "12:00", "type": "共感", "mako_type": "型A"},
+    {"day": 7, "time": "07:30", "type": "チェックリスト", "mako_type": "型D"},
 ]
 
-# ASP承認済みプログラム（収益優先順・FX単軸 2026-05-31確定。クレカ・NISA・保険は撤退済みのため載せない）
+# 国内FXの比較対象（内部報酬額は生成promptへ渡さない）
 # 特徴欄は検証済みの事実のみ書く（未検証の「No.1」「◯◯万口座」等は書かない→そのままツイートに載る）
 ASP_PROGRAMS = {
     "DMM_FX": {
-        "単価": "33,000円/件",
         "ブログURL": "tsumiba.com/blog/dmm-fx-review/",
-        "特徴": "FX取引高4年連続世界第1位（ファイナンス・マグネイト社調べ2022〜2025年）・スプレッド0.2銭・最短即日開設・新規口座開設キャンペーン実施中（条件は公式で要確認）",
-        "向いている人": "FX初心者・スマホ派・デイトレ",
-        "投稿比率": "週3本（最優先）",
+        "特徴": "スマホアプリ・最低取引単位・スプレッド・サポートを公式情報で比較する",
+        "向いている人": "スマホ中心で国内FXの条件を比較したい人",
     },
     "JFX": {
-        "単価": "8,800円/件",
         "ブログURL": "tsumiba.com/blog/jfx-review/",
-        "特徴": "2025年オリコン顧客満足度FX総合No.1・MT4対応・約定力重視",
-        "向いている人": "MT4ユーザー・約定力重視・自動売買",
-        "投稿比率": "週2本",
+        "特徴": "MT4はチャート分析専用（発注・ポジション管理・EA自動売買は不可）。取引はMATRIX TRADERを使用",
+        "向いている人": "PCでMT4チャート分析を使いたい人・約定力を重視する人",
     },
     "FXTF": {
-        "単価": "14,102円/件",
         "ブログURL": "tsumiba.com/blog/fxtf-review/",
-        "特徴": "FX+CFD+ノックアウトオプションを一口座・MT4対応",
-        "向いている人": "CFD・KOに興味ある人・MT4ユーザー",
-        "投稿比率": "週2本",
+        "特徴": "国内FXでMT4を利用できる（機能・利用条件は公式で要確認）",
+        "向いている人": "国内FXでMT4を使いたい人・取引コストとツールを比較したい人",
     },
 }
 
-# NOTE(2026-07-12): 投稿頻度の現行ルールは1日1〜3本の質重視（Xバズ構造リサーチ_2026-07-12 §3 #14）。
-# 28本/週=4本/日の生成・投稿本数はX-S01（X戦略再設計）で再設計するまで変更しない（Phase 0中はx-generate停止済み）。
+# 初週はX-P01最終版どおり1日1本×7日。Phase 0中はx-generate停止済み。
 WEEKLY_THEMES = {
     0: "FX入門（何から始めるか・少額開始・失敗回避）",
     1: "FXの税金（確定申告・損益通算・経費）",
@@ -78,143 +139,33 @@ TYPE_DESCRIPTIONS = {
     "型A": "比較・保存狙い。箇条書き・数字・判断軸。「迷ったらこれを見る」系。",
     "型B": "共感あるある。読者の悩みを代弁。「わかる」「最初ここで止まる」。",
     "型C": "入口づくり。記事・比較ページへの導線を短く置く。",
-    "型D": "ストーリー・体験談。失敗→学び→今の判断基準。信頼を作る。",
+    "型D": "調査・検証記録。公式情報→比較して分かった差→判断基準。未確認の利用体験は書かない。",
     "型E": "質問。選択肢を並べて、返信・反応を取りやすくする。",
-    "型HENSHIN": "変身ストーリー。「読者のよくあるビフォー→転換点→アフター」を読者主語・一般化で描く時系列。編集部個人の実績語りは禁止（虚偽実績になる）。読者に「自分もできるかも」と思わせる。",
 }
 
 PERSONA = """
 tsumiba編集部（FX比較メディア「tsumiba」の編集部アカウント）
 - 人格：信頼できる先輩編集部。誠実・等身大・押し付けない。読者の得を最優先
-- 一人称は「編集部」か、一人称を出さない。個人の人生ストーリー・個人の運用実績は語らない（架空個人ペルソナは2026-05-31に全廃）
+- 一人称は「編集部」か、一人称を出さない。個人・読者の人生ストーリー、利用体験、運用実績、変身談を作らない
 - 禁止：「確実に儲かる」「絶対」「必ず増える」「元本保証」・虚偽の実績数字・絵文字
 - 投稿の主目的は、FXをXで育てて比較・失敗回避・少額開始へ自然につなぐこと
 - 280文字以内厳守（日本語1文字=1カウント）
+- JFXのMT4はチャート分析専用。発注・注文・ポジション管理・EA自動売買は不可。取引はMATRIX TRADERを使う
+- 読者の声・質問数・相場観測は、確認済みデータがなければ事実として書かない
+- 具体数字は公式確認済みの事実だけを使い、確認日・適用条件を省略しない
 
-【最重要：AIバレしない文体ルール（Grokリサーチ2026年最新）】
-
-■ 絶対禁止（AIっぽさの元凶）
+■ 文体
 - → ━━━ ・ ① ② ③ などの記号・箇条書きを多用しない
 - 完璧に整列された構造（均等な改行・完全な対称）
 - 毎回同じ「問題提起→比較→リンク」の型
 - 「初心者・スマホ派・サポート重視」のような体言止め羅列
-
-■ 代わりに使う（人間らしさの出し方）
-- 話し言葉全開：「めっちゃ」「マジで」「正直」「意外と」「便利すぎ」「最初はみんな」
-- 感情ツッコミ：「これ気づかない人多い」「痛い目見たわ」「誰も教えてくれないよね」
+- 話し言葉は使えるが、未確認の多数派・読者反応を根拠にしない
+- 感情表現は「ここは見落としやすい」「条件を先に確認したい」のように事実へ接続する
 - **空行（連続改行）は使わない**。改行は文の区切りだけに使い、詰まった密度で書く。「段落＋空行」の均等ブロック構造はAIの署名なので禁止（2026-07-05 工藤指示）
 - 言い切らない：「〜だと思う」「〜かもしれない」「〜かなって」
-- **口癖の分散**：同じ語尾・同じ締め（「〜かなって」「コメントに貼っておくね」等）は28本中2回まで。人間は同じ言い回しを連発しない
-
-■ 投稿の長さ・構造バリエーション（必須）
-- 1〜3行で終わる短投稿：28本中8本以上
-- CTAなし（URLもLINEも誘導なし）の純粋な一言：28本中6本
-- コメント誘導で終わる投稿：28本中6本以上（「コメントで教えて」「どれ使ってる？」）
-- 長文比較投稿：28本中4本まで
-- 型HENSHIN（変身ストーリー）：28本中2本以上（読者のよくある変化を読者主語で時系列に描く）
-
-■ 実在感の出し方
-- 具体数字を必ず入れる。ただし検証可能な事実の数字のみ：「スプレッド0.2銭」「キャッシュバック33,000円」「1000通貨＝約5,000円」「月5万の積み立て」
-- 時間軸を入れる：「昨日の相場で」「先週キャンペーンが更新されて」「最近読者からよく聞かれるんだけど」
-
-■ マスフック→FX展開（インプレッションの源泉・最重要 2026-07-05）
-28本中8本以上は、1行目をFXの単語から始めない。誰もが持つお金の感情から入り、2〜3行目でFXの具体的な話に着地させる（着地なしのバズ狙いは禁止）：
-「給料は上がらないのに、物価だけ上がっていく」「貯金だけで10年後大丈夫かなって、ふと不安になる」「副収入ほしいけど、何から手を付けるか分からない」
-※欲求には「お金の勉強」「収入の柱を増やす」「不安を減らす」の言葉で寄り添う。「稼げる」「儲かる」の断定・煽りは引き続き禁止
-
-■ 心理トリガー（行動経済学・毎週の28本に意識して散らす）
-- 損失回避：人は得より損に約2倍強く反応する。「知らないと損してる」「もったいない」で注意を引く（「損しない」と断定はしない）
-- 好奇心ギャップ：1行目で結論を全部言わない。「スプレッド0.2銭と0.3銭、10年続けたら差がいくらになるか計算してみた」のように具体で引っ張る
-- 社会的証明：「読者から一番多い質問」「最初はみんな同じところで止まる」
-- 現在バイアス：行動は最小の一歩に落とす。「口座開設だけなら無料・スマホで20分」
-- アンカリング：検証可能な数字を先に置く（33,000円・0.2銭・1000通貨＝約5,000円）
-
-■ 7つのフック型（コピーライティングリポジトリ学習済み）
-1. 好奇心フック：「[常識] は実は間違いだった」「FX口座、何となく選んでない？」
-2. ストーリーフック：「先週、[意外なこと] が起きた」「3年前の自分に言いたいことがある」
-3. 価値フック：「[結果] の方法（[よくある痛み] なし）」「[数字] つのこと」
-4. 逆説フック：「みんなが言う [常識] は間違ってる」「[よくやること] をやめたら良くなった」
-5. 共感フック：「わかる。最初はみんな [同じ状況] だから」
-6. 数字フック：「FX口座 [数字] つ使ってわかったこと」
-7. 返信誘導フック★最優先：「[A] と [B]、どっち派？」「コメントで教えて」
-
-■ コピーライティング4原則（marketingskillsリポジトリより）
-- 明瞭さ > 巧みさ：「資産形成を最適化」→「毎月5万を10年続けるだけ」
-- 便益 > 特徴：「最短1日開設」→「明日から取引できる」
-- 具体性 > 曖昧さ：必ず数字を入れる（「200万」「月5万」「2年で」）
-- 読者の言葉：「ポートフォリオ分散」→「貯金だけじゃ不安だよね」
-- buzzword禁止：「最適化」「効率的に」「実現する」「最大化する」を使わない
-
-■ 強いCTAの設計（コメント欄誘導のみ）
-- 弱い：「詳しくはこちら」「見てみて」
-- 強い：「比較表、コメントに貼っておくね」「どれが向いてるかコメントで教えて」
-フォーマット：[動作動詞] + [何が得られるか] + [摩擦を取り除く一言]
-
-■ 変身ストーリー（型HENSHIN）の書き方
-- 読者主語で一般化して描く（「〜で止まってた人が」「最初の一歩を踏み出す人のパターン」）。編集部個人の実績・人生は語らない
-- 「転換点」を1つ特定する（「FX口座を変えてから」「1000通貨なら約5,000円と知ってから」）
-- 読者に「自分もできるかも」と思わせる終わり方
-- 過去を否定しすぎない（「過去の自分を責めなくていい。知らなかっただけだから」）
-
-■ Xアルゴリズム対応ルール（2026-07-12改定。正本: AI運用/戦略/X集客/Xバズ構造リサーチ_2026-07-12.md）
-2026-01-20の全面置換（Grok系transformer）で固定の重みテーブルは全廃。数値重みを根拠にしない。
-順序関係だけ使う：深い会話（長い返信・会話継続）> 保存(bookmark)・dwell > 浅いいいね。
-→ 「返信を誘う」投稿が最も評価される。ただし問いは内容から必然的に生まれる形のみ。
-   中身と無関係な「あなたはどう思う？」の機械的付加や「保存して」「RTして」等の直接要求はGrok降格対象＝禁止。
-→ 7日28本を以下の7カテゴリに分散させる（Grox自動スパム検出対策）：
-   1. 問いかけ（返信誘導・最優先）
-   2. まとめ情報（保存・ブックマーク狙い）
-   3. 体験談（信頼構築・dwell time）
-   4. 逆説・反直感（議論を呼ぶ・返信増）
-   5. 図解説明（テキスト比較・情報価値）
-   6. 数字・データ活用（保存狙い）
-   7. CTA・導線（ブログ記事・/start/ハブ。LINEは補助動線・2026-07-05降格）
-→ 同じ構造を3本連続させない（フォーマット多様性）。
-→ 週に2本はdwell time狙いの「読み応えある長文」を作る（最後まで読まれることが正のシグナル）。
-→ ネガティブシグナル（ミュート・ブロック・報告）を受けやすいパターンを避ける：
-   過度な煽り・明らかな誇大表現・同じ内容の繰り返し
-
-■ 最強の組み合わせ
-問題解決 → 体験談 → 自然リスト → 質問CTA → リンク
-
-■ ハッシュタグルール
-ハッシュタグは1投稿につき最大3個。多用禁止。
-使うもの：#FX #FX口座 #FX初心者 #FXおすすめ のどれかだけ
-ハッシュタグなし投稿も半数以上OK（むしろ自然）
-
-■ 参考：AIバレしないリライト例（この文体を目指す）
----
-FX口座って、何となくで決めてない？
-
-「有名だから」「CMで見たから」だけで選んじゃう人、めっちゃ多いけど…
-開設してから「これヤバい」って気づく人、9割くらいだと思う。
-
-スプレッドの計算を間違えてたり、手数料トータルで全然考えてなかったり。
-正直、誰も教えてくれないよね。
-
-編集部で4社をまとめて比較してみて、やっと「これが基準だ」ってわかった。
-
-DMM FXは初心者でスマホ派、サポートもしっかり欲しい人にはまずこれ。取引高4年連続世界1位（ファイナンス・マグネイト社調べ）なだけある。
-JFXはMT4でガチでやりたい人向け。満足度もかなり高い。
-FXTFは意外と見落としがちなんだけど、スプレッド＋手数料をセットで計算すると実は一番コスパいいケースが多い。
-
-結局「どれが安いか」はトレードスタイルで全然変わる。
-比較表はコメント欄に貼っておくね。
-
-自分はどんなスタイルで取引してる？コメントで教えてくれたら本気で答えるよ。
----
-
-■ 変身ストーリー例（型HENSHIN・読者主語で一般化する）
----
-「FXって怖い」で止まってた人が、最初の一歩を踏み出すときのパターンはだいたい同じ。
-
-きっかけは大きな決意じゃなくて、「1000通貨なら約5,000円から始められる」って知った瞬間だったりする。
-
-最初の3ヶ月で大事なのは勝つことじゃなくて、退場しないこと。
-少額で仕組みを体で覚えた人から、相場に残っていく。
-
-過去に貯金できなかった自分を責めなくていい。知らなかっただけだから。
----
+- 同じ書き出し・同じ締めを連続させない
+- 問いは本文から必然的に生まれる1問だけ。保存・RT・フォローを直接要求しない
+- URL付き投稿は週1本まで。リンク近くにPRを明示する
 """
 
 
@@ -228,7 +179,12 @@ def load_learning_data() -> dict:
         for line in f:
             if line.strip():
                 try:
-                    records.append(json.loads(line))
+                    record = json.loads(line)
+                    learning_text = "\n".join(
+                        filter(None, (record.get("final_text", ""), record.get("original_text", "")))
+                    )
+                    if not unsafe_content_reason(learning_text):
+                        records.append(record)
                 except json.JSONDecodeError:
                     pass
 
@@ -283,22 +239,21 @@ def build_prompt(week_offset: int, learning: dict) -> str:
     for t, desc in TYPE_DESCRIPTIONS.items():
         type_section += f"- {t}：{desc}\n"
 
-    asp_section = "\n## ASP承認済みプログラム（必ずこれを収益源にする）\n"
+    asp_section = "\n## 比較対象の国内FX記事（報酬額ではなく読者条件で選ぶ）\n"
     for name, info in ASP_PROGRAMS.items():
         asp_section += (
-            f"\n### {name}（{info['単価']}）\n"
+            f"\n### {name}\n"
             f"- URL: {info['ブログURL']}\n"
             f"- 特徴: {info['特徴']}\n"
             f"- 向いている人: {info['向いている人']}\n"
-            f"- 投稿比率: {info['投稿比率']}\n"
         )
-    asp_section += "\n**ルール**: DMM FX最優先。FX全体は比較と失敗回避を中心にする。ブログURL・アフィリエイトリンクは投稿本文に含めない（コメント欄に載せるため）。\n"
+    asp_section += "\n**ルール**: 案件の優先順位は内部報酬額で決めない。読者の条件と公式情報の比較を優先し、URLは本文に含めない。\n"
 
-    schedule_section = "\n## 今週の投稿スケジュール（7日分・計28本）\n"
-    schedule_section += "各日に以下の順番で4本生成する:\n"
-    for time, tweet_type in POSTING_SCHEDULE:
-        schedule_section += f"- {time}: {tweet_type}\n"
-    schedule_section += "さらに各週2本以上は型HENSHINを必ず入れること。\n"
+    schedule_section = "\n## 初週の日別類型（X-P01最終版・1日1本×7日）\n"
+    for item in WEEK1_PLAN:
+        schedule_section += (
+            f"- D{item['day']}: {item['type']} / {item['mako_type']} / 提案時刻 {item['time']}\n"
+        )
 
     output_format = """
 ## 出力形式（厳守）
@@ -308,8 +263,8 @@ def build_prompt(week_offset: int, learning: dict) -> str:
 [
   {
     "day": 1,
-    "time": "07:30",
-    "type": "型C",
+    "time": "21:00",
+    "type": "共感",
     "text": "ツイート本文"
   },
   ...
@@ -317,7 +272,7 @@ def build_prompt(week_offset: int, learning: dict) -> str:
 
 - day: 1〜7（1=今週の1日目）
 - time: "07:30" / "12:00" / "19:00" / "21:00"
-- type: "型A" / "型B" / "型C" / "型D" / "型E" / "型HENSHIN" または "DMM_FX" / "JFX" / "FXTF" / "バズ汎用"
+- type: 各日の指定どおり「共感 / チェックリスト / 公式解説 / 質問応答 / 比較」のいずれか
 - text: 280文字以内・改行は \\n で表現
 - **ブログURL・アフィリエイトリンクは text に絶対に含めない**（コメント欄に別途掲載するため）
 - リンク誘導したい場合は「詳しくはコメント欄に」「リンクはコメントに貼っておくね」などで締める
@@ -327,14 +282,22 @@ def build_prompt(week_offset: int, learning: dict) -> str:
 ## Xアルゴリズム優先指示（2026-05-15版）
 
 以下の優先順位でコンテンツを設計する：
-1. **返信(reply)最優先**：28本中最低8本は「返信を誘う問いかけ」で終わること
-2. **7カテゴリ分散**：問いかけ/まとめ/体験談/逆説/図解/数字/CTAを満遍なく使う
+1. **1日1本×7日**：X-P01の確定順を変えない
+2. **返信は必然性優先**：質問応答型だけ、本文から自然に生じる1問で終える
 3. **同フォーマット連続禁止**：同じ構造・同じ書き出しパターンを3本連続させない
-4. **dwell time狙い**：週2本は200文字以上の「最後まで読ませる」長文を入れる
-5. **フォロー動機**：週1本は「このアカウントをフォローしたい」と思わせる自己紹介型
+4. **検証優先**：公式情報・確認日・適用条件がない数値や読者反応を作らない
+5. **CTAは週1本まで**：リンク近くにPRを置き、申込を急がせない
 """
 
     return f"""あなたはtsumiba編集部として X（Twitter）に投稿するコンテンツを生成するシステムです。
+
+## 現行ターゲット・scope（最優先、他の参考例より優先）
+- 対象読者: 少額で国内FXを始めたい、20代・スマホ中心の初心者。職業は固定しない
+- 対象: 国内FX口座の比較、口座開設、スマホアプリ、少額取引、レバレッジ・ロスカット・追証・税金・詐欺対策、入出金・デモ・サポート・取引時間
+- 対象外: 海外FX、CFD、ノックアウトオプション、FXスクール、EA・自動売買の実運用推奨、証券、保険、クレジットカード
+- FXの実利用体験核は現在ゼロ。編集部や架空個人が口座を使った・取引した・利益や損失を得たという体験を生成しない
+- 過去投稿・編集例は文体だけの参考。旧ターゲット、scope外商品、未確認体験、金融条件は継承しない
+- JFXのMT4はチャート分析専用。発注・注文・ポジション管理・EA自動売買は不可で、取引はMATRIX TRADERを使う
 
 ## ペルソナ
 {PERSONA}
@@ -350,8 +313,11 @@ def next_id() -> int:
     return max((int(r["id"]) for r in rows), default=0) + 1
 
 
-def get_next_week_dates(week_offset: int = 0) -> list[str]:
+def get_next_week_dates(week_offset: int = 0, start: str | None = None) -> list[str]:
     """翌週月曜から7日分の日付を返す（week_offset=1で翌々週）"""
+    if start:
+        first = datetime.strptime(start, "%Y-%m-%d")
+        return [(first + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
     today = datetime.now()
     days_until_monday = (7 - today.weekday()) % 7 or 7
     monday = today + timedelta(days=days_until_monday + week_offset * 7)
@@ -359,6 +325,14 @@ def get_next_week_dates(week_offset: int = 0) -> list[str]:
 
 
 def add_to_queue(tweets: list[dict], dates: list[str]) -> int:
+    if len(tweets) != len(WEEK1_PLAN):
+        print(f"⚠️ 初週生成は7本ちょうどが必要です（実際: {len(tweets)}本）。キュー書込を中止します")
+        return 0
+    days = [tweet.get("day") for tweet in tweets]
+    if not all(isinstance(day, int) for day in days) or sorted(days) != list(range(1, len(WEEK1_PLAN) + 1)):
+        print("⚠️ dayは1〜7を重複なく1件ずつ含む必要があります。キュー書込を中止します")
+        return 0
+
     # pending/skip/posted すべてのスロットを除外対象にする（重複生成防止）
     existing_slots: set[tuple[str, str]] = set()
     with open(QUEUE_FILE, encoding="utf-8", newline="") as f:
@@ -371,19 +345,26 @@ def add_to_queue(tweets: list[dict], dates: list[str]) -> int:
     skipped = 0
 
     for tweet in tweets:
-        day_idx = tweet.get("day", 1) - 1
-        if day_idx >= len(dates):
+        day = tweet.get("day")
+        if not isinstance(day, int) or not 1 <= day <= len(WEEK1_PLAN):
+            skipped += 1
             continue
-        slot = (dates[day_idx], tweet.get("time", "09:00"))
+        expected = WEEK1_PLAN[day - 1]
+        slot = (dates[day - 1], expected["time"])
         if slot in existing_slots:
             skipped += 1
             continue
         text = tweet.get("text", "").replace("\\n", "\n")
+        unsafe_reason = unsafe_content_reason(text)
+        if unsafe_reason:
+            skipped += 1
+            print(f"⚠️ scope/体験ゲートでスキップ: {unsafe_reason}")
+            continue
         new_rows.append({
             "id": start_id + len(new_rows),
             "scheduled_date": slot[0],
             "scheduled_time": slot[1],
-            "tweet_type": tweet.get("type", ""),
+            "tweet_type": expected["type"],
             "text": text,
             "original_text": text,
             "status": "pending",
@@ -394,7 +375,7 @@ def add_to_queue(tweets: list[dict], dates: list[str]) -> int:
         existing_slots.add(slot)
 
     if skipped:
-        print(f"⚠️ 既存pendingと重複のためスキップ: {skipped}本")
+        print(f"⚠️ 重複または安全ゲートによりスキップ: {skipped}本")
 
     with open(QUEUE_FILE, "a", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
@@ -419,7 +400,27 @@ def add_to_queue(tweets: list[dict], dates: list[str]) -> int:
     return len(new_rows)
 
 
-def main(week_offset: int = 0) -> None:
+def build_week1_plan(dates: list[str]) -> list[dict]:
+    """X-P01最終版と同期した、書込を伴わない初週7本の器を返す。"""
+    return [
+        {
+            "id": f"X30-D{item['day']:02d}-P01",
+            "day": item["day"],
+            "date": dates[item["day"] - 1],
+            "time": item["time"],
+            "type": item["type"],
+            "mako_type": item["mako_type"],
+            "text": None,
+            "status": "draft",
+        }
+        for item in WEEK1_PLAN
+    ]
+
+
+def generate_and_queue(week_offset: int = 0, planned_start: str | None = None) -> None:
+    import anthropic
+    from dotenv import load_dotenv
+
     load_dotenv(BASE_DIR / ".env")
     api_key = os.getenv("ANTHROPIC_API_KEY")
     if not api_key:
@@ -442,24 +443,44 @@ def main(week_offset: int = 0) -> None:
     )
     raw = response.content[0].text.strip()
 
-    start = raw.find("[")
-    end = raw.rfind("]") + 1
-    if start == -1 or end == 0:
+    json_start = raw.find("[")
+    json_end = raw.rfind("]") + 1
+    if json_start == -1 or json_end == 0:
         print(f"❌ JSON が見つかりません:\n{raw[:300]}")
         return
 
     try:
-        tweets = json.loads(raw[start:end])
+        tweets = json.loads(raw[json_start:json_end])
     except json.JSONDecodeError as e:
-        print(f"❌ JSON パースエラー: {e}\n{raw[start:start+200]}")
+        print(f"❌ JSON パースエラー: {e}\n{raw[json_start:json_start+200]}")
         return
 
-    dates = get_next_week_dates(week_offset)
+    dates = get_next_week_dates(week_offset, planned_start)
     count = add_to_queue(tweets, dates)
     print(f"✅ {count}本を翌週キューに追加しました（{dates[0]}〜{dates[-1]}）")
 
 
+def main() -> int:
+    parser = argparse.ArgumentParser(description="初週7本の安全dry-run。API/キュー書込は--execute時のみ")
+    parser.add_argument("week_offset", nargs="?", type=int, default=0)
+    parser.add_argument("--start", help="D1候補日 YYYY-MM-DD")
+    parser.add_argument("--execute", action="store_true", help="API生成とローカルキュー書込を明示的に許可")
+    args = parser.parse_args()
+
+    dates = get_next_week_dates(args.week_offset, args.start)
+    if not args.execute:
+        result = {
+            "mode": "dry-run",
+            "posts": build_week1_plan(dates),
+            "queue_written": False,
+            "api_called": False,
+        }
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+
+    generate_and_queue(args.week_offset, args.start)
+    return 0
+
+
 if __name__ == "__main__":
-    import sys
-    offset = int(sys.argv[1]) if len(sys.argv) > 1 else 0
-    main(week_offset=offset)
+    raise SystemExit(main())
