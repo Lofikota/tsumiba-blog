@@ -36,12 +36,21 @@ OUT_OF_SCOPE_TERMS = [
     )
 ]
 RECOMMEND_PATTERN = re.compile(
-    r"おすすめ|オススメ|推奨|向いてい(?:る|ます)|最適(?!化)|使える|対応している|"
-    r"始め(?:よう|ましょう|るなら)|試してみ|挑戦してみ|選ぶべき|活用しよう"
+    r"おすすめ|オススメ|お勧め|推奨|推せる|向いてい(?:る|ます)|最適(?!化)|狙い目|チャンス|"
+    r"使える|対応している|始め(?:よう|ましょう|るなら)|試してみ|挑戦してみ|選ぶべき|"
+    r"活用しよう|強み|(?<!デ)メリット|使い分け|選択肢|挑戦したい(?:人|方)?"
 )
-DISSUADE_PATTERN = re.compile(
-    r"おすすめし(?:ない|ません)|推奨し(?:ない|ません)|対象外|扱わない|紹介しない|"
-    r"避ける|手を出さない|危険|注意|リスク|できない|できません|不可|非対応|分析専用"
+RECOMMEND_NEG_TAIL_PATTERN = re.compile(
+    r"^(?:(?:は|が|も|に|と|として)?(?:しません|しない|していません|していない|できません|"
+    r"できない|されません|しづらい|しにくい|ではありません|ではない|ではなく|ではなくて|"
+    r"ありません|ない|対象外|対象(?:で|と)?はありません|対象ではない|"
+    r"に(?:は)?含めません|に(?:は)?含めない|に(?:は)?含まれません|に(?:は)?含まれない|"
+    r"に(?:は)?入りません|に(?:は)?入らない|とは評価しません|とは評価していません|"
+    r"とは言えません|とは言えない|(?:を行う|する)もの(?:で(?:は)?)?ありません)|"
+    r"ることは(?:おすすめ|推奨|紹介)(?:しません|しない|できません|できない)|"
+    r"にも?[、,\s]*(?:当サイトでは)?(?:おすすめ|推奨|紹介)(?:しません|しない|できません|できない)|"
+    r"(?:は|として(?:は)?)?扱(?:いません|わない|っていません|っていない)|"
+    r"メリット(?:より|を上回る)デメリット|よりデメリットが(?:大き|多))"
 )
 UNVERIFIED_EXPERIENCE_PATTERNS = [
     re.compile(pattern)
@@ -76,7 +85,11 @@ def unsafe_content_reason(text: str) -> str | None:
     """危険な生成物をCSV/D1用データの作成前に決定論的に拒否する。"""
     for sentence in filter(None, re.split(r"[。\n]", text)):
         if any(pattern.search(sentence) for pattern in OUT_OF_SCOPE_TERMS):
-            if RECOMMEND_PATTERN.search(sentence) and not DISSUADE_PATTERN.search(sentence):
+            has_affirmative_recommendation = any(
+                not RECOMMEND_NEG_TAIL_PATTERN.search(sentence[match.end():])
+                for match in RECOMMEND_PATTERN.finditer(sentence)
+            )
+            if has_affirmative_recommendation:
                 return "scope外テーマの推奨・誘導"
         if JFX_CONTEXT_PATTERN.search(sentence) and not JFX_SAFE_PATTERN.search(sentence):
             ambiguous_mt4_support = re.search(r"MT4\s*(?:に)?対応", sentence, re.IGNORECASE)
