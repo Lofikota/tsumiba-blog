@@ -15,7 +15,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -282,7 +282,133 @@ function checkStrategyResidue() {
   if (!crit.length && !warn.length) infos.push('旧戦略残存スキャン: クリーン');
 }
 
+// ── 9. 日次アウトプット単位カウンタ（AI仕組み化ドクトリン §2「検証単位／日」）──
+// 燃料投下の単位は「公開記事本数」ではなく「検証可能なアウトプット1単位／日」。
+// これをモデルの自己申告ではなくgit/キューから機械算出する（コンテキスト資産化設計:
+// 「モデルの善意頼みの仕組みは作らない」）。同一日は種別・件数が何件でも1カウント
+// （連投で日数を買わせない）。正本: AI運用/戦略/AI仕組み化ドクトリン_2026-07-22.md §2
+const CADENCE_WINDOW_DAYS = 14;
+const AI_OPS_ROOT = path.join(AFFILIATE_ROOT, 'AI運用');
+
+const toYmd = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+const shQuiet = (cwd, cmd) => { try { return execSync(cmd, { cwd, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }); } catch { return ''; } };
+
+// git log を「日付 + そのcommitで触ったファイル」の配列に落とす（--name-only の素朴パース）
+function gitTouches(cwd, since, until, pathspec, filter = 'AM') {
+  const out = shQuiet(cwd, `git log --since="${since}" --until="${until} 23:59:59" --diff-filter=${filter} --date=short --format="@@%ad %H" --name-only -- ${pathspec}`);
+  const commits = [];
+  let cur = null;
+  for (const line of out.split('\n')) {
+    if (line.startsWith('@@')) { cur = { date: line.slice(2, 12), sha: line.slice(13).trim(), files: [] }; commits.push(cur); }
+    else if (cur && line.trim()) cur.files.push(line.trim());
+  }
+  return commits;
+}
+
+// CSVは本文に改行・カンマ・引用符を含むので行分割では壊れる。最小限のパーサで読む。
+function parseCsv(text) {
+  const rows = []; let row = [], field = '', quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else quoted = false; } else field += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ',') { row.push(field); field = ''; }
+    else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+    else if (c !== '\r') field += c;
+  }
+  if (field || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+// 窓内の各日に「どの種別のアウトプットが出たか」を集める（1日1カウントはSetで担保）
+function collectOutputUnits(since, until) {
+  const units = new Map();
+  const mark = (date, kind) => {
+    if (!date || date < since || date > until) return;
+    if (!units.has(date)) units.set(date, new Set());
+    units.get(date).add(kind);
+  };
+
+  // 記事: 追加/変更された .mdx のうち、そのcommit時点で draft:true でないものだけ（下書きは燃料ではない）
+  for (const c of gitTouches(ROOT, since, until, 'src/content/blog')) {
+    const published = c.files.filter((f) => f.endsWith('.mdx')).some((f) => {
+      // ファイル名はgit由来なのでシェル経由にせず引数配列で渡す（メタ文字の解釈事故を防ぐ）
+      let head = '';
+      try { head = execFileSync('git', ['show', `${c.sha}:${f}`], { cwd: ROOT, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }).slice(0, 1500); } catch { return false; }
+      const fm = head.match(/^---\n([\s\S]*?)\n---/);
+      return Boolean(fm) && !/^draft:\s*true/m.test(fm[1]);
+    });
+    if (published) mark(c.date, '記事');
+  }
+
+  // CV改善: 本番に反映されるUI/導線コードの変更
+  for (const c of gitTouches(ROOT, since, until, 'src/components src/layouts src/pages', 'AMD')) mark(c.date, 'CV改善');
+
+  // 比較データ / 実験: AI運用は別リポジトリ（自動バックアップミラー）で、commitが
+  // 「7/16〜07-22の取り残しを回収」のようにバッチ化される。commit日付だけだと実作業日が
+  // 潰れて偽の欠測になるため、ファイルmtimeとの和集合で判定する（どちらも決定論的）。
+  for (const [dir, kind] of [['データ正本', '比較データ'], ['実験', '実験']]) {
+    for (const c of gitTouches(AI_OPS_ROOT, since, until, dir, 'AMD')) mark(c.date, kind);
+    const abs = path.join(AI_OPS_ROOT, dir);
+    if (!fs.existsSync(abs)) continue;
+    for (const f of fs.readdirSync(abs)) {
+      if (!/\.(ya?ml|md)$/.test(f) || f.startsWith('_')) continue;
+      mark(toYmd(fs.statSync(path.join(abs, f)).mtime), kind);
+    }
+  }
+
+  // X投稿: 実投稿されたtweetのみ（status=pending のキュー投入は燃料に数えない）。
+  // 実データのstatus値は 'posted'。将来 'published' に変わっても拾えるよう両方受ける。
+  const queueCsv = path.join(ROOT, 'x-automation/data/tweet_queue.csv');
+  if (fs.existsSync(queueCsv)) {
+    const rows = parseCsv(fs.readFileSync(queueCsv, 'utf-8'));
+    const head = rows[0] ?? [];
+    const si = head.indexOf('status'), pi = head.indexOf('posted_at');
+    if (si >= 0 && pi >= 0) {
+      for (const r of rows.slice(1)) {
+        if (!['posted', 'published'].includes(r[si])) continue;
+        mark((r[pi] ?? '').slice(0, 10), 'X投稿');
+      }
+    }
+  }
+  return units;
+}
+
+function checkOutputCadence(asOf) {
+  const until = toYmd(asOf);
+  const days = Array.from({ length: CADENCE_WINDOW_DAYS }, (_, i) => toYmd(new Date(asOf.getTime() - i * 86400000))).reverse();
+  const since = days[0];
+  const units = collectOutputUnits(since, until);
+
+  const covered = days.filter((d) => units.has(d)).length;
+  const missing = CADENCE_WINDOW_DAYS - covered;
+  // ゼロ連続の判定からは当日を外す（診断はセッション開始時＝その日の作業前に走るため、
+  // 当日ゼロを数えると毎朝1日水増しされる）。検知は1日遅れるが偽🚨を出さない。
+  const closed = days.slice(0, -1);
+  let run = 0, maxRun = 0, tail = 0;
+  for (const d of closed) {
+    if (units.has(d)) run = 0; else { run++; maxRun = Math.max(maxRun, run); }
+  }
+  for (let i = closed.length - 1; i >= 0 && !units.has(closed[i]); i--) tail++;
+
+  const kinds = {};
+  for (const set of units.values()) for (const k of set) kinds[k] = (kinds[k] ?? 0) + 1;
+  const breakdown = Object.entries(kinds).map(([k, v]) => `${k}=${v}日`).join(' / ') || '該当なし';
+  infos.push(`直近${CADENCE_WINDOW_DAYS}日のアウトプット: ${covered}/${CADENCE_WINDOW_DAYS}日（欠測: ${missing}日 / 内訳: ${breakdown}）`);
+
+  if (maxRun >= 3) {
+    critical.push(`アウトプットが連続${maxRun}日ゼロ（${tail >= 3 ? `直近${tail}日を含む・${days.at(-2)}まで` : '窓内で発生'}）。燃料投下の停止＝事業が進んでいない。品質ゲート待ちなら人間判定の滞留、ネタ切れなら知識ソース層の不足と切り分けること（正本: AI運用/戦略/AI仕組み化ドクトリン_2026-07-22.md §2）。`);
+  } else if (missing > 5) {
+    warnings.push(`直近${CADENCE_WINDOW_DAYS}日で欠測${missing}日（合格ラインは90日で7日以内）。比較データ・一次情報確認は法務レビュー不要で毎日1単位取れる。`);
+  }
+}
+
 // ── 実行 ────────────────────────────────────────────────────────
+// --cadence-as-of=YYYY-MM-DD: カウンタの起点日をずらす（判定ロジックの動作確認用）
+const asOfArg = process.argv.find((a) => a.startsWith('--cadence-as-of='));
+const cadenceAsOf = asOfArg ? new Date(`${asOfArg.split('=')[1]}T12:00:00`) : new Date();
+
 console.log('🩺 ops-doctor — 事業システム健康診断\n');
 checkGit();
 await checkActions();
@@ -292,6 +418,7 @@ checkHandoff();
 checkStructure();
 await checkCvFunnel();
 checkStrategyResidue();
+checkOutputCadence(cadenceAsOf);
 
 if (critical.length) {
   console.log('🚨 要対応（今日中に潰す）');
