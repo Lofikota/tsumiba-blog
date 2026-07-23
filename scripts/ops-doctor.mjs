@@ -20,7 +20,16 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
-const AFFILIATE_ROOT = path.join(ROOT, '..');
+// worktree から実行すると ROOT が .claude/worktrees/<name>/ になり、AI運用・X自動化 といった
+// 兄弟ディレクトリを丸ごと見失う（＝存在するのに「無い」と誤警告する）。
+// git-common-dir（常に本体の .git を指す）の親をリポジトリ本体として解決する。
+const MAIN_REPO = (() => {
+  try {
+    const gitDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: ROOT, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    return path.dirname(gitDir);
+  } catch { return ROOT; }
+})();
+const AFFILIATE_ROOT = path.join(MAIN_REPO, '..');
 const REPO_API = 'https://api.github.com/repos/Lofikota/tsumiba-blog';
 const noNet = process.argv.includes('--no-net');
 
@@ -47,7 +56,9 @@ function checkGit() {
   const untracked = dirty.split('\n').filter((l) => l.startsWith('??') && l.endsWith('.mdx'));
   if (untracked.length) critical.push(`未追跡の記事ファイル ${untracked.length} 件。commitされない限り存在しないのと同じ。`);
 
-  const locks = fs.readdirSync(path.join(ROOT, '.git')).filter((f) => f.includes('.lock'));
+  // worktreeでは .git がファイル（gitdirへのポインタ）なので readdir が落ちる。実体を解決する。
+  const gitDir = path.resolve(ROOT, sh('git rev-parse --git-dir'));
+  const locks = fs.readdirSync(gitDir).filter((f) => f.includes('.lock'));
   if (locks.length) warnings.push(`staleなgitロックが ${locks.length} 件（Coworkサンドボックス残骸の可能性）: ${locks.join(', ')}`);
 
   const lastOrigin = sh('git log -1 --format=%ci origin/main');
@@ -321,6 +332,31 @@ function parseCsv(text) {
   return rows;
 }
 
+// X投稿の実績正本。投稿しているのは launchd `com.tsumiba.xposter`（5分毎・日1本）で、
+// 結果を書き戻すのはこのCSVだけ。同名の tsumiba-blog/x-automation/data/tweet_queue.csv は
+// 旧世代のコピーで posted_at が2026-05-20で止まっており、Cloudflare D1 も
+// cronトリガー無し＝自走しない停止済み系統。どちらも実績としては読まない。
+// --x-queue=<path>: 検証用の差し替え。稼働中のCSVはlaunchdが5分毎に読み書きするので、
+// 停止検知の動作確認でこのファイルを退避・改変してはいけない。
+const X_QUEUE_PATH = process.argv.find((a) => a.startsWith('--x-queue='))?.slice(10)
+  ?? path.join(AFFILIATE_ROOT, 'X自動化/data/tweet_queue.csv');
+let xQueueCache;
+function readXQueue() {
+  if (xQueueCache !== undefined) return xQueueCache;
+  if (!fs.existsSync(X_QUEUE_PATH)) return (xQueueCache = null);
+  const rows = parseCsv(fs.readFileSync(X_QUEUE_PATH, 'utf-8'));
+  const head = rows[0] ?? [];
+  const col = Object.fromEntries(['status', 'posted_at', 'scheduled_date', 'scheduled_time', 'error'].map((k) => [k, head.indexOf(k)]));
+  if (col.status < 0 || col.posted_at < 0) return (xQueueCache = null);
+  const at = (r, k) => (col[k] >= 0 ? (r[col[k]] ?? '') : '');
+  return (xQueueCache = rows.slice(1)
+    .filter((r) => r.length > col.status)
+    .map((r) => ({
+      status: at(r, 'status'), posted_at: at(r, 'posted_at'),
+      scheduled_date: at(r, 'scheduled_date'), scheduled_time: at(r, 'scheduled_time'), error: at(r, 'error'),
+    })));
+}
+
 // 窓内の各日に「どの種別のアウトプットが出たか」を集める（1日1カウントはSetで担保）
 function collectOutputUnits(since, until) {
   const units = new Map();
@@ -359,20 +395,41 @@ function collectOutputUnits(since, until) {
   }
 
   // X投稿: 実投稿されたtweetのみ（status=pending のキュー投入は燃料に数えない）。
-  // 実データのstatus値は 'posted'。将来 'published' に変わっても拾えるよう両方受ける。
-  const queueCsv = path.join(ROOT, 'x-automation/data/tweet_queue.csv');
-  if (fs.existsSync(queueCsv)) {
-    const rows = parseCsv(fs.readFileSync(queueCsv, 'utf-8'));
-    const head = rows[0] ?? [];
-    const si = head.indexOf('status'), pi = head.indexOf('posted_at');
-    if (si >= 0 && pi >= 0) {
-      for (const r of rows.slice(1)) {
-        if (!['posted', 'published'].includes(r[si])) continue;
-        mark((r[pi] ?? '').slice(0, 10), 'X投稿');
-      }
-    }
+  // 実績の正本は稼働中の投稿系統が書き戻すCSVのみ（readXQueue のコメント参照）。
+  for (const r of readXQueue() ?? []) {
+    if (['posted', 'published'].includes(r.status)) mark(r.posted_at.slice(0, 10), 'X投稿');
   }
   return units;
+}
+
+// ── X投稿パイプラインの生死 ────────────────────────────────────
+// アウトプット内訳の「X投稿=0日」だけでは、投稿が無いのか実績を読めていないのか区別できない。
+// 正本を読めたかを先に判定し、0 と 未計測 を混同させない。
+function checkXPosting() {
+  const rows = readXQueue();
+  if (!rows) {
+    warnings.push(`X投稿の実績を読めない（${X_QUEUE_PATH} が無い、または列が想定外）。下のアウトプット内訳のX投稿は「0日」ではなく「未計測」。`);
+    return;
+  }
+  const posted = rows.filter((r) => ['posted', 'published'].includes(r.status) && r.posted_at);
+  const last = posted.map((r) => r.posted_at).sort().at(-1);
+  const pending = rows.filter((r) => r.status === 'pending');
+  const today = toYmd(new Date());
+  const overdue = pending.filter((r) => r.scheduled_date && r.scheduled_date < today);
+  infos.push(`X投稿: posted=${posted.length} / pending=${pending.length}（うち期限切れ${overdue.length}） / 最終投稿=${last?.slice(0, 10) ?? 'なし'}`);
+
+  const silent = last ? daysAgo(last) : null;
+  if (silent === null || silent >= 3) {
+    const err = rows.filter((r) => r.status === 'error' && r.error)
+      .sort((a, b) => `${a.scheduled_date} ${a.scheduled_time}`.localeCompare(`${b.scheduled_date} ${b.scheduled_time}`)).at(-1);
+    const cause = err
+      ? `直近エラー(${err.scheduled_date} ${err.scheduled_time}): ${err.error.slice(0, 160)}`
+      : 'errorレコードも無い＝投稿を試みた形跡すらない（launchctl list | grep xposter でジョブの生死を確認）。';
+    critical.push(`X投稿が${silent === null ? '一度も成功していない' : `${silent}日間ゼロ`}（最終: ${last?.slice(0, 10) ?? 'なし'}）。集客の即効チャネルが停止している。${cause}`);
+  } else if (overdue.length) {
+    warnings.push(`X投稿キューに期限切れpendingが${overdue.length}件（最古 ${overdue.map((r) => r.scheduled_date).sort()[0]}）。投稿枠が消化されず先送りされている。`);
+  }
+  if (!pending.length) warnings.push('X投稿のpendingが0件。次の投稿予定が無く、明日以降ゼロになる。');
 }
 
 function checkOutputCadence(asOf) {
@@ -418,6 +475,7 @@ checkHandoff();
 checkStructure();
 await checkCvFunnel();
 checkStrategyResidue();
+checkXPosting();
 checkOutputCadence(cadenceAsOf);
 
 if (critical.length) {
