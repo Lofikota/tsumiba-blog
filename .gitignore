@@ -14,3 +14,6 @@ KPI管理/automation-runs/
 
 # Python
 __pycache__/
+
+# generate-article.mjs --dry-run のプロンプトダンプ（検証用の使い捨て）
+data/last-article-prompt.txt
