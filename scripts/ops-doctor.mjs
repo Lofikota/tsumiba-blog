@@ -41,11 +41,7 @@ function checkGit() {
   if (ahead > 0) critical.push(`未pushコミットが ${ahead} 件ある。成果物が埋もれる前に push すること（6/15・7/2 に発生した事故と同型）。`);
   if (behind > 0) warnings.push(`origin より ${behind} コミット遅れ。CMS編集の可能性 → git pull --rebase 推奨。`);
 
-  const dirty = sh('git status --porcelain -- src/content/blog data/keyword-queue.json');
-  if (dirty) warnings.push(`記事/キューに未commitの変更あり:\n${dirty.split('\n').map((l) => `      ${l}`).join('\n')}`);
-
-  const untracked = dirty.split('\n').filter((l) => l.startsWith('??') && l.endsWith('.mdx'));
-  if (untracked.length) critical.push(`未追跡の記事ファイル ${untracked.length} 件。commitされない限り存在しないのと同じ。`);
+  checkUncommitted();
 
   const locks = fs.readdirSync(path.join(ROOT, '.git')).filter((f) => f.includes('.lock'));
   if (locks.length) warnings.push(`staleなgitロックが ${locks.length} 件（Coworkサンドボックス残骸の可能性）: ${locks.join(', ')}`);
@@ -54,6 +50,66 @@ function checkGit() {
   const age = daysAgo(lastOrigin);
   if (age >= 3) critical.push(`origin/main が ${age} 日間更新されていない。日次パイプラインが沈黙している疑い。`);
   else infos.push(`origin/main 最終更新: ${age} 日前`);
+}
+
+// ── 1-b. 未commit変更（リポジトリ全体・重要度で3段に分ける）─────
+// 旧実装は src/content/blog と keyword-queue.json だけを見ており、収益動線の中核
+// （src/components・scripts・.github/workflows・package.json）の放置を検知できなかった。
+// 全域に広げるとビルド残骸で常時警告が鳴り形骸化するため、重要度で段を分ける。
+const UNCOMMITTED_IMPORTANT_STALE_DAYS = 3;
+const IMPORTANT_PREFIXES = ['src/', 'scripts/', '.github/workflows/'];
+const IMPORTANT_FILES = ['package.json', 'package-lock.json'];
+// ビルド残骸: 成果物ではなく掃除対象。commit催促ではなく削除/ignore を促す。
+const BUILD_RESIDUE = [/^astro\.config\..*tmp\.mjs$/, /^_t\.tmp$/, /^\.astro_old_/];
+
+// porcelain 1行 → { status, file, untracked }。rename は新パス側を採る。
+function parsePorcelain(line) {
+  const status = line.slice(0, 2);
+  let file = line.slice(3);
+  if (file.includes(' -> ')) file = file.split(' -> ').pop();
+  if (file.startsWith('"') && file.endsWith('"')) file = JSON.parse(file);
+  return { status: status.trim(), file, untracked: status === '??' };
+}
+
+// 未commit変更は git 側に日付を持たないため、経過日数の唯一のソースは mtime。
+function fileAgeDays(file) {
+  try {
+    return Math.floor((Date.now() - fs.statSync(path.join(ROOT, file.replace(/\/$/, ''))).mtimeMs) / 86400000);
+  } catch { return null; }
+}
+
+const isImportant = (f) => IMPORTANT_PREFIXES.some((p) => f.startsWith(p)) || IMPORTANT_FILES.includes(f);
+const isResidue = (f) => BUILD_RESIDUE.some((re) => re.test(f));
+const fmt = (items) => items.map(({ file, age }) => `      ${file}${age === null ? '' : `（${age}日）`}`).join('\n');
+
+function checkUncommitted() {
+  // sh() は trim() するが、porcelain は先頭カラムが有意なスペース（' M' = worktree変更）。
+  // 全体 trim すると1行目だけ1文字ズレてパスと状態が壊れるため、末尾改行だけ落とす。
+  const raw = execFileSync('git', ['status', '--porcelain'], { cwd: ROOT, encoding: 'utf-8' }).replace(/\n+$/, '');
+  if (!raw) { infos.push('未commitの変更なし。'); return; }
+
+  const entries = raw.split('\n').map(parsePorcelain)
+    .map((e) => ({ ...e, age: fileAgeDays(e.file) }))
+    .sort((a, b) => (b.age ?? 0) - (a.age ?? 0));
+
+  const residue = entries.filter((e) => isResidue(e.file));
+  const rest = entries.filter((e) => !isResidue(e.file));
+  const staleImportant = rest.filter((e) => isImportant(e.file) && (e.age ?? 0) >= UNCOMMITTED_IMPORTANT_STALE_DAYS);
+  const other = rest.filter((e) => !staleImportant.includes(e));
+
+  if (staleImportant.length) {
+    critical.push(`重要ファイルに ${UNCOMMITTED_IMPORTANT_STALE_DAYS} 日以上未commitの変更が ${staleImportant.length} 件（src/・scripts/・.github/workflows/・package.json）。成果物が消える・本番と乖離する:\n${fmt(staleImportant)}`);
+  }
+  if (other.length) {
+    const untrackedCount = other.filter((e) => e.untracked).length;
+    warnings.push(`その他の未commit ${other.length} 件（うち未追跡 ${untrackedCount} 件）:\n${fmt(other)}`);
+  }
+  if (residue.length) {
+    warnings.push(`掃除候補（ビルド残骸・一時ファイル）${residue.length} 件。commitではなく削除、または .gitignore へ追加すること:\n${fmt(residue)}\n      → rm -rf ${residue.map((e) => e.file).join(' ')}`);
+  }
+
+  const untrackedMdx = entries.filter((e) => e.untracked && e.file.endsWith('.mdx'));
+  if (untrackedMdx.length) critical.push(`未追跡の記事ファイル ${untrackedMdx.length} 件。commitされない限り存在しないのと同じ: ${untrackedMdx.map((e) => e.file).join(', ')}`);
 }
 
 // ── 2. GitHub Actions 実行結果（公開APIのみ・認証不要）──────────
