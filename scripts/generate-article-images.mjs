@@ -6,24 +6,27 @@
  *   node scripts/generate-article-images.mjs --slug fx-kouza-hikaku
  *   node scripts/generate-article-images.mjs --all --limit 5
  *   node scripts/generate-article-images.mjs --slug fx-kouza-hikaku --dry-run
+ *   node scripts/generate-article-images.mjs --slug fx-kouza-hikaku --compose-only
  *   node scripts/generate-article-images.mjs --all --all-categories
  *
  * Required:
  *   OPENAI_API_KEY
  *
  * Optional:
- *   OPENAI_IMAGE_MODEL=gpt-image-1.5
+ *   OPENAI_IMAGE_MODEL=gpt-image-2
  *   OPENAI_IMAGE_SIZE=1536x1024
  *   OPENAI_IMAGE_QUALITY=high
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { composeArticleImage } from './compose-article-image.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const BLOG_DIR = path.join(ROOT, 'src/content/blog');
 const IMAGE_DIR = path.join(ROOT, 'public/images/articles');
+const BASE_IMAGE_DIR = path.join(IMAGE_DIR, 'base');
 
 const args = process.argv.slice(2);
 const getArg = (name) => {
@@ -38,11 +41,12 @@ const overwrite = hasArg('--overwrite');
 const allMode = hasArg('--all');
 const allCategories = hasArg('--all-categories');
 const onlyNonFx = hasArg('--only-non-fx');
+const composeOnly = hasArg('--compose-only');
 const limit = Number(getArg('--limit') ?? 999);
 
-const model = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
-const size = process.env.OPENAI_IMAGE_SIZE || '1024x1024';
-const quality = process.env.OPENAI_IMAGE_QUALITY || 'low';
+const model = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2';
+const size = process.env.OPENAI_IMAGE_SIZE || '1536x1024';
+const quality = process.env.OPENAI_IMAGE_QUALITY || 'high';
 
 if (!slugArg && !allMode) {
   console.error('Usage: node scripts/generate-article-images.mjs --slug <slug> または --all');
@@ -83,6 +87,7 @@ function parseFrontmatter(content) {
       description: getString('description'),
       pubDate: getString('pubDate'),
       category: getString('category'),
+      articleType: getString('articleType'),
       heroImage: getString('heroImage'),
     },
     block,
@@ -99,6 +104,14 @@ function writeHeroImage(content, imagePath) {
     : `${parsed.block}\nheroImage: "${imagePath}"`;
 
   return `---\n${nextBlock}\n---${content.slice(parsed.bodyStart)}`;
+}
+
+function resolveArticleType({ articleType, title = '', slug = '' }) {
+  if (articleType) return articleType;
+  if (/レビュー|評判|review/i.test(`${title} ${slug}`)) return 'review';
+  if (/比較|ランキング|おすすめ|vs|hikaku|ranking/i.test(`${title} ${slug}`)) return 'comparison';
+  if (/ニュース|発表|改定|変更|news/i.test(`${title} ${slug}`)) return 'news';
+  return 'guide';
 }
 
 function listTargets() {
@@ -119,6 +132,7 @@ function listTargets() {
     .filter((item) => slugArg || allCategories || isFxArticle(item))
     .filter((item) => !onlyNonFx || !isFxArticle(item))
     .filter((item) => {
+      if (composeOnly) return fs.existsSync(path.join(BASE_IMAGE_DIR, `${item.slug}.png`));
       if (overwrite) return true;
       if (!item.data.heroImage) return true;
       if (item.data.heroImage.startsWith('/og/') || item.data.heroImage.startsWith('/thumbnails/')) return true;
@@ -134,24 +148,25 @@ function listTargets() {
 }
 
 // Claudeでビジュアルシーンを動的生成する（失敗時はnullを返してフォールバックへ）
-async function generateSceneWithClaude({ title, description, category }) {
+async function generateSceneWithClaude({ title, description, category, articleType }) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return null;
 
-  const system = `You are a visual art director for a Japanese personal finance blog.
-Blog persona: Tanaka Ren, a 32-year-old Japanese IT office worker who overcame 2M yen debt.
-Task: given an article title and description, write a specific scene description for a photorealistic 16:9 hero image.`;
+  const system = `You are a visual art director for tsumiba, a Japanese editorial media brand that helps domestic-FX beginners make careful decisions.
+Task: given an article title and description, write a specific visual scene for a premium 16:9 editorial hero image. The publisher is an editorial team, not an individual persona.`;
 
   const user = `Article title: ${title}
 Description: ${description || '(none)'}
 Category: ${category}
+Article type: ${articleType || 'guide'}
 
 Write a specific, vivid scene description (2-3 sentences, English only).
 Rules:
 - Reflect the SPECIFIC topic of this article — not a generic "man at laptop" shot
 - Include concrete props, environment, or action directly tied to the article content
-- Subject: realistic Japanese 30s office worker or hands-only composition; no brand logos; no celebrities
-- Mood: trustworthy, warm daylight, practical, premium but not luxury
+- Choose the best visual subject for the topic: objects, hands, smartphone, comparison cards, documents, or a generic learner. Do not default to a man at a laptop
+- No invented personal identity, personal results, debt story, salary, assets, or trading performance
+- Mood: trustworthy, practical, editorial, premium but not luxury
 - No text in image, no exaggerated money piles
 
 Reply with ONLY the scene description. No explanation, no bullet points.`;
@@ -183,10 +198,15 @@ Reply with ONLY the scene description. No explanation, no bullet points.`;
   }
 }
 
-async function promptForArticle({ slug, data }) {
+async function promptForArticle({ slug, data }, { allowClaude = true } = {}) {
   const category = data.category || 'FX・外貨';
   const title = data.title || slug;
   const description = data.description || '';
+  const articleType = resolveArticleType({
+    articleType: data.articleType,
+    title,
+    slug,
+  });
 
   const isFx = category === 'FX・外貨' || FX_SLUGS.has(slug) || slug.includes('fx');
   const categoryScenes = {
@@ -197,7 +217,7 @@ async function promptForArticle({ slug, data }) {
     },
     'NISA・投資': {
       direction: 'Long-term investing and asset-building education. Show patient planning and low-pressure decision support.',
-      scene: 'a Japanese office worker planning long-term investments with a notebook, tablet portfolio chart, simple asset allocation notes, calm morning light',
+      scene: 'hands planning long-term investments with a notebook, tablet portfolio shapes, simple asset allocation objects, and calm morning light',
       avoid: 'FX trading screens, insurance consultation scenes, credit card closeups, profit guarantees',
     },
     '投資・資産運用': {
@@ -207,7 +227,7 @@ async function promptForArticle({ slug, data }) {
     },
     '副業・節税': {
       direction: 'Side business and tax preparation for salaried workers. Show practical documentation and action steps.',
-      scene: 'a Japanese office worker organizing receipts, tax forms, laptop spreadsheet, and a checklist after work, practical side-business atmosphere',
+      scene: 'hands organizing receipts, tax forms, a laptop spreadsheet, and a checklist on a practical home-work desk',
       avoid: 'FX charts, broker screens, insurance sales scenes, luxury flexing',
     },
     'クレジットカード': {
@@ -227,14 +247,17 @@ async function promptForArticle({ slug, data }) {
     },
   };
 
+  const fxTypeScenes = {
+    review: 'a premium editorial still life of a generic smartphone with simplified non-readable app interface shapes, a neutral comparison card, a risk checklist, and carefully arranged desk objects related to the reviewed FX service',
+    comparison: 'a clear split-composition editorial scene showing two or three generic smartphone and comparison-card options under the same criteria, with balanced visual weight and no winner crown or ranking hype',
+    guide: 'a calm step-by-step learning scene with a smartphone, notebook, three physical step cards, risk notes, and a clear path from learning to comparison',
+    news: 'a timely editorial announcement scene with a smartphone notification shape, calendar, official-document motif, and restrained sense of freshness',
+  };
+
   const fxSpec = {
-    direction: 'FX-focused. Prioritize FX account comparison, DMM FX, JFX, FXTF, beginner risk management, and office-worker decision support.',
-    scene: [
-      'a focused Japanese office worker comparing FX account conditions on a laptop',
-      'currency charts, risk notes, a simple comparison checklist, and a clean desk',
-      'disciplined and cautious mood, modern Japanese work-from-home setting',
-    ].join(', '),
-    avoid: 'tax-saving visuals, NISA visuals, insurance consultation scenes, household budgeting scenes, credit cards, profit guarantees, get-rich-quick mood',
+    direction: 'Domestic-FX beginner education. Help the reader compare required funds, smartphone usability, costs, and loss risk without implying profit.',
+    scene: fxTypeScenes[articleType] || fxTypeScenes.guide,
+    avoid: 'tax-saving visuals, NISA visuals, insurance scenes, credit cards, readable trading UI, profit guarantees, winning trades, get-rich-quick mood',
   };
 
   const spec = isFx ? fxSpec : (categoryScenes[category] || {
@@ -244,7 +267,9 @@ async function promptForArticle({ slug, data }) {
   });
 
   // Claudeで記事固有のシーンを生成（失敗時は固定シーンにフォールバック）
-  const claudeScene = await generateSceneWithClaude({ title, description, category });
+  const claudeScene = allowClaude
+    ? await generateSceneWithClaude({ title, description, category, articleType })
+    : null;
   if (claudeScene) {
     console.log(`  [Claude scene] ${claudeScene.slice(0, 100)}${claudeScene.length > 100 ? '...' : ''}`);
   }
@@ -252,19 +277,19 @@ async function promptForArticle({ slug, data }) {
 
   return [
     'Use case: photorealistic-natural',
-    'Asset type: 16:9 hero image for a Japanese personal finance affiliate blog article',
+    'Asset type: text-free base artwork for a 16:9 Japanese editorial blog hero and OGP image',
     `Business direction: ${spec.direction}`,
     'Marketing perspective: reader-first problem solving, trustworthy comparison, clear next action, no hard-selling, no exaggerated success imagery.',
-    'Persona perspective: Tanaka Ren, a 30s Japanese IT office worker, explains money decisions from practical lived experience.',
     `Article title for context: ${title}`,
     `Article category: ${category}`,
+    `Article type: ${articleType}`,
     description ? `Article description: ${description}` : '',
     `Scene/backdrop: ${scene}.`,
-    'Subject: realistic Japanese 30s office worker or hands-only composition depending on what feels natural; no identifiable celebrity; no brand logos, no broker logos.',
-    'Composition: editorial blog cover, strong central visual, clean negative space near the top-left for page layout, professional WordPress-style article thumbnail.',
-    'Style: photorealistic, trustworthy, warm daylight, premium but not luxury, practical financial comparison mood, high detail, natural colors.',
-    `Avoid: in-image text, fake UI labels, brand logos, watermarks, exaggerated money piles, ${spec.avoid}.`,
-    'Output: landscape image, no text.'
+    'Subject: use the scene that best explains this article. A person is optional and must be generic; no fixed persona, no identifiable celebrity, no brand or broker logos.',
+    'Composition: landscape editorial cover with the main visual weighted to the right half. Keep the left 58% relatively calm and dark enough for a later title overlay.',
+    'Style: high-end Japanese editorial illustration or natural editorial photography, trustworthy, practical, calm, visually distinctive, premium but not luxury.',
+    `Avoid: all in-image text, letters, numbers, readable UI, fake UI labels, logos, watermarks, upward arrows, candlestick charts, exaggerated money, personal success imagery, ${spec.avoid}.`,
+    'Output: landscape base artwork only. Do not render any title or words; title will be added later by code.'
   ].filter(Boolean).join('\n');
 }
 
@@ -317,6 +342,10 @@ async function generateImage(prompt, outputPath) {
 
 const targets = listTargets();
 if (targets.length === 0) {
+  if (composeOnly && slugArg) {
+    console.error(`ベース画像がありません: ${path.relative(ROOT, path.join(BASE_IMAGE_DIR, `${slugArg}.png`))}`);
+    process.exit(1);
+  }
   console.log('対象記事がありません。heroImageなしの記事がないか、slugを確認してください。');
   process.exit(0);
 }
@@ -326,23 +355,46 @@ console.log(`対象: ${targets.length}件 / scope=${allCategories ? 'all-categor
 for (const target of targets) {
   const imagePath = `/images/articles/${target.slug}.png`;
   const outputPath = path.join(ROOT, 'public', imagePath);
-  const prompt = await promptForArticle(target);
+  const baseOutputPath = path.join(BASE_IMAGE_DIR, `${target.slug}.png`);
+  const prompt = composeOnly
+    ? null
+    : await promptForArticle(target, { allowClaude: !dryRun });
 
   if (dryRun) {
-    console.log(`\n--- ${target.slug} ---\n${prompt}\n=> ${imagePath}`);
+    if (composeOnly) {
+      console.log(`\n--- ${target.slug} ---\ncompose-only: ${path.relative(ROOT, baseOutputPath)} => ${imagePath}`);
+    } else {
+      console.log(`\n--- ${target.slug} ---\n${prompt}\n=> base: ${path.relative(ROOT, baseOutputPath)}\n=> final: ${imagePath}`);
+    }
     continue;
   }
 
-  if (fs.existsSync(outputPath) && !overwrite) {
-    console.log(`skip: ${target.slug} 既存画像あり (${imagePath})`);
+  if (composeOnly) {
+    console.log(`compose-only: ${target.slug}`);
+  } else if (fs.existsSync(baseOutputPath) && !overwrite) {
+    console.log(`skip generation: ${target.slug} ベース画像あり (${path.relative(ROOT, baseOutputPath)})`);
   } else {
     console.log(`generate: ${target.slug}`);
-    await generateImage(prompt, outputPath);
+    await generateImage(prompt, baseOutputPath);
   }
 
-  const nextContent = writeHeroImage(target.content, imagePath);
-  fs.writeFileSync(target.filePath, nextContent, 'utf-8');
-  console.log(`updated: ${path.relative(ROOT, target.filePath)} -> ${imagePath}`);
+  await composeArticleImage({
+    basePath: baseOutputPath,
+    outputPath,
+    title: target.data.title || target.slug,
+    category: target.data.category || 'FX・外貨',
+  });
+  console.log(`composed: ${path.relative(ROOT, outputPath)}`);
+
+  if (!composeOnly) {
+    const nextContent = writeHeroImage(target.content, imagePath);
+    if (nextContent !== target.content) {
+      fs.writeFileSync(target.filePath, nextContent, 'utf-8');
+      console.log(`updated: ${path.relative(ROOT, target.filePath)} -> ${imagePath}`);
+    } else {
+      console.log(`unchanged: ${path.relative(ROOT, target.filePath)}`);
+    }
+  }
 }
 
 console.log('\n完了');
