@@ -49,33 +49,81 @@ const FINANCIAL_KEYWORDS = ['FX', '投資', 'NISA', 'iDeCo', '証券', '株', '�
 
 // ── 生成再注入ゲート（C10C-G 2026-07-17・P0-C10実体検証§3(b)対応）──
 // LLM生成物がscope外推奨・JFX誤情報・未証明体験・ASP内部報酬額を持ち込むのを
-// 最終ゲートで決定論的に拒否する。語句の言及自体は注意喚起記事で正当なため、
-// 文単位で「推奨・可能形の文脈」との共起だけを拒否し、否定形・注意喚起文は通す。
+// 最終ゲートで決定論的に拒否する。scope外語句は原則拒否し、
+// 明示的な否定・対象外表明・注意喚起だけを例外として通す。
 
-// 1. scope外語句（海外FX・CFD・KO・FXスクール・EA運用）の推奨・誘導文脈
+// 1. scope外語句（海外FX・CFD・KO・FXスクール・EA運用）
 const SCOPE_TERMS = [
   { re: /海外\s*FX/i, label: '海外FX' },
   { re: /(?<![A-Za-z])CFD(?![A-Za-z])/, label: 'CFD' },
-  { re: /ノックアウト・?オプション|ノックアウト注文/, label: 'ノックアウトオプション' },
+  { re: /ノックアウト(?:・?オプション|注文)?/, label: 'ノックアウトオプション' },
   { re: /FX\s*スクール/i, label: 'FXスクール' },
   { re: /自動売買|(?<![A-Za-z])EA(?![A-Za-z])|システムトレード|シストレ/i, label: 'EA・自動売買' },
 ];
-// 推奨語＋「言い換え誘導語」（強み/メリット/使い分け/選択肢/挑戦したい）。
-// P0-C12B（2026-07-19）: 「CFDが強み」「CFDで使い分け」等、直接的な推奨語を使わず
-// 対象外商品を積極選択させる言い換えが両ゲートを通っていた（P0-C11 §4.2・§6.9）。
-// 「デメリット」は注意喚起で正当なので (?<!デ) で除外する。各語の明示的な
-// 否定形は RECOMMEND_NEG_TAIL_RE で誘導語ごとに除外する。
-const RECOMMEND_RE = /おすすめ|オススメ|お勧め|推奨|推せる|向いてい(?:る|ます)|最適(?!化)|狙い目|チャンス|(?:使っ|試し|始め|挑戦し)てみ(?:ましょう|よう|てください|る価値|るのも)|始め(?:ましょう|るなら)|活用(?:しましょう|するのが)|選(?:びましょう|ぶべき)|通(?:いましょう|うのが最短)|検討(?:する価値|しましょう|してみ)|強み|(?<!デ)メリット|使い分け|選択肢|挑戦したい(?:人|方)?/g;
-// 推奨語の直後が否定なら推奨ではない（動詞形「おすすめしません」・名詞形「強みではない」「メリットはない」）
-const RECOMMEND_NEG_TAIL_RE = /^(?:(?:は|が|も|に|と|として)?(?:しません|しない|していません|していない|できません|できない|されません|しづらい|しにくい|ではありません|ではない|ではなく|ではなくて|ありません|ない|対象外|対象(?:で|と)?はありません|対象ではない|に(?:は)?含めません|に(?:は)?含めない|に(?:は)?含まれません|に(?:は)?含まれない|に(?:は)?入りません|に(?:は)?入らない|とは評価しません|とは評価していません|とは言えません|とは言えない|(?:を行う|する)もの(?:で(?:は)?)?ありません)|ることは(?:おすすめ|推奨|紹介)(?:しません|しない|できません|できない)|にも?[、,\s]*(?:当サイトでは)?(?:おすすめ|推奨|紹介)(?:しません|しない|できません|できない)|(?:は|として(?:は)?)?扱(?:いません|わない|っていません|っていない)|メリット(?:より|を上回る)デメリット|よりデメリットが(?:大き|多))/;
+// P0-C13R（2026-07-25）: 推奨語の列挙は言い換えで回避できるため廃止。
+// scope外語句を含む節は原則拒否し、明示的な否定・対象外表明・注意喚起だけを許可する。
+const SCOPE_HARD_NEGATION_RE = /対象外|(?:でき|使え|動かせ|選べ|始められ)(?:ません|ない|ず)|(?:おすすめ|オススメ|お勧め|推奨|紹介|掲載)(?:しません|しない|できません|できない|せず)|扱(?:いません|わない|わず|っていません|っていない)|含め(?:ません|ない)|評価(?:しません|しない|していません|していない)|られ(?:ません|ない)|不可|非対応|禁止|避け(?:る|ます|ましょう)|手を出さ(?:ない|ず)|メリット(?:が|は)?(?:ありません|ない)|元本保証[^、,]*ない|では(?:ありません|ない)|わけではない/i;
+const SCOPE_PURE_WARNING_RE = /(?:デメリット|危険性|注意点?|リスク)(?:について|を|と|が|は|も|の)?[^。\n]{0,24}?(?:説明|解説|整理|確認|理解)(?:します|する|してください|が必要です|が必要だ)?$|(?:危険性|リスク)(?:が|は|も)(?:あります|ある|高い|大きい)$|無登録業者(?:が|は)?(?:多い|多く存在します|多く存在する)$/i;
+const SCOPE_WARNING_CONTINUATION_RE = /(?:危険性|注意点?|リスク)(?:が|は|も)?[^。\n]{0,20}?(?:ある|高い|大きい)ため$|無登録業者(?:が|は)?多く$/i;
+const SCOPE_ADVERSATIVE_RE = /ですが|ますが|ませんが|ないが|ものの|けれど(?:も)?|しかし(?:ながら)?|一方で|ただし/;
+const SCOPE_CLAUSE_SPLIT_RE = new RegExp(`[、,；;]|${SCOPE_ADVERSATIVE_RE.source}`);
+
+function hasOnlyAllowedScopeMentions(sentence) {
+  const normalizedSentence = sentence.replace(/[\[\]*_]/g, '');
+  const adversativeParts = normalizedSentence.split(SCOPE_ADVERSATIVE_RE);
+  if (
+    adversativeParts.length > 1
+    && !SCOPE_HARD_NEGATION_RE.test(adversativeParts.at(-1))
+    && !SCOPE_PURE_WARNING_RE.test(adversativeParts.at(-1))
+  ) {
+    return false;
+  }
+
+  const clauses = normalizedSentence.split(SCOPE_CLAUSE_SPLIT_RE).map(clause => clause.trim()).filter(Boolean);
+  let scopeSeen = false;
+  for (const [index, clause] of clauses.entries()) {
+    const hasScopeTerm = SCOPE_TERMS.some(({ re }) => re.test(clause));
+    if (!hasScopeTerm) continue;
+    scopeSeen = true;
+    // ALLOWは明示的否定か、文末まで注意喚起だけで閉じる節に限定する。
+    const warningLeadsToHardNegation = SCOPE_WARNING_CONTINUATION_RE.test(clause)
+      && clauses.slice(index + 1).some(nextClause => SCOPE_HARD_NEGATION_RE.test(nextClause));
+    if (
+      !SCOPE_HARD_NEGATION_RE.test(clause)
+      && !SCOPE_PURE_WARNING_RE.test(clause)
+      && !warningLeadsToHardNegation
+    ) return false;
+  }
+  return scopeSeen;
+}
 
 // 2. JFX不変条件: MT4はチャート分析専用（発注・ポジション管理・EA自動売買は不可）
 const JFX_CONTEXT_RE = /JFX|MATRIX\s*TRADER|マトリックス・?トレーダー/i;
 // 「チャート分析対応」は正しい主張（分析専用が正）なので lookbehind で除外。
 // 「対応状況/可否」等の中立な言及、「使えばいい？」等の疑問形、「できず」等の否定形も除外。
-const JFX_MT4_CAPABLE_RE = /MT4[^、,]{0,16}?(?:(?<!分析)に対応|(?<!チャート分析)(?<!分析)対応(?!状況|可否|状態|一覧|の(?:違い|有無))|が使え(?!ない|ません|ず|ば)|を使え(?!ない|ません|ず|ば)|で(?:発注|注文|取引|売買|自動売買)|でも?EA|を?動かせ(?!ない|ません|ず|ば))/i;
+const JFX_MT4_CAPABLE_RE = /MT4(?:\s*に)?対応|MT4[^。]{0,80}?(?:(?:で|から|を使って)[^。]{0,16})?(?:(?:発注|注文|取引|売買|エントリー)[^。]{0,12}?(?:でき(?!ない|ません|ず)|可能|行え|出せ)|(?:EA|自動売買)[^。]{0,18}?(?:動かせ(?!ない|ません|ず)|使え(?!ない|ません|ず)|でき(?!ない|ません|ず)|可能|対応))/i;
 const JFX_EA_CAPABLE_RE = /(?:EA|自動売買)[^、,]{0,24}?(?:動かせ(?!ない|ません|ず)|使え(?!ない|ません|ず|ば)|でき(?!ない|ません|ず)|可能|に対応|向いてい)/i;
-const JFX_NEG_RE = /不可|できない|できません|できず|使えない|使えません|使えず|動かせない|動かせません|動かせず|非対応|対応していません|対応しません|(?:チャート)?分析専用|とは?違い|とは異なり|一方/;
+const JFX_MT4_CONNECTOR_RE = /MT4[^。]{0,32}?(?:から|上で|を使って|経由で|で)([^。]{0,48})/gi;
+const JFX_OPERATION_RE = /発注|注文|取引|売買|エントリー|新規ポジション|(?:建玉|保有玉|保有ポジション|ポジション)[^。]{0,12}(?:保有|建て|閉じ|決済|手仕舞|クローズ|解消|変更|管理)|(?:建て|閉じ|決済|手仕舞|クローズ|解消|変更|管理)[^。]{0,12}(?:建玉|保有玉|保有ポジション|ポジション)|建て|決済|手仕舞い|クローズ|解消|利確|損切り/i;
+const JFX_OPERATION_NEGATION_RE = /できない|できません|できず|られない|られません|不可|非対応|行わない|しない|使えない|分析専用/i;
+const MATRIX_ORDER_PATTERNS = [
+  /(?:発注|注文)(?:は|を)?[^。]{0,8}MATRIX\s*TRADER[^。]{0,18}(?:から|で)?[^。]{0,8}(?:行|実行)/gi,
+  /MATRIX\s*TRADER[^。]{0,18}(?:から|で)[^。]{0,18}(?:発注|注文)[^。]{0,12}(?:行|でき)/gi,
+];
+
+function maskMatrixTraderOrders(sentence) {
+  return MATRIX_ORDER_PATTERNS.reduce((masked, pattern) => masked.replace(pattern, ' '), sentence);
+}
+
+function hasAffirmativeMt4Operation(sentence) {
+  for (const connectorMatch of sentence.matchAll(JFX_MT4_CONNECTOR_RE)) {
+    const operationMatch = connectorMatch[1].match(JFX_OPERATION_RE);
+    if (!operationMatch) continue;
+    const suffix = connectorMatch[1].slice(operationMatch.index ?? 0, (operationMatch.index ?? 0) + 36);
+    if (!JFX_OPERATION_NEGATION_RE.test(suffix)) return true;
+  }
+  return false;
+}
 
 // 3. 未証明の一人称利用体験・第三者の成果表現
 const UNPROVEN_EXPERIENCE_PATTERNS = [
@@ -83,13 +131,30 @@ const UNPROVEN_EXPERIENCE_PATTERNS = [
   { re: /(?:編集部|筆者|私|僕)(?:が|は|も|たち|一同)?[^。\n]{0,24}?(?:口座を?開設(?:し|して)|使っ(?:た|て(?:み|きた|いる))|試し(?:た|て)|取引し(?:た|て)|運用し(?:た|て)|儲かっ|損し(?:た|て))/, label: '編集部・筆者の一人称利用体験' },
   { re: /編集部(?:の|が試した)?体験談/, label: '編集部の体験談' },
   { re: /(?:読者|フォロワー|知人|友人|ユーザー|受講生)の?\s*[A-ZＡ-Ｚa-zａ-ｚ]?\s*さん[^。\n]{0,40}?(?:利益|勝ち|勝て|稼(?:い|げ)|儲(?:か|け)|プラスに|資産(?:が|を)増)/, label: '読者・第三者の成果表現' },
+  { re: /(?:利用者|ユーザー|顧客|申込者|受講生|購入者)[^。\n]{0,40}?(?:利益|成果|稼げた|儲かった)[^。\n]{0,32}?(?:声|報告|届(?:いた|きました))/, label: '利用者・顧客等の成果の声' },
 ];
+const THIRD_PARTY_SUBJECT_RE = /読者|利用者|口座利用者|ユーザー|顧客|お客様|申込者|会員|受講生|購入者|成功者|体験者|トレーダー/;
+const THIRD_PARTY_RESULT_RE = /利益|稼げ|儲|成果|収益|勝て|黒字/;
+const THIRD_PARTY_HEARSAY_RE = /声|好評|報告|届|寄せ|口コミ|感想|評価|投稿/;
+const SOCIAL_PROOF_RE = /声|口コミ|レビュー|体験談|アンケート|コメント|回答|紹介|感想|評価|投稿/;
+const SOCIAL_RESULT_RE = /利益|収益|稼|儲|成功|増え|プラス|黒字|勝(?:て|った|ち|率|てる)/;
+const SOCIAL_NUMBER_RE = /(?:\d[\d,.]*|[０-９][０-９，．]*|[〇零一二三四五六七八九十百千万億]+)(?:\s*(?:円|万円|%|％|倍|件|人|か月|ヶ月|月))/;
+const INTERNAL_DEAL_RE = /案件|提携プログラム|広告プログラム|アフィリエイト/;
+const INTERNAL_PAYOUT_EVENT_RE = /受け取|支払|支給|入金|振込|(?:円|万円)(?:が)?(?:入る|入ります)|(?:お金|金銭|報酬|収益)[^。\n]{0,8}(?:入る|入ります)|(?:入る|入ります)[^。\n]{0,8}(?:お金|金銭|報酬|収益)|発生ベース/;
+const INTERNAL_MONEY_RE = /(?:\d[\d,.]*|[０-９][０-９，．]*|[〇零一二三四五六七八九十百千万億]+)\s*(?:円|万円)/;
+const INTERNAL_ECONOMICS_CONTEXT_RE = /広告|案件|提携|アフィリエイト|リンク|申込|成約|獲得|承認|契約/;
+const INTERNAL_UNIT_EVENT_RE = /(?:\d+|[０-９]+|[〇零一二三四五六七八九十百千万億]+)\s*(?:件|人)(?:あたり|につき|ごと)?|(?:申込|申し込|成約|獲得|承認|契約|発生|決ま(?:る|り))[^。\n]{0,12}(?:ごと|たび|ベース)/;
 
 // 4. ASP報酬額（内部管理値。読者向けページに載せてはならない）
 const ASP_REWARD_PATTERNS = [
+  { re: /報酬|単価|コミッション|紹介料|成約|(?:^|[^A-Za-z])CV(?:[^A-Za-z]|$)|(?:^|[^A-Za-z])CPA(?:[^A-Za-z]|$)|(?:^|[^A-Za-z])EPC(?:[^A-Za-z]|$)|アフィリエイト収益/i, label: '内部案件経済語' },
+  { re: /成果報酬|報酬単価|承認報酬|案件単価|高単価/, label: '内部報酬・案件単価の概念' },
+  { re: /1件(?:成約|獲得|申込|承認)[^。\n]{0,24}?(?:収益|報酬|利益)|(?:収益|報酬|利益)[^。\n]{0,24}?1件(?:成約|獲得|申込|承認)/, label: '1件成約あたりの収益概念' },
   { re: /\d[\d,，]*\s*円\s*[/／]\s*件/, label: '「◯円/件」形式の報酬額' },
-  { re: /(?:成果報酬|報酬単価|アフィリエイト報酬|承認報酬)[^。\n]{0,16}?\d[\d,，]*\s*円/, label: '報酬語＋金額' },
+  { re: /[〇零一二三四五六七八九十百千万億壱弐参肆伍陸漆捌玖拾佰仟萬]+\s*円\s*[/／]\s*件/, label: '漢数字の「◯円/件」形式の報酬額' },
+  { re: /(?:成果報酬|報酬単価|アフィリエイト報酬|承認報酬)[^。\n]{0,20}?(?:\d[\d,]*(?:\.\d+)?\s*(?:万|千)?|[〇零一二三四五六七八九十百千万億壱弐参肆伍陸漆捌玖拾佰仟萬]+)\s*円/, label: '報酬語＋金額' },
   { re: /1件(?:あたり|につき)[^。\n]{0,8}?\d[\d,，]*\s*円/, label: '「1件あたり◯円」形式の報酬額' },
+  { re: /(?:この|当該|ASP|アフィリエイト)?案件[^。\n]{0,24}?高単価|高単価[^。\n]{0,24}?(?:案件|報酬|プログラム)/, label: '案件の高単価訴求' },
 ];
 
 // 本文を文単位に分割（frontmatter・import・リンクURL・HTMLタグを除去してから）
@@ -102,46 +167,340 @@ function splitSentences(content) {
   return text.split(/[。\n]/).map(s => s.trim()).filter(Boolean);
 }
 
-// 生成再注入チェック本体。拒否理由の配列を返す（空=通過）
-export function checkInjectionSafety(content) {
+function extractStructuredSafetySegments(content) {
+  const segments = [];
+  const frontmatter = content.match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
+  const frontmatterLines = frontmatter.split('\n');
+  for (let index = 0; index < frontmatterLines.length; index += 1) {
+    const line = frontmatterLines[index];
+    if (/^(title|description):\s*/.test(line)) segments.push(line);
+    if (!/^tags:\s*/.test(line)) continue;
+    const tagLines = [line];
+    while (
+      index + 1 < frontmatterLines.length
+      && !/^[A-Za-z_][\w-]*:\s*/.test(frontmatterLines[index + 1])
+    ) {
+      tagLines.push(frontmatterLines[index + 1]);
+      index += 1;
+    }
+    segments.push(tagLines.join('\n'));
+  }
+  for (const component of content.matchAll(CTA_COMPONENT_RE)) {
+    for (const match of component[0].matchAll(CTA_ATTR_RE)) {
+      segments.push(`${match[1]}=${match[2] ?? match[3] ?? ''}`);
+    }
+  }
+  for (const component of content.matchAll(COMPONENT_RE)) {
+    if (component[1] !== 'ComparisonTable') continue;
+    // 表全体を1文にすると、列見出しのJFXと別行のFXTF仕様が誤結合するため行単位で検査する。
+    for (const row of component[0].matchAll(/\{([^{}]+)\}/g)) {
+      segments.push(row[1]);
+    }
+  }
+  return segments;
+}
+
+function checkInjectionSafetyInternal(content, includeStructuredSegments) {
   const errors = [];
-  const sentences = splitSentences(content);
+  // frontmatter・CTA属性・比較表はHTML/MDX除去前に取り出し、可視面の抜け道を塞ぐ。
+  const sentences = [...new Set([
+    ...(includeStructuredSegments ? extractStructuredSafetySegments(content) : []),
+    ...splitSentences(content),
+  ])];
 
   for (const s of sentences) {
-    // 1. scope外語句の推奨文脈
+    // 1. scope外語句は原則拒否。明示的な否定・注意喚起だけ許可
     for (const { re, label } of SCOPE_TERMS) {
       if (!re.test(s)) continue;
-      for (const m of s.matchAll(RECOMMEND_RE)) {
-        if (RECOMMEND_NEG_TAIL_RE.test(s.slice(m.index + m[0].length))) continue;
-        errors.push(`scope外語句「${label}」の推奨・誘導文脈: 「${s.slice(0, 60)}」`);
-        break;
+      if (!hasOnlyAllowedScopeMentions(s)) {
+        errors.push(`scope外語句「${label}」は明示的な否定・注意喚起以外では扱わない: 「${s.slice(0, 60)}」`);
       }
+      break;
     }
 
     // 2. JFX不変条件（MT4はチャート分析専用）
-    if (JFX_CONTEXT_RE.test(s) && !JFX_NEG_RE.test(s)) {
-      if (JFX_MT4_CAPABLE_RE.test(s)) {
-        errors.push(`JFX不変条件違反（MT4は分析専用・発注/EA不可が正）: 「${s.slice(0, 60)}」`);
-      } else if (JFX_EA_CAPABLE_RE.test(s)) {
-        errors.push(`JFX不変条件違反（EA・自動売買は不可が正）: 「${s.slice(0, 60)}」`);
+    const jfxMatch = s.match(JFX_CONTEXT_RE);
+    if (jfxMatch) {
+      // MT4の禁止操作と、正しいMATRIX TRADER発注を主体別に分離する。
+      const jfxContext = maskMatrixTraderOrders(s.slice((jfxMatch.index ?? 0)));
+      if (hasAffirmativeMt4Operation(jfxContext) || JFX_MT4_CAPABLE_RE.test(jfxContext)) {
+        errors.push(`JFX不変条件違反（MT4は分析専用・発注/EA不可が正）: 「${compactSnippet(jfxContext).slice(0, 60)}」`);
+      } else if (JFX_EA_CAPABLE_RE.test(jfxContext)) {
+        errors.push(`JFX不変条件違反（EA・自動売買は不可が正）: 「${compactSnippet(jfxContext).slice(0, 60)}」`);
       }
     }
 
-    // 3. 未証明の一人称利用体験・第三者成果
+    // 3. ASP内部経済は「紹介」等が社会的証明にも見えるため、理由分類を先に確定する。
+    if (
+      INTERNAL_DEAL_RE.test(s)
+      && INTERNAL_PAYOUT_EVENT_RE.test(s)
+      && INTERNAL_MONEY_RE.test(s)
+    ) {
+      errors.push(`ASP報酬額の露出（案件の金銭取得イベント・内部管理値は本文に書かない）: 「${s.slice(0, 60)}」`);
+    }
+    if (
+      INTERNAL_ECONOMICS_CONTEXT_RE.test(s)
+      && INTERNAL_UNIT_EVENT_RE.test(s)
+      && (INTERNAL_MONEY_RE.test(s) || INTERNAL_PAYOUT_EVENT_RE.test(s))
+    ) {
+      errors.push(`ASP報酬額の露出（広告・申込等の単位イベントと金銭情報は本文に書かない）: 「${s.slice(0, 60)}」`);
+    }
+
+    // 4. ASP報酬額
+    const normalizedForReward = s.normalize('NFKC');
+    for (const { re, label } of ASP_REWARD_PATTERNS) {
+      if (re.test(normalizedForReward)) {
+        errors.push(`ASP報酬額の露出（${label}・内部管理値は本文に書かない）: 「${s.slice(0, 60)}」`);
+      }
+    }
+
+    // 5. 未証明の一人称利用体験・第三者成果
     for (const { re, label } of UNPROVEN_EXPERIENCE_PATTERNS) {
       if (re.test(s)) {
         errors.push(`未証明の利用体験・成果表現（${label}）: 「${s.slice(0, 60)}」`);
       }
     }
-
-    // 4. ASP報酬額
-    for (const { re, label } of ASP_REWARD_PATTERNS) {
-      if (re.test(s)) {
-        errors.push(`ASP報酬額の露出（${label}・内部管理値は本文に書かない）: 「${s.slice(0, 60)}」`);
-      }
+    if (
+      THIRD_PARTY_SUBJECT_RE.test(s)
+      && THIRD_PARTY_RESULT_RE.test(s)
+      && THIRD_PARTY_HEARSAY_RE.test(s)
+    ) {
+      errors.push(`未証明の利用体験・成果表現（第三者成果の伝聞）: 「${s.slice(0, 60)}」`);
+    }
+    if (
+      SOCIAL_PROOF_RE.test(s)
+      && (SOCIAL_RESULT_RE.test(s) || SOCIAL_NUMBER_RE.test(s))
+    ) {
+      errors.push(`未証明の利用体験・成果表現（社会的証明と成果・数値の共起）: 「${s.slice(0, 60)}」`);
     }
   }
   return errors;
+}
+
+// 生成再注入チェック本体。拒否理由の配列を返す（空=通過）
+export function checkInjectionSafety(content) {
+  return checkInjectionSafetyInternal(content, true);
+}
+
+// ── published全件の構造化scope監査（P0-C13R 2026-07-25）────────
+// 生成物は上の原則REJECTを通す。既存published記事だけは、MDX構造を保持したまま
+// 積極誘導と正当な注意喚起・商品仕様・税務・出典を分離して監査する。
+const LEGACY_SCOPE_SLUGS = new Set([
+  'fx-auto-trade-shoshinsha',
+  'fxtf-cfd-hajimekata',
+  'fxtf-knockout-option',
+]);
+const CTA_COMPONENT_RE = /<(?:[A-Z][A-Za-z0-9]*CTA)\b[\s\S]*?\/>/g;
+const COMPONENT_RE = /<([A-Z][A-Za-z0-9]*)\b[\s\S]*?\/>/g;
+const CTA_ATTR_RE = /\b(heading|lead|note|badge|text)\s*=\s*(?:"([^"]*)"|'([^']*)')/g;
+const WARNING_SCOPE_RE = /向いていない|向かない|できない|できません|できず|使えない|不可|非対応|扱わない|扱いません|扱わず|扱っていない|紹介しない|紹介しません|推奨しない|推奨しません|推奨せず|対象外|答えられない|実現できない|にはない|わけではない|税|課税|確定申告|損益通算|リスク|注意|危険|怖い|出金拒否|デメリット|罠|元本(?:が)?保証されず|元本保証(?:がなく|[^。\n]*ない|はありません)|価値(?:が|は)ゼロ|無登録|詐欺|トラブル|避ける|手を出さない/i;
+const NEGATIVE_AUDIENCE_RE = /向いていない人|向かない人|できない人|対象外(?:の人|商品)?/i;
+const NEUTRAL_SECTION_RE = /スペック|仕様|基本情報|取引条件|対応状況|機能比較|商品比較|ツール|利用料|コスト|手数料|税|課税|確定申告|出典|参考|参照|公式情報|一次情報/i;
+const NEUTRAL_FACT_RE = /とは|仕組み|提供|リリース|発表|設立|会社|サーバー|プラン|ドキュメント|対応(?:している|状況|可否|も変わる)|取引(?:が)?できる|利用(?:が)?できる|スプレッド|手数料|費用|税|課税|確定申告|損益通算|出典|参考|参照|公式|金融庁|国税庁|登録業者|違い|違法(?:なの|か)/i;
+
+function scopeTermFor(text) {
+  return SCOPE_TERMS.find(({ re }) => re.test(text));
+}
+
+function compactSnippet(text) {
+  return text.replace(/\s+/g, ' ').trim().slice(0, 100);
+}
+
+function extractLiteralCtaAttributes(component) {
+  const values = [];
+  for (const match of component.matchAll(CTA_ATTR_RE)) {
+    values.push(`${match[1]}=${match[2] ?? match[3] ?? ''}`);
+  }
+  return values.join(' ');
+}
+
+function extractMarkdownBlocks(content) {
+  const withoutComponents = content
+    .replace(/^---[\s\S]*?---/m, '')
+    .replace(/^import .+$/gm, '')
+    .replace(COMPONENT_RE, '')
+    .replace(/<[^>]+>/g, '');
+  const blocks = [];
+  let heading = '';
+  let lines = [];
+
+  const flush = () => {
+    const text = lines.join('\n').trim();
+    if (text) blocks.push({ heading, text });
+    lines = [];
+  };
+
+  for (const line of withoutComponents.split('\n')) {
+    const headingMatch = line.match(/^#{1,6}\s+(.+)$/);
+    if (headingMatch) {
+      flush();
+      heading = headingMatch[1].trim();
+    } else if (!line.trim()) {
+      flush();
+    } else {
+      lines.push(line);
+    }
+  }
+  flush();
+  return blocks;
+}
+
+function findLegacyPromotionLinks(content) {
+  const errors = [];
+  const legacySlugs = [...LEGACY_SCOPE_SLUGS].join('|');
+  const markdownLinkRe = new RegExp(
+    `\\[[^\\]]*\\]\\((?:https?://(?:www\\.)?tsumiba\\.com)?/blog/(${legacySlugs})/?(?:[?#][^\\s)]*)?\\)`,
+    'g',
+  );
+  const htmlLinkRe = new RegExp(
+    `\\bhref\\s*=\\s*["'](?:https?://(?:www\\.)?tsumiba\\.com)?/blog/(${legacySlugs})/?(?:[?#][^"']*)?["']`,
+    'g',
+  );
+
+  for (const link of content.matchAll(markdownLinkRe)) {
+    errors.push(`legacy記事「${link[1]}」へのMarkdownリンク: 「${compactSnippet(link[0])}」`);
+  }
+  for (const link of content.matchAll(htmlLinkRe)) {
+    errors.push(`legacy記事「${link[1]}」へのHTMLリンク: 「${compactSnippet(link[0])}」`);
+  }
+  return errors;
+}
+
+export function checkPublishedScopeSafety(content, slug) {
+  const activeErrors = [];
+  const exemptWarning = [];
+  const exemptNeutral = [];
+  const legacyExempt = [];
+  const publishedSentences = splitSentences(content);
+  const hasPublicRewardDisclosure = publishedSentences.some(sentence => (
+    ASP_REWARD_PATTERNS.some(({ re }) => re.test(sentence.normalize('NFKC')))
+    && /MLM|マルチ商法|勧誘|詐欺|税|雑所得|確定申告|ライティング/.test(sentence)
+  ));
+  const hasNeutralExternalEvidence = publishedSentences.some(sentence => (
+    SOCIAL_PROOF_RE.test(sentence)
+    && (SOCIAL_RESULT_RE.test(sentence) || SOCIAL_NUMBER_RE.test(sentence))
+    && /教育コンテンツ|公的|公式|調査|統計|目安/.test(sentence)
+  ));
+
+  for (const error of checkInjectionSafety(content).filter(item => !item.startsWith('scope外語句'))) {
+    const isPublishedSocialWarning = error.startsWith('未証明の利用体験・成果表現')
+      && (
+        /保証するものではありません|生存者バイアス|投稿してしまう|とすれば[^」]*投稿/.test(error)
+        || (
+          error.includes('社会的証明と成果・数値の共起')
+          && /評価/.test(error)
+          && !/(口コミ|投稿|声|レビュー|体験談|アンケート|コメント|回答|感想)/.test(error)
+        )
+      );
+    if (error.startsWith('ASP報酬額の露出') && hasPublicRewardDisclosure) {
+      exemptNeutral.push(`税務・詐欺注意に必要な報酬語: ${error}`);
+    } else if (error.includes('社会的証明と成果・数値の共起') && hasNeutralExternalEvidence) {
+      exemptNeutral.push(`外部根拠・目安の中立記述: ${error}`);
+    } else if (isPublishedSocialWarning) {
+      exemptNeutral.push(`注意喚起・成果保証否定・商品編集評価: ${error}`);
+    } else {
+      activeErrors.push(error);
+    }
+  }
+
+  if (LEGACY_SCOPE_SLUGS.has(slug)) {
+    // legacy件数は従来と比較できる本文基準。生成ゲート自体は構造面も検査する。
+    const strictScopeErrors = checkInjectionSafetyInternal(content, false)
+      .filter(error => error.startsWith('scope外語句'));
+    legacyExempt.push(...strictScopeErrors.map(error => `LEGACY_EXEMPT: ${error}`));
+    return { activeErrors, exemptWarning, exemptNeutral, legacyExempt };
+  }
+
+  activeErrors.push(...findLegacyPromotionLinks(content));
+
+  // HTML/MDXタグを消す前にCTAの読者向け属性を検査する。
+  for (const componentMatch of content.matchAll(CTA_COMPONENT_RE)) {
+    const attributes = extractLiteralCtaAttributes(componentMatch[0]);
+    const scope = scopeTermFor(attributes);
+    if (!scope) continue;
+    const strictScopeErrors = checkInjectionSafety(componentMatch[0])
+      .filter(error => error.startsWith('scope外語句'));
+    if (strictScopeErrors.length === 0) continue;
+    activeErrors.push(`CTA内のscope外誘導（${scope.label}）: 「${compactSnippet(attributes)}」`);
+  }
+
+  // ComparisonTableのhighlight行は、scope外語句との共存を積極誘導として扱う。
+  for (const componentMatch of content.matchAll(COMPONENT_RE)) {
+    if (componentMatch[1] !== 'ComparisonTable') continue;
+    for (const row of componentMatch[0].matchAll(/\{([^{}]*\bhighlight\s*:\s*["']([^"']+)["'][^{}]*)\}/g)) {
+      if (!row[2] || row[2].toLowerCase() === 'false') continue;
+      const scope = scopeTermFor(row[1]);
+      if (scope) {
+        activeErrors.push(`ComparisonTable highlightのscope外誘導（${scope.label}）: 「${compactSnippet(row[1])}」`);
+      }
+    }
+  }
+
+  const blocks = extractMarkdownBlocks(content);
+  for (const [index, block] of blocks.entries()) {
+    const isMarkdownTable = block.text.split('\n').filter(Boolean).every(line => /^\s*\|/.test(line));
+    let sourceText = block.text;
+    const sourceLines = sourceText.split('\n').filter(Boolean);
+    const blockLead = sourceLines[0] ?? '';
+    const blockRemainder = sourceLines.slice(1).join('\n');
+    const nextText = blocks[index + 1]?.text ?? '';
+    const isScopeDecisionLabel = /^\s*\*\*[\s\S]*\*\*\s*$/.test(blockLead) && scopeTermFor(blockLead);
+    const hasInlineDecisionRejection = isScopeDecisionLabel && WARNING_SCOPE_RE.test(blockRemainder);
+    const hasNextDecisionRejection = isScopeDecisionLabel
+      && !blockRemainder
+      && WARNING_SCOPE_RE.test(nextText);
+    if (hasNextDecisionRejection) {
+      sourceText = `${sourceText}\n${nextText}`;
+    }
+    const isQuotedClaim = /^[「『]/.test(sourceText.trim())
+      && /宣伝|広告|うたい文句|注意|リスク|罠/.test(nextText);
+    if (isQuotedClaim) sourceText = `${sourceText}\n${nextText}`;
+
+    const isPairedWarning = hasInlineDecisionRejection || hasNextDecisionRejection || isQuotedClaim;
+    const units = isMarkdownTable
+      ? sourceText.split('\n').filter(line => /^\s*\|/.test(line) && scopeTermFor(line))
+      : isPairedWarning
+        ? [sourceText]
+      : sourceText.split(/[。\n]/).map(text => text.trim()).filter(text => scopeTermFor(text));
+
+    for (const unit of units) {
+      const scope = scopeTermFor(unit);
+      if (!scope) continue;
+      const strictScopeErrors = checkInjectionSafety(unit)
+        .filter(error => error.startsWith('scope外語句'));
+      if (strictScopeErrors.length === 0) continue;
+      const context = `${block.heading}\n${blockLead}\n${unit}`;
+      const hasWarning = WARNING_SCOPE_RE.test(context);
+      const isNegativeAudience = NEGATIVE_AUDIENCE_RE.test(block.heading)
+        || NEGATIVE_AUDIENCE_RE.test(unit.split('\n', 1)[0]);
+      const isWarningSection = WARNING_SCOPE_RE.test(block.heading)
+        || WARNING_SCOPE_RE.test(blockLead);
+      const hasScopeWarningContinuation = unit
+        .split(/[、,]/)
+        .map(clause => clause.replace(/\]\([^)]*\)/g, ']'))
+        .some(clause => scopeTermFor(clause) && SCOPE_WARNING_CONTINUATION_RE.test(clause));
+      const hasNeutralStructure = (
+        isMarkdownTable
+        || NEUTRAL_SECTION_RE.test(block.heading)
+        || NEUTRAL_FACT_RE.test(unit)
+      );
+
+      if (
+        isNegativeAudience
+        || isPairedWarning
+        || hasScopeWarningContinuation
+        || (isWarningSection && hasWarning)
+      ) {
+        exemptWarning.push(`明示的な対象外・否定（${scope.label}）: 「${compactSnippet(unit)}」`);
+      } else if (hasNeutralStructure) {
+        exemptNeutral.push(`商品仕様・税務・出典の中立記述（${scope.label}）: 「${compactSnippet(unit)}」`);
+      } else {
+        activeErrors.push(`分類不能なscope外記述（${scope.label}）: 「${compactSnippet(unit)}」`);
+      }
+    }
+  }
+
+  return { activeErrors, exemptWarning, exemptNeutral, legacyExempt };
 }
 
 export function checkArticle(content, slug) {

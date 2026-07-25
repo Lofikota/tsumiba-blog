@@ -6,7 +6,7 @@ interface Props {
 
 const {
   heading = 'まず3口座を比較する',
-  lead = 'FX口座はDMM FX・JFX・FXTFを優先して確認してください。DMM FXは総合力とキャンペーン、JFXは取引機能・MT4重視、FXTFはコスト・商品幅重視と特性が異なります。',
+  lead = 'FX口座はDMM FX・JFX・FXTFを優先して確認してください。DMM FXは総合力とキャンペーン、JFXはMATRIX TRADERの取引機能と分析専用MT4チャート、FXTFは最低取引単位と取引コストの確認が中心です。',
 } = Astro.props;
 ---
 
@@ -23,12 +23,12 @@ const {
     <a href="/go/jfx/" class="fx-priority-card" data-google-event="article_cta_click" data-google-category="affiliate" data-google-label="fx-priority-jfx">
       <span class="fx-priority-rank">2</span>
       <strong>JFX</strong>
-      <small>オリコン顧客満足度FX総合1位。MT4対応・約定力重視の短期売買に強い。</small>
+      <small>MT4はチャート分析専用で、発注・EAは不可。注文とポジション管理はMATRIX TRADERを使用。</small>
     </a>
     <a href="/go/fxtf/" class="fx-priority-card" data-google-event="article_cta_click" data-google-category="affiliate" data-google-label="fx-priority-fxtf">
       <span class="fx-priority-rank">3</span>
       <strong>FXTF</strong>
-      <small>ゼロスプ・CFD・ノックアウトオプションまで扱える。コストと商品幅を細かく見たい人向け。</small>
+      <small>最低1,000通貨から取引可能。口座・通貨ペアごとのスプレッドや手数料を確認。</small>
     </a>
   </div>
   <p class="fx-priority-note">FXは元本割れや預け入れた資金を上回る損失が発生するリスクがあります。申込前に必ず公式条件を確認してください。</p>

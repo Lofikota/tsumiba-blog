@@ -33,7 +33,7 @@ import LineCTA from '../../components/LineCTA.astro';
 - OANDA FX Japanの基本スペック（[スプレッド](/blog/central-tanshi-fx-review/)・通貨ペア・最低入金）
 - [スキャルピング](/blog/fx-small-start-guide/)に向いているか正直な評価
 - OANDAが強い点・弱い点
-- 他のFX会社との比較（[JFX](/blog/jfx-fxtf-kakuteishinkoku/)・[FXTF](/blog/fxtf-knockout-option/)・[DMM FX](/blog/dmm-fx-review/)）
+- 他のFX会社との比較（[JFX](/blog/jfx-fxtf-kakuteishinkoku/)・[FXTF](/blog/fxtf-review/)・[DMM FX](/blog/dmm-fx-review/)）
 - 向いている人・向かない人の整理
 - FXを始める前に知っておくべきリスクの基礎
 
@@ -57,15 +57,14 @@ FXは「余剰資金の中でも、なくなっても生活に支障がないお
 
 ## OANDA FX Japanとは？まず基本を整理する
 
-OANDAは1996年に米国で設立されたFX・[CFD](/blog/fxtf-knockout-option/)会社で、世界で200カ国以上の顧客を持つ大手業者だ。日本法人の「OANDA Japan株式会社」は、関東財務局への金融商品取引業者登録を持っており、規制面では安心して利用できる。
+OANDAは1996年に米国で設立されたFX・CFD会社で、世界で200カ国以上の顧客を持つ大手業者だ。日本法人の「OANDA Japan株式会社」は、関東財務局への金融商品取引業者登録を持っており、規制面では安心して利用できる。
 
 OANDAが他のFX業者と違う特徴は大きく3つある。
 
 1. **NYサーバーの「fxTrade」と東京サーバーのMT5など、サブアカウント別に取引環境を選べる**
-2. **APIを使った[自動売買](/blog/fx-auto-trade-shoshinsha/)に強い**
-3. **通貨ペアの取り扱い数が多い（70通貨ペア以上）**
+2. **通貨ペアの取り扱い数が多い（70通貨ペア以上）**
 
-初心者向けに「シンプルで使いやすい」という設計ではなく、分析や[自動売買](/blog/fx-auto-trade-shoshinsha/)をしっかりやりたい人向けという位置づけだ。
+初心者向けに「シンプルで使いやすい」という設計ではなく、複数の取引環境やチャート機能を比較して選びたい人向けという位置づけだ。
 
 OANDA FX Japanの基本スペックをまとめると以下のとおりだ。
 
@@ -77,7 +76,7 @@ OANDA FX Japanの基本スペックをまとめると以下のとおりだ。
 | 取扱通貨ペア | 70通貨ペア以上 |
 | 最低取引単位 | NYサーバーのfxTradeは1通貨、東京サーバーは原則1,000通貨（MXN/JPY・CNH/JPYは1万通貨） |
 | 最大[レバレッジ](/blog/fx-shoshinsha-guide/) | 25倍（個人口座・法定上限） |
-| 取引プラットフォーム | fxTrade（NYサーバー）・MT5（東京サーバー）・[MT4](/blog/fx-auto-trade-shoshinsha/)（東京サーバーの既存サブアカウント） |
+| 取引プラットフォーム | fxTrade（NYサーバー）・MT5（東京サーバー）・MT4（東京サーバーの既存サブアカウント） |
 | API対応 | あり（REST API・ストリーミングAPI） |
 | 最低入金額 | 1円（※公式で要確認） |
 | [デモ口座](/blog/fx-demo-tsukaikata/) | あり（無期限） |
@@ -98,7 +97,7 @@ OANDAは[スキャルピング](/blog/fx-small-start-guide/)に向いている�
 
 OANDAの[スプレッド](/blog/fx-spread-hikaku/)は原則固定ではなく**変動制**だ。コアタイム（東京・ロンドン・[NY市場](/blog/fx-best-time/)が重なる時間帯）では[ドル円](/blog/fx-best-time/)で0.2〜0.4銭程度まで縮まることがあるが、流動性が薄い時間帯では大幅に拡大する。
 
-[スキャルピング](/blog/fx-small-start-guide/)は1回の値幅が小さいため、スプレッドが取引[コスト](/blog/fx-spread-hikaku/)に与える影響が大きい。固定スプレッドを売りにしている[DMM FX](/blog/dmm-fx-review/)（0.2銭原則固定）や[FXTF](/blog/fxtf-knockout-option/)（[ゼロスプレッド](/blog/fxtf-zero-spread/)コースあり）と比べると、OANDAの[コスト](/blog/fx-spread-hikaku/)面での優位性は限定的だ。
+[スキャルピング](/blog/fx-small-start-guide/)は1回の値幅が小さいため、スプレッドが取引[コスト](/blog/fx-spread-hikaku/)に与える影響が大きい。固定スプレッドを売りにしている[DMM FX](/blog/dmm-fx-review/)（0.2銭原則固定）や[FXTF](/blog/fxtf-review/)（[ゼロスプレッド](/blog/fxtf-zero-spread/)コースあり）と比べると、OANDAの[コスト](/blog/fx-spread-hikaku/)面での優位性は限定的だ。
 
 ### 約定力・約定速度の評価
 
@@ -123,7 +122,7 @@ OANDAでスキャルピングをするなら、以下の条件に当てはまる
 
 スキャルピングに限らず、FX取引では[スプレッド](/blog/fx-spread-hikaku/)が取引[コスト](/blog/fx-spread-hikaku/)の大部分を占める。OANDAのスプレッドを主要口座と比較してみる。
 
-| 口座名 | [ドル円](/blog/fx-best-time/)スプレッド | スプレッドタイプ | [MT4](/blog/fx-auto-trade-shoshinsha/)の利用状況 |
+| 口座名 | [ドル円](/blog/fx-best-time/)スプレッド | スプレッドタイプ | MT4の利用状況 |
 |--------|---------------|---------------|---------|
 | OANDA FX Japan | 0.2〜0.4銭（変動） | 変動制 | △（東京サーバーの既存サブアカウントのみ） |
 | [JFX](/blog/jfx-review/) | 0.2銭（原則固定） | 原則固定 | △（チャート分析専用・発注・EA不可） |
@@ -158,9 +157,9 @@ fxTradeの主な特徴：
 
 東京サーバーでは、裁量プランとスタンダードプランで利用できる機能が異なる。裁量プランはMT5を使えるがEAは動作しない。スタンダードプランはMT5でEAを利用できる。
 
-東京サーバーのスタンダードプランには[MT4](/blog/fx-auto-trade-shoshinsha/)用サブアカウントもあるが、新規開設は2026年3月27日で終了した。これからEA環境を選ぶ人は、スタンダードプランのMT5を前提に確認する必要がある。
+東京サーバーのスタンダードプランにはMT4用サブアカウントもあるが、新規開設は2026年3月27日で終了した。利用できるツールは、申込前にスタンダードプランの最新条件で確認する必要がある。
 
-[DMM FX](/blog/dmm-fx-review/)はMT4・MT5に対応していないため、EAを使いたい人はOANDAのスタンダードプランや[FXTF](/blog/fxtf-review/)など、発注とEAに対応する環境を比較したい。
+[DMM FX](/blog/dmm-fx-review/)はMT4・MT5に対応していない。MT4のチャート分析を重視する場合は、分析専用で利用できる[JFX](/blog/jfx-review/)などと公式ツールの条件を比較したい。
 
 ### API取引について
 
@@ -218,7 +217,7 @@ fxTradeもMT5も機能が豊富な分、初めてFXを触る人には「何か�
 
 **③ 日本語サポートの質にばらつきがある**
 
-グローバル展開の企業ゆえ、サポートの質に差があるという声が一部ある。日本語によるきめ細かいサポートを重視するなら、国内専業のFX業者（[JFX](/blog/jfx-fxtf-kakuteishinkoku/)・[FXTF](/blog/fxtf-knockout-option/)・[DMM FX](/blog/dmm-fx-review/)）の方が安心かもしれない。
+グローバル展開の企業ゆえ、サポートの質に差があるという声が一部ある。日本語によるきめ細かいサポートを重視するなら、国内専業のFX業者（[JFX](/blog/jfx-fxtf-kakuteishinkoku/)・[FXTF](/blog/fxtf-review/)・[DMM FX](/blog/dmm-fx-review/)）の方が安心かもしれない。
 
 **④ キャンペーン・特典が少ない**
 
@@ -267,7 +266,7 @@ ITに慣れていてFXも少し経験がある人なら、OANDAは選択肢と�
 **とにかく[コスト](/blog/fx-spread-hikaku/)を安定させたい**
 → [FXTF](/blog/fxtf-review/)（[ゼロスプレッド](/blog/fxtf-zero-spread/)コース）または[DMM FX](/blog/dmm-fx-review/)（原則0.2銭固定）
 
-**EA・[自動売買](/blog/fx-auto-trade-shoshinsha/)を目的に選びたい**
+**EA・自動売買を目的に選びたい**
 → 当サイトでは紹介しません。国内FXの取引条件・取引単位・スプレッドを比較してほしい
 
 **APIでシステムトレードを自作したい**
@@ -287,7 +286,7 @@ ITに慣れていてFXも少し経験がある人なら、OANDAは選択肢と�
 
 **比較する条件**：サーバー・プランごとの最小取引単位、変動制スプレッド、対応する発注ツール
 
-**向いていない条件**：スプレッド[コスト](/blog/fx-spread-hikaku/)を最小化した純粋な手動スキャルピング（この場合[FXTF](/blog/fxtf-knockout-option/)の方が有利）
+**向いていない条件**：スプレッド[コスト](/blog/fx-spread-hikaku/)を最小化した純粋な手動スキャルピング（この場合[FXTF](/blog/fxtf-review/)の方が有利）
 
 「スキャルピング」という言葉の中身によってOANDAの適性は変わる。手動売買で比較する場合も、スプレッドだけでなく取引単位・発注ツール・取引時間帯を公式情報で確認してほしい。
 

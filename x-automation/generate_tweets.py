@@ -14,6 +14,7 @@ import argparse
 import csv
 import json
 import re
+import unicodedata
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -31,29 +32,38 @@ FIELDNAMES = [
 OUT_OF_SCOPE_TERMS = [
     re.compile(pattern, re.IGNORECASE)
     for pattern in (
-        r"海外\s*FX", r"(?<![A-Za-z])CFD(?![A-Za-z])", r"ノックアウト(?:オプション)?",
-        r"FXスクール", r"(?<![A-Za-z])NISA(?![A-Za-z])", r"(?<![A-Za-z])iDeCo(?![A-Za-z])",
+        r"海外\s*FX", r"(?<![A-Za-z])CFD(?![A-Za-z])", r"ノックアウト(?:・?オプション)?",
+        r"FX\s*スクール", r"(?<![A-Za-z])NISA(?![A-Za-z])", r"(?<![A-Za-z])iDeCo(?![A-Za-z])",
         r"証券口座", r"保険相談|保険見直し|生命保険|損害保険", r"クレジットカード",
-        r"自動売買|シストレ|(?<![A-Za-z])EA(?![A-Za-z])",
+        r"自動売買|システムトレード|シストレ|(?<![A-Za-z])EA(?![A-Za-z])",
     )
 ]
-RECOMMEND_PATTERN = re.compile(
-    r"おすすめ|オススメ|お勧め|推奨|推せる|向いてい(?:る|ます)|最適(?!化)|狙い目|チャンス|"
-    r"使える|対応している|始め(?:よう|ましょう|るなら)|試してみ|挑戦してみ|選ぶべき|"
-    r"活用しよう|強み|(?<!デ)メリット|使い分け|選択肢|挑戦したい(?:人|方)?"
+SCOPE_HARD_NEGATION_PATTERN = re.compile(
+    r"対象外|(?:でき|使え|動かせ|選べ|始められ)(?:ません|ない|ず)|"
+    r"(?:おすすめ|オススメ|お勧め|推奨|紹介|掲載)(?:しません|しない|できません|できない|せず)|"
+    r"扱(?:いません|わない|わず|っていません|っていない)|含め(?:ません|ない)|"
+    r"評価(?:しません|しない|していません|していない)|られ(?:ません|ない)|"
+    r"不可|非対応|禁止|避け(?:る|ます|ましょう)|手を出さ(?:ない|ず)|"
+    r"メリット(?:が|は)?(?:ありません|ない)|"
+    r"元本保証[^、,]*ない|では(?:ありません|ない)|わけではない",
+    re.IGNORECASE,
 )
-RECOMMEND_NEG_TAIL_PATTERN = re.compile(
-    r"^(?:(?:は|が|も|に|と|として)?(?:しません|しない|していません|していない|できません|"
-    r"できない|されません|しづらい|しにくい|ではありません|ではない|ではなく|ではなくて|"
-    r"ありません|ない|対象外|対象(?:で|と)?はありません|対象ではない|"
-    r"に(?:は)?含めません|に(?:は)?含めない|に(?:は)?含まれません|に(?:は)?含まれない|"
-    r"に(?:は)?入りません|に(?:は)?入らない|とは評価しません|とは評価していません|"
-    r"とは言えません|とは言えない|(?:を行う|する)もの(?:で(?:は)?)?ありません)|"
-    r"ることは(?:おすすめ|推奨|紹介)(?:しません|しない|できません|できない)|"
-    r"にも?[、,\s]*(?:当サイトでは)?(?:おすすめ|推奨|紹介)(?:しません|しない|できません|できない)|"
-    r"(?:は|として(?:は)?)?扱(?:いません|わない|っていません|っていない)|"
-    r"メリット(?:より|を上回る)デメリット|よりデメリットが(?:大き|多))"
+SCOPE_PURE_WARNING_PATTERN = re.compile(
+    r"(?:デメリット|危険性|注意点?|リスク)(?:について|を|と|が|は|も|の)?.{0,24}"
+    r"(?:説明|解説|整理|確認|理解)(?:します|する|してください|が必要です|が必要だ)?$|"
+    r"(?:危険性|リスク)(?:が|は|も)(?:あります|ある|高い|大きい)$|"
+    r"無登録業者(?:が|は)?(?:多い|多く存在します|多く存在する)$",
+    re.IGNORECASE,
 )
+SCOPE_WARNING_CONTINUATION_PATTERN = re.compile(
+    r"(?:危険性|注意点?|リスク)(?:が|は|も)?.{0,20}(?:ある|高い|大きい)ため$|"
+    r"無登録業者(?:が|は)?多く$",
+    re.IGNORECASE,
+)
+SCOPE_ADVERSATIVE_PATTERN = re.compile(
+    r"ですが|ますが|ませんが|ないが|ものの|けれど(?:も)?|しかし(?:ながら)?|一方で|ただし"
+)
+SCOPE_CLAUSE_SPLIT_PATTERN = re.compile(rf"[、,；;]|{SCOPE_ADVERSATIVE_PATTERN.pattern}")
 UNVERIFIED_EXPERIENCE_PATTERNS = [
     re.compile(pattern)
     for pattern in (
@@ -61,16 +71,52 @@ UNVERIFIED_EXPERIENCE_PATTERNS = [
         r"(?:使って|試して|取引して|口座開設して).{0,24}(?:わかった|分かった|気づいた)",
         r"編集部(?:の|が試した)?体験談",
         r"(?:読者|フォロワー|知人|友人|ユーザー)の?\s*[A-ZＡ-Ｚa-zａ-ｚ]?\s*さん.{0,40}(?:利益|勝ち|稼い|儲か|資産が増)",
+        r"(?:利用者|ユーザー|顧客|申込者|受講生|購入者).{0,40}(?:利益|成果|稼げた|儲かった).{0,32}(?:声|報告|届(?:いた|きました))",
         r"最初はみんな|読者から(?:よく|一番多く|多く)聞",
         r"(?:読者|初心者|人).{0,30}(?:口座開設|FXを始め).{0,40}(?:人生が変わ|利益|稼げ|できるようにな)",
     )
 ]
+THIRD_PARTY_SUBJECT_PATTERN = re.compile(
+    r"読者|利用者|口座利用者|ユーザー|顧客|お客様|申込者|会員|受講生|購入者|成功者|体験者|トレーダー"
+)
+THIRD_PARTY_RESULT_PATTERN = re.compile(r"利益|稼げ|儲|成果|収益|勝て|黒字")
+THIRD_PARTY_HEARSAY_PATTERN = re.compile(r"声|好評|報告|届|寄せ|口コミ|感想|評価|投稿")
+SOCIAL_PROOF_PATTERN = re.compile(r"声|口コミ|レビュー|体験談|アンケート|コメント|回答|紹介|感想|評価|投稿")
+SOCIAL_RESULT_PATTERN = re.compile(r"利益|収益|稼|儲|成功|増え|プラス|黒字|勝(?:て|った|ち|率|てる)")
+SOCIAL_NUMBER_PATTERN = re.compile(
+    r"(?:\d[\d,.]*|[０-９][０-９，．]*|[〇零一二三四五六七八九十百千万億]+)"
+    r"(?:\s*(?:円|万円|%|％|倍|件|人|か月|ヶ月|月))"
+)
+INTERNAL_DEAL_PATTERN = re.compile(r"案件|提携プログラム|広告プログラム|アフィリエイト")
+INTERNAL_PAYOUT_EVENT_PATTERN = re.compile(
+    r"受け取|支払|支給|入金|振込|(?:円|万円)(?:が)?(?:入る|入ります)|"
+    r"(?:成約|獲得|申込|承認|発生)(?:する|した|ごと|たび|ベース)"
+)
+INTERNAL_MONEY_PATTERN = re.compile(
+    r"(?:\d[\d,，]*(?:\.\d+)?|[０-９][０-９，．]*|"
+    r"[〇零一二三四五六七八九十百千万億壱弐参肆伍陸漆捌玖拾佰仟萬]+)"
+    r"\s*(?:円|万円)"
+)
+INTERNAL_ECONOMICS_CONTEXT_PATTERN = re.compile(
+    r"広告|案件|提携|アフィリエイト|リンク|申込|成約|獲得|承認|契約"
+)
+INTERNAL_UNIT_EVENT_PATTERN = re.compile(
+    r"(?:\d+|[０-９]+|[〇零一二三四五六七八九十百千万億]+)\s*(?:件|人)(?:あたり|につき|ごと)?|"
+    r"(?:申込|申し込|成約|獲得|承認|契約|発生|決ま(?:る|り)).{0,12}(?:ごと|たび|ベース)"
+)
 ASP_REWARD_PATTERNS = [
     re.compile(pattern)
     for pattern in (
+        r"報酬|単価|コミッション|紹介料|成約|(?<![A-Za-z])CV(?![A-Za-z])|"
+        r"(?<![A-Za-z])CPA(?![A-Za-z])|(?<![A-Za-z])EPC(?![A-Za-z])|アフィリエイト収益",
+        r"成果報酬|報酬単価|承認報酬|案件単価|高単価",
+        r"(?:1件(?:成約|獲得|申込|承認).{0,24}(?:収益|報酬|利益)|(?:収益|報酬|利益).{0,24}1件(?:成約|獲得|申込|承認))",
         r"\d[\d,，]*\s*円\s*[/／]\s*件",
-        r"(?:成果報酬|報酬単価|アフィリエイト報酬|承認報酬).{0,20}\d[\d,，]*\s*円",
+        r"[〇零一二三四五六七八九十百千万億壱弐参肆伍陸漆捌玖拾佰仟萬]+\s*円\s*[/／]\s*件",
+        r"(?:成果報酬|報酬単価|アフィリエイト報酬|承認報酬).{0,20}"
+        r"(?:\d[\d,]*(?:\.\d+)?\s*(?:万|千)?|[〇零一二三四五六七八九十百千万億壱弐参肆伍陸漆捌玖拾佰仟萬]+)\s*円",
         r"1件(?:あたり|につき).{0,12}\d[\d,，]*\s*円",
+        r"(?:(?:この|当該|ASP|アフィリエイト)?案件.{0,24}高単価|高単価.{0,24}(?:案件|報酬|プログラム))",
     )
 ]
 JFX_CONTEXT_PATTERN = re.compile(r"JFX|MATRIX\s*TRADER|マトリックス・?トレーダー", re.IGNORECASE)
@@ -78,38 +124,136 @@ JFX_CONTEXT_PATTERN = re.compile(r"JFX|MATRIX\s*TRADER|マトリックス・?ト
 # 判定根拠の正本: AI運用/データ正本/brokers_*.yaml の brokers[id=jfx] の mt4_ea と notes。
 # 正本の条件が変わったらこの正規表現も見直す（正本→ここは自動同期されない）。
 JFX_FALSE_CAPABILITY_PATTERNS = [
-    re.compile(r"MT4.{0,18}(?:で(?:発注|注文|取引|売買|自動売買)|が?使える|を?動かせる)", re.IGNORECASE),
+    re.compile(
+        r"MT4(?:\s*に)?対応|MT4.{0,80}(?:(?:(?:で|から|を使って).{0,16})?"
+        r"(?:発注|注文|取引|売買|エントリー).{0,12}"
+        r"(?:でき(?!ない|ません|ず)|可能|行え|出せ)|(?:EA|自動売買).{0,18}"
+        r"(?:動かせ(?!ない|ません|ず)|使え(?!ない|ません|ず)|でき(?!ない|ません|ず)|可能|対応))",
+        re.IGNORECASE,
+    ),
     re.compile(r"(?:EA|自動売買).{0,24}(?:できる|動かせる|使える|可能|向いている|に対応)", re.IGNORECASE),
 ]
-JFX_SAFE_PATTERN = re.compile(
-    r"不可|できない|できません|使えない|使えません|動かせない|動かせません|非対応|分析専用"
+JFX_MT4_CONNECTOR_PATTERN = re.compile(
+    r"MT4.{0,32}?(?:から|上で|を使って|経由で|で)(.{0,48})",
+    re.IGNORECASE,
 )
+JFX_OPERATION_PATTERN = re.compile(
+    r"発注|注文|取引|売買|エントリー|新規ポジション|"
+    r"(?:建玉|保有玉|保有ポジション|ポジション).{0,12}(?:保有|建て|閉じ|決済|手仕舞|クローズ|解消|変更|管理)|"
+    r"(?:建て|閉じ|決済|手仕舞|クローズ|解消|変更|管理).{0,12}(?:建玉|保有玉|保有ポジション|ポジション)|"
+    r"建て|決済|手仕舞い|クローズ|解消|利確|損切り"
+)
+JFX_OPERATION_NEGATION_PATTERN = re.compile(
+    r"できない|できません|できず|られない|られません|不可|非対応|行わない|しない|使えない|分析専用"
+)
+MATRIX_ORDER_PATTERNS = [
+    re.compile(
+        r"(?:発注|注文)(?:は|を)?.{0,8}MATRIX\s*TRADER.{0,18}(?:から|で)?.{0,8}(?:行|実行)",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"MATRIX\s*TRADER.{0,18}(?:から|で).{0,18}(?:発注|注文).{0,12}(?:行|でき)",
+        re.IGNORECASE,
+    ),
+]
+
+
+def has_affirmative_mt4_operation(sentence: str) -> bool:
+    for connector_match in JFX_MT4_CONNECTOR_PATTERN.finditer(sentence):
+        operation_match = JFX_OPERATION_PATTERN.search(connector_match.group(1))
+        if not operation_match:
+            continue
+        suffix = connector_match.group(1)[operation_match.start():operation_match.start() + 36]
+        if not JFX_OPERATION_NEGATION_PATTERN.search(suffix):
+            return True
+    return False
 
 
 def unsafe_content_reason(text: str) -> str | None:
     """危険な生成物をCSV/D1用データの作成前に決定論的に拒否する。"""
     for sentence in filter(None, re.split(r"[。\n]", text)):
         if any(pattern.search(sentence) for pattern in OUT_OF_SCOPE_TERMS):
-            has_affirmative_recommendation = any(
-                not RECOMMEND_NEG_TAIL_PATTERN.search(sentence[match.end():])
-                for match in RECOMMEND_PATTERN.finditer(sentence)
-            )
-            if has_affirmative_recommendation:
-                return "scope外テーマの推奨・誘導"
-        if JFX_CONTEXT_PATTERN.search(sentence) and not JFX_SAFE_PATTERN.search(sentence):
-            ambiguous_mt4_support = re.search(r"MT4\s*(?:に)?対応", sentence, re.IGNORECASE)
-            chart_analysis_support = re.search(r"チャート分析.{0,8}対応", sentence)
+            adversative_parts = SCOPE_ADVERSATIVE_PATTERN.split(sentence)
             if (
-                any(pattern.search(sentence) for pattern in JFX_FALSE_CAPABILITY_PATTERNS)
-                or (ambiguous_mt4_support and not chart_analysis_support)
+                len(adversative_parts) > 1
+                and not (
+                    SCOPE_HARD_NEGATION_PATTERN.search(adversative_parts[-1])
+                    or SCOPE_PURE_WARNING_PATTERN.search(adversative_parts[-1])
+                )
+            ):
+                return "scope外テーマは明示的な否定・注意喚起以外では扱わない"
+
+            clauses = list(filter(None, (
+                part.strip()
+                for part in SCOPE_CLAUSE_SPLIT_PATTERN.split(sentence)
+            )))
+            for index, clause in enumerate(clauses):
+                has_scope_term = any(
+                    pattern.search(clause)
+                    for pattern in OUT_OF_SCOPE_TERMS
+                )
+                if has_scope_term:
+                    # 後続節の安全語で、先行する肯定的なscope節を救済しない。
+                    warning_leads_to_hard_negation = (
+                        SCOPE_WARNING_CONTINUATION_PATTERN.search(clause)
+                        and any(
+                            SCOPE_HARD_NEGATION_PATTERN.search(next_clause)
+                            for next_clause in clauses[index + 1:]
+                        )
+                    )
+                    if not (
+                        SCOPE_HARD_NEGATION_PATTERN.search(clause)
+                        or SCOPE_PURE_WARNING_PATTERN.search(clause)
+                        or warning_leads_to_hard_negation
+                    ):
+                        return "scope外テーマは明示的な否定・注意喚起以外では扱わない"
+        jfx_match = JFX_CONTEXT_PATTERN.search(sentence)
+        if jfx_match:
+            # MT4の禁止操作と、正しいMATRIX TRADER発注を主体別に分離する。
+            jfx_context = sentence[jfx_match.start():]
+            for pattern in MATRIX_ORDER_PATTERNS:
+                jfx_context = pattern.sub(" ", jfx_context)
+            if (
+                has_affirmative_mt4_operation(jfx_context)
+                or any(pattern.search(jfx_context) for pattern in JFX_FALSE_CAPABILITY_PATTERNS)
             ):
                 return "JFX不変条件違反（MT4は分析専用・発注/EA不可）"
+        if (
+            INTERNAL_DEAL_PATTERN.search(sentence)
+            and INTERNAL_PAYOUT_EVENT_PATTERN.search(sentence)
+            and INTERNAL_MONEY_PATTERN.search(sentence)
+        ):
+            return "ASP内部報酬額"
+        if (
+            INTERNAL_ECONOMICS_CONTEXT_PATTERN.search(sentence)
+            and INTERNAL_UNIT_EVENT_PATTERN.search(sentence)
+            and (
+                INTERNAL_MONEY_PATTERN.search(sentence)
+                or INTERNAL_PAYOUT_EVENT_PATTERN.search(sentence)
+            )
+        ):
+            return "ASP内部報酬額"
+        normalized_for_reward = unicodedata.normalize("NFKC", sentence)
+        for pattern in ASP_REWARD_PATTERNS:
+            if pattern.search(normalized_for_reward):
+                return "ASP内部報酬額"
         for pattern in UNVERIFIED_EXPERIENCE_PATTERNS:
             if pattern.search(sentence):
                 return f"未確認体験・読者反応: {pattern.pattern}"
-        for pattern in ASP_REWARD_PATTERNS:
-            if pattern.search(sentence):
-                return "ASP内部報酬額"
+        if (
+            THIRD_PARTY_SUBJECT_PATTERN.search(sentence)
+            and THIRD_PARTY_RESULT_PATTERN.search(sentence)
+            and THIRD_PARTY_HEARSAY_PATTERN.search(sentence)
+        ):
+            return "未確認体験・読者反応: 第三者成果の伝聞"
+        if (
+            SOCIAL_PROOF_PATTERN.search(sentence)
+            and (
+                SOCIAL_RESULT_PATTERN.search(sentence)
+                or SOCIAL_NUMBER_PATTERN.search(sentence)
+            )
+        ):
+            return "未確認体験・読者反応: 社会的証明と成果・数値の共起"
     return None
 
 WEEK1_PLAN = [
