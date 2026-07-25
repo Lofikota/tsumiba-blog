@@ -426,6 +426,57 @@ function checkBackupHealth() {
   for (const t of BACKUP_TARGETS) checkBackupTarget(t);
 }
 
+// ── 6-3. ルート正本がバックアップ経路に乗っているか（MNT-10/11・2026-07-25）──
+// Affiliate/ 自体はGitリポジトリではない（管理下は AI運用/ tsumiba-blog/ X自動化/ の3つだけ）。
+// ルート直下の CLAUDE.md・AGENTS.md は**どのリポジトリにも属さず**、2026-07-25まで全損したら
+// 復元不能だった（MNT-09でCLAUDE.mdを編集した際に発覚）。CLAUDE.mdは3層記憶構造の常駐層＝
+// 失うと全AIセッションの判断基準・行動ルール12条・参照先マップが同時に消える。
+// git-backup.sh が実体を AI運用/正本ミラー/ へ複製する構成にしたので、複製が止まったことを検知する。
+// symlinkはgitがリンク文字列しか保存せず中身が守られないためコピー方式（正本ミラー/README.md）。
+// 未push滞留は §6-2-b が既に見ているので、ここは**中身の差分だけ**を担当する。
+// 正本: AI運用/バックアップ設計_2026-07-12.md「ルート正本ミラー」／MNT-10実施記録_2026-07-25.md
+const MIRROR_DRIFT_DAYS = 2;   // 編集当日の差分は正常（その晩23:30で同期）。跨いだら経路の故障
+const MIRRORED_ROOT_DOCS = ['CLAUDE.md', 'AGENTS.md'];
+
+// テスト注入口: ROOTDOCS_DIR（原本側）/ ROOTDOCS_MIRROR_DIR（ミラー側）。§6-2 と同じ <対象>_<用途> 規約。
+// 原本側にも注入口が要るのは、ヒステリシス分岐（当日=ℹ️ / MIRROR_DRIFT_DAYS超=🚨）が
+// 原本のmtimeで決まるため。実CLAUDE.mdのmtimeは触れないので、これが無いと🚨側を検証できない。
+//
+// ⚠️ ミラー側に §6-2 の AIOPS_DIR を流用しないこと（MNT-11で踏んだ実バグ）。
+// AIOPS_DIR は「バックアップ対象ディレクトリ」を意味する別用途の注入口で、
+// test-backup-health.sh がこれをfixtureに差し替えると §6-3 が fixture配下にミラーを探しに行き、
+// 無関係な🚨を誤発火して**他のテストを巻き添えで落とす**。注入口は用途ごとに分ける。
+function checkRootDocsBackup() {
+  const rootDir = process.env.ROOTDOCS_DIR || AFFILIATE_ROOT;
+  const mirrorDir = process.env.ROOTDOCS_MIRROR_DIR || path.join(AFFILIATE_ROOT, 'AI運用', '正本ミラー');
+  if (!fs.existsSync(mirrorDir)) {
+    critical.push(`ルート正本のミラー ${mirrorDir} が存在しない。Affiliate/CLAUDE.md はどのGitリポジトリにも属さず、失うと全AIセッションの判断基準が同時に消える → bash "AI運用/git-backup.sh"。`);
+    return;
+  }
+  for (const name of MIRRORED_ROOT_DOCS) {
+    const src = path.join(rootDir, name);
+    const mirror = path.join(mirrorDir, `${name}.mirror`);
+    if (!fs.existsSync(src)) {
+      warnings.push(`ルート正本 ${name} が見つからない（${src}）。復元: cp "${mirror}" "${src}"`);
+      continue;
+    }
+    if (!fs.existsSync(mirror)) {
+      critical.push(`${name} がバックアップ経路に乗っていない（${mirror} が無い）。ディスク障害で復元不能 → bash "AI運用/git-backup.sh"。`);
+      continue;
+    }
+    if (fs.readFileSync(src).equals(fs.readFileSync(mirror))) {
+      infos.push(`ルート正本 ${name}: ミラー同期済み`);
+      continue;
+    }
+    const age = daysAgo(fs.statSync(src).mtime);
+    if (age >= MIRROR_DRIFT_DAYS) {
+      critical.push(`${name} とミラーの中身が ${age} 日ズレたまま（最終編集から日次バックアップを少なくとも1回跨いでいる）。同期が壊れており、守られているのは古い版 → bash "AI運用/git-backup.sh" で原因を確認。`);
+    } else {
+      infos.push(`ルート正本 ${name}: 本日の編集が未同期（今夜23:30のバックアップで同期される）`);
+    }
+  }
+}
+
 // ── 7. CV動線の退行（2026-07-05 直CV転換。正本: AI運用/戦略/CV動線構造_2026-07-05.md）──
 async function checkCvFunnel() {
   // 7-1. リテラル分岐の腐敗検知（sticky死亡・旧優先順位FXTF残存はこのパターンで2度腐った実績）
@@ -672,6 +723,7 @@ checkDrafts();
 checkHandoff();
 checkStructure();
 checkBackupHealth();
+checkRootDocsBackup();
 await checkCvFunnel();
 checkStrategyResidue();
 checkOutputCadence(cadenceAsOf);
