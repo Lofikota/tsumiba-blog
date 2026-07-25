@@ -233,6 +233,65 @@ function checkStructure() {
   }
 }
 
+// ── 6-2. AI運用/ 日次バックアップの健全性（2026-07-22 沈黙障害の再発防止）──
+// 2026-07-16〜07-21の6日間、git-backup.sh が毎晩ゲートで中断していたのに誰にも通知されず
+// 1度もpushされていなかった。「安全ゲートの失敗が通知されない」＝沈黙障害。
+// git-backup.sh は set -e ＋ 全出力を1ログに追記する構造なので、
+// 失敗は「開始マーカーだけあって完了マーカーがない末尾ブロック」として必ず残る。
+// 正本: AI運用/バックアップ設計_2026-07-12.md
+const BACKUP_LOG = process.env.AIOPS_BACKUP_LOG || path.join(process.env.HOME || '', 'Library/Logs/aiops-backup.log');
+const BACKUP_STALE_DAYS = 2;   // LaunchAgent(毎日23:30)が2日動いていなければ停止とみなす
+const BACKUP_PENDING_DAYS = 3; // 未pushコミット・未追跡ファイルの滞留許容日数
+
+function checkAiOpsBackup() {
+  // 6-2-a. 最終実行の結果（ゲート中断・途中失敗の検知）
+  if (!fs.existsSync(BACKUP_LOG)) {
+    critical.push(`AI運用/ バックアップのログが存在しない（${BACKUP_LOG}）。LaunchAgent com.kudokota.aiops-backup が一度も動いていない疑い → launchctl list | grep aiops-backup で確認。`);
+  } else {
+    const text = fs.readFileSync(BACKUP_LOG, 'utf-8');
+    const startRe = /^=== (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) backup start ===$/gm;
+    let last = null, m;
+    while ((m = startRe.exec(text))) last = { at: m[1], from: m.index };
+    if (!last) {
+      critical.push(`AI運用/ バックアップログに実行記録がない（${BACKUP_LOG}）。LaunchAgent停止 or ログ破損の疑い。`);
+    } else {
+      const body = text.slice(last.from);
+      const done = body.includes('=== backup done ===');
+      const age = daysAgo(last.at.replace(' ', 'T'));
+      if (!done) {
+        const reason = body.split('\n').slice(1).map((l) => l.trim()).find(Boolean) ?? '(出力なし)';
+        critical.push(`AI運用/ の最終バックアップが完走していない（${last.at}）: ${reason}\n      → bash "AI運用/git-backup.sh" を手動実行して原因を確認。ゲート誤検知なら AI運用/.gitleaks.toml のallowlistで解消する。`);
+      }
+      if (age >= BACKUP_STALE_DAYS) {
+        critical.push(`AI運用/ のバックアップが ${age} 日間実行されていない（最終実行 ${last.at}／想定は毎日23:30）。LaunchAgent停止の疑い → launchctl list | grep aiops-backup。`);
+      }
+      if (done && age < BACKUP_STALE_DAYS) infos.push(`AI運用/ バックアップ: 最終成功 ${last.at}（${age}日前）`);
+    }
+  }
+
+  // 6-2-b. 実際にリモートへ届いているか（ログが正常でも push 漏れが滞留していないかを直接見る）
+  const aiOps = process.env.AIOPS_DIR || path.join(AFFILIATE_ROOT, 'AI運用');
+  if (!fs.existsSync(path.join(aiOps, '.git'))) return;
+  const ahead = Number(shQuiet(aiOps, 'git rev-list --count origin/main..HEAD').trim() || 0);
+  if (ahead > 0) {
+    const oldest = shQuiet(aiOps, 'git log --reverse --format=%cs origin/main..HEAD').split('\n')[0];
+    const age = oldest ? daysAgo(oldest) : 0;
+    if (age >= BACKUP_PENDING_DAYS) warnings.push(`AI運用/ に未pushコミット ${ahead} 件が ${age} 日滞留（最古 ${oldest}）。バックアップが届いていない → bash "AI運用/git-backup.sh"。`);
+    else infos.push(`AI運用/ 未pushコミット ${ahead} 件（最古 ${oldest}）`);
+  }
+  const dirty = shQuiet(aiOps, 'git status --porcelain').split('\n').filter(Boolean);
+  if (dirty.length) {
+    // 滞留日数はファイルmtimeで測る（未commitなのでgitに日付が無い）
+    const ages = dirty.map((l) => {
+      const f = path.join(aiOps, l.slice(3).replace(/^"|"$/g, ''));
+      try { return daysAgo(fs.statSync(f).mtime); } catch { return 0; }
+    });
+    const oldestAge = Math.max(...ages);
+    if (oldestAge >= BACKUP_PENDING_DAYS) warnings.push(`AI運用/ に未commitの変更 ${dirty.length} 件が最大 ${oldestAge} 日滞留。日次バックアップが拾えていない → bash "AI運用/git-backup.sh"。`);
+    else infos.push(`AI運用/ 未commitの変更 ${dirty.length} 件（最大 ${oldestAge} 日）`);
+  }
+}
+
 // ── 7. CV動線の退行（2026-07-05 直CV転換。正本: AI運用/戦略/CV動線構造_2026-07-05.md）──
 async function checkCvFunnel() {
   // 7-1. リテラル分岐の腐敗検知（sticky死亡・旧優先順位FXTF残存はこのパターンで2度腐った実績）
@@ -303,7 +362,9 @@ function checkStrategyResidue() {
     { p: path.join(ROOT, 'scripts'), level: 'critical' },
     { p: path.join(ROOT, 'x-automation'), level: 'critical', skip: /\/data\// },
     { p: path.join(ROOT, 'src/content/blog'), level: 'critical' },
-    { p: path.join(AFFILIATE_ROOT, 'AI運用'), level: 'warning', skip: /archive|learning-log|handoff/ },
+    // 衛生実施記録(MNT-*)・受入検品・旧投稿棚卸し・正本一本化判断は監査/実査の履歴で、
+    // 旧表現の引用が記録の本質（削除対象の特定・除去確認の証跡）。全件判定= AI運用/MNT-旧戦略掃除_2026-07.md
+    { p: path.join(AFFILIATE_ROOT, 'AI運用'), level: 'warning', skip: /archive|learning-log|handoff|衛生実施記録|受入検品|旧投稿棚卸し|正本一本化判断/ },
     { p: path.join(AFFILIATE_ROOT, '専門記事'), level: 'warning' },
     { p: path.join(AFFILIATE_ROOT, 'ブログ運営観点'), level: 'warning' },
   ];
@@ -472,6 +533,7 @@ checkQueue();
 checkDrafts();
 checkHandoff();
 checkStructure();
+checkAiOpsBackup();
 await checkCvFunnel();
 checkStrategyResidue();
 checkOutputCadence(cadenceAsOf);
