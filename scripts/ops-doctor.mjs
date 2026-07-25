@@ -177,7 +177,7 @@ function checkQueue() {
 // 結果だけ見ると suspended が増えるだけで、原因も損失も画面のどこにも出ない典型的な沈黙障害。
 // 検知を3層で置く: ①取りこぼし本体 ②経路の死活 ③設定の退行。
 // 3つのパスは判定ロジックを fixture で検証できるよう環境変数で差し替え可能にする
-// （checkAiOpsBackup の AIOPS_BACKUP_LOG と同じ規約）。検証: X自動化/test_ops_doctor_x.sh
+// （checkBackupTarget の AIOPS_BACKUP_LOG と同じ規約）。検証: X自動化/test_ops_doctor_x.sh
 const X_AUTOMATION_DIR = path.join(AFFILIATE_ROOT, 'X自動化');
 const X_QUEUE_CSV = process.env.X_QUEUE_CSV || path.join(X_AUTOMATION_DIR, 'data/tweet_queue.csv');
 const X_POSTER_LOG = process.env.X_POSTER_LOG || path.join(X_AUTOMATION_DIR, 'logs/launchd_stderr.log');
@@ -331,63 +331,99 @@ function checkStructure() {
   }
 }
 
-// ── 6-2. AI運用/ 日次バックアップの健全性（2026-07-22 沈黙障害の再発防止）──
+// ── 6-2. 正本ディレクトリの日次バックアップ健全性（2026-07-22 沈黙障害の再発防止）──
 // 2026-07-16〜07-21の6日間、git-backup.sh が毎晩ゲートで中断していたのに誰にも通知されず
 // 1度もpushされていなかった。「安全ゲートの失敗が通知されない」＝沈黙障害。
 // git-backup.sh は set -e ＋ 全出力を1ログに追記する構造なので、
 // 失敗は「開始マーカーだけあって完了マーカーがない末尾ブロック」として必ず残る。
+//
+// 2026-07-25 MNT-X02: 対象を AI運用/ と X自動化/ の2つへ拡張。
+// MNT-X01 で X自動化/ のバックアップを開始したが、doctor は aiops-backup.log しか見ておらず
+// X投稿エンジンとキュー正本のバックアップが止まっても誰も気づけない同型の穴が残っていた。
+// マーカー規約（=== ... backup start === / === backup done ===）は git-backup.sh との契約なので、
+// 対象ごとにロジックを複製せずテーブル＋共通関数で回す（片方だけ腐るのを防ぐ）。
 // 正本: AI運用/バックアップ設計_2026-07-12.md
-const BACKUP_LOG = process.env.AIOPS_BACKUP_LOG || path.join(process.env.HOME || '', 'Library/Logs/aiops-backup.log');
-const BACKUP_STALE_DAYS = 2;   // LaunchAgent(毎日23:30)が2日動いていなければ停止とみなす
+const BACKUP_STALE_DAYS = 2;   // LaunchAgentが2日動いていなければ停止とみなす
 const BACKUP_PENDING_DAYS = 3; // 未pushコミット・未追跡ファイルの滞留許容日数
 
-function checkAiOpsBackup() {
+// テスト注入口: <PREFIX>_BACKUP_LOG / <PREFIX>_DIR で fixture を差し込める
+// （checkXPostAvailability と同じ規約）。検証: tsumiba-blog/scripts/test-backup-health.sh
+const BACKUP_TARGETS = [
+  {
+    label: 'AI運用/',
+    log: process.env.AIOPS_BACKUP_LOG || path.join(process.env.HOME || '', 'Library/Logs/aiops-backup.log'),
+    dir: process.env.AIOPS_DIR || path.join(AFFILIATE_ROOT, 'AI運用'),
+    agent: 'com.kudokota.aiops-backup',
+    schedule: '毎日23:30',
+    grep: 'aiops-backup',
+    fix: 'bash "AI運用/git-backup.sh"',
+    gitleaks: 'AI運用/.gitleaks.toml',
+  },
+  {
+    label: 'X自動化/',
+    log: process.env.XAUTO_BACKUP_LOG || path.join(process.env.HOME || '', 'Library/Logs/x-automation-backup.log'),
+    dir: process.env.XAUTO_DIR || path.join(AFFILIATE_ROOT, 'X自動化'),
+    agent: 'com.kudokota.xautomation-backup',
+    schedule: '毎日23:40',
+    grep: 'xautomation-backup',
+    fix: 'bash "AI運用/git-backup.sh" "$HOME/Affiliate/X自動化" "$HOME/Library/Logs/x-automation-backup.log"',
+    gitleaks: 'X自動化/.gitleaks.toml',
+  },
+];
+
+function checkBackupTarget(t) {
+  // 対象ディレクトリごと無いマシンでは検査しない（誤検知の🚨を出さない）
+  if (!fs.existsSync(t.dir)) { infos.push(`${t.label} バックアップ: 対象ディレクトリ未検出（このマシンには無い）`); return; }
+
   // 6-2-a. 最終実行の結果（ゲート中断・途中失敗の検知）
-  if (!fs.existsSync(BACKUP_LOG)) {
-    critical.push(`AI運用/ バックアップのログが存在しない（${BACKUP_LOG}）。LaunchAgent com.kudokota.aiops-backup が一度も動いていない疑い → launchctl list | grep aiops-backup で確認。`);
+  if (!fs.existsSync(t.log)) {
+    critical.push(`${t.label} バックアップのログが存在しない（${t.log}）。LaunchAgent ${t.agent} が一度も動いていない疑い → launchctl list | grep ${t.grep} で確認。`);
   } else {
-    const text = fs.readFileSync(BACKUP_LOG, 'utf-8');
+    const text = fs.readFileSync(t.log, 'utf-8');
     const startRe = /^=== (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) backup start ===$/gm;
     let last = null, m;
     while ((m = startRe.exec(text))) last = { at: m[1], from: m.index };
     if (!last) {
-      critical.push(`AI運用/ バックアップログに実行記録がない（${BACKUP_LOG}）。LaunchAgent停止 or ログ破損の疑い。`);
+      critical.push(`${t.label} バックアップログに実行記録がない（${t.log}）。LaunchAgent停止 or ログ破損の疑い。`);
     } else {
       const body = text.slice(last.from);
       const done = body.includes('=== backup done ===');
       const age = daysAgo(last.at.replace(' ', 'T'));
       if (!done) {
         const reason = body.split('\n').slice(1).map((l) => l.trim()).find(Boolean) ?? '(出力なし)';
-        critical.push(`AI運用/ の最終バックアップが完走していない（${last.at}）: ${reason}\n      → bash "AI運用/git-backup.sh" を手動実行して原因を確認。ゲート誤検知なら AI運用/.gitleaks.toml のallowlistで解消する。`);
+        critical.push(`${t.label} の最終バックアップが完走していない（${last.at}）: ${reason}\n      → ${t.fix} を手動実行して原因を確認。ゲート誤検知なら ${t.gitleaks} のallowlistで解消する。`);
       }
       if (age >= BACKUP_STALE_DAYS) {
-        critical.push(`AI運用/ のバックアップが ${age} 日間実行されていない（最終実行 ${last.at}／想定は毎日23:30）。LaunchAgent停止の疑い → launchctl list | grep aiops-backup。`);
+        critical.push(`${t.label} のバックアップが ${age} 日間実行されていない（最終実行 ${last.at}／想定は${t.schedule}）。LaunchAgent停止の疑い → launchctl list | grep ${t.grep}。`);
       }
-      if (done && age < BACKUP_STALE_DAYS) infos.push(`AI運用/ バックアップ: 最終成功 ${last.at}（${age}日前）`);
+      if (done && age < BACKUP_STALE_DAYS) infos.push(`${t.label} バックアップ: 最終成功 ${last.at}（${age}日前）`);
     }
   }
 
   // 6-2-b. 実際にリモートへ届いているか（ログが正常でも push 漏れが滞留していないかを直接見る）
-  const aiOps = process.env.AIOPS_DIR || path.join(AFFILIATE_ROOT, 'AI運用');
-  if (!fs.existsSync(path.join(aiOps, '.git'))) return;
-  const ahead = Number(shQuiet(aiOps, 'git rev-list --count origin/main..HEAD').trim() || 0);
+  if (!fs.existsSync(path.join(t.dir, '.git'))) return;
+  const ahead = Number(shQuiet(t.dir, 'git rev-list --count origin/main..HEAD').trim() || 0);
   if (ahead > 0) {
-    const oldest = shQuiet(aiOps, 'git log --reverse --format=%cs origin/main..HEAD').split('\n')[0];
+    const oldest = shQuiet(t.dir, 'git log --reverse --format=%cs origin/main..HEAD').split('\n')[0];
     const age = oldest ? daysAgo(oldest) : 0;
-    if (age >= BACKUP_PENDING_DAYS) warnings.push(`AI運用/ に未pushコミット ${ahead} 件が ${age} 日滞留（最古 ${oldest}）。バックアップが届いていない → bash "AI運用/git-backup.sh"。`);
-    else infos.push(`AI運用/ 未pushコミット ${ahead} 件（最古 ${oldest}）`);
+    if (age >= BACKUP_PENDING_DAYS) warnings.push(`${t.label} に未pushコミット ${ahead} 件が ${age} 日滞留（最古 ${oldest}）。バックアップが届いていない → ${t.fix}。`);
+    else infos.push(`${t.label} 未pushコミット ${ahead} 件（最古 ${oldest}）`);
   }
-  const dirty = shQuiet(aiOps, 'git status --porcelain').split('\n').filter(Boolean);
+  const dirty = shQuiet(t.dir, 'git status --porcelain').split('\n').filter(Boolean);
   if (dirty.length) {
     // 滞留日数はファイルmtimeで測る（未commitなのでgitに日付が無い）
     const ages = dirty.map((l) => {
-      const f = path.join(aiOps, l.slice(3).replace(/^"|"$/g, ''));
+      const f = path.join(t.dir, l.slice(3).replace(/^"|"$/g, ''));
       try { return daysAgo(fs.statSync(f).mtime); } catch { return 0; }
     });
     const oldestAge = Math.max(...ages);
-    if (oldestAge >= BACKUP_PENDING_DAYS) warnings.push(`AI運用/ に未commitの変更 ${dirty.length} 件が最大 ${oldestAge} 日滞留。日次バックアップが拾えていない → bash "AI運用/git-backup.sh"。`);
-    else infos.push(`AI運用/ 未commitの変更 ${dirty.length} 件（最大 ${oldestAge} 日）`);
+    if (oldestAge >= BACKUP_PENDING_DAYS) warnings.push(`${t.label} に未commitの変更 ${dirty.length} 件が最大 ${oldestAge} 日滞留。日次バックアップが拾えていない → ${t.fix}。`);
+    else infos.push(`${t.label} 未commitの変更 ${dirty.length} 件（最大 ${oldestAge} 日）`);
   }
+}
+
+function checkBackupHealth() {
+  for (const t of BACKUP_TARGETS) checkBackupTarget(t);
 }
 
 // ── 7. CV動線の退行（2026-07-05 直CV転換。正本: AI運用/戦略/CV動線構造_2026-07-05.md）──
@@ -635,7 +671,7 @@ checkXPostAvailability();
 checkDrafts();
 checkHandoff();
 checkStructure();
-checkAiOpsBackup();
+checkBackupHealth();
 await checkCvFunnel();
 checkStrategyResidue();
 checkOutputCadence(cadenceAsOf);
