@@ -307,8 +307,19 @@ function checkStructure() {
   const handoffPath = path.join(AFFILIATE_ROOT, 'AI運用/handoff.md');
   if (fs.existsSync(handoffPath)) {
     const kb = Math.round(fs.statSync(handoffPath).size / 1024);
-    if (kb > 50) warnings.push(`handoff.md が ${kb}KB。50KB超は実質読めず形骸化する → 古いエントリを AI運用/archive/ へ退避（7/2に236KB放置が発生した事故と同型）。`);
+    // 35KB: rotate-handoff.mjs が30KBまで戻すので、超えたら実行する合図（2026-07-25 MNT-08で50KB→35KB）
+    if (kb > 35) warnings.push(`handoff.md が ${kb}KB。読めないhandoffは形骸化する → \`node AI運用/scripts/rotate-handoff.mjs\` を実行（退避・索引追記・欠損検証まで自動。7/2に236KB放置が発生した事故と同型）。`);
     else infos.push(`handoff.md サイズ: ${kb}KB`);
+  }
+  // learning-log.md のサイズ（2026-07-25 MNT-08 追加）
+  // handoff しか見ておらず、learning-log は50KBを超えても誰も気づかない＝同型の沈黙障害が残っていた。
+  // 退避は自動化しない: learning-log は非時系列＋現行運用セクション混在の宣言型のため、
+  // 日付での機械的な切り出しは現行方針をアーカイブ層へ落とす（MNT-08実施記録 §3）。
+  const learningLogPath = path.join(AFFILIATE_ROOT, 'AI運用/learning-log.md');
+  if (fs.existsSync(learningLogPath)) {
+    const kb = Math.round(fs.statSync(learningLogPath).size / 1024);
+    if (kb > 30) warnings.push(`learning-log.md が ${kb}KB。30KB超 → 古い学びを AI運用/archive/learning-log-archive-*.md へ退避。⚠️自動退避しない（「想起ミス台帳」「未確定情報」など日付なしセクションは現行運用のため必ず残す）。`);
+    else infos.push(`learning-log.md サイズ: ${kb}KB`);
   }
   const queuePath = path.join(AFFILIATE_ROOT, 'AI運用/Codex委譲キュー.md');
   if (fs.existsSync(queuePath)) {
