@@ -170,6 +170,93 @@ function checkQueue() {
   else if (pendingCount <= 3) warnings.push(`pendingが残り${pendingCount}件。数日でキーワード切れ → refill-keyword-queue.mjs で補充を検討。`);
 }
 
+// ── 3-2. X投稿経路の可用性（X-AVAIL-01 2026-07-25）────────────────
+// 背景: 2026-07-22に再開したlaunchd投稿経路が、StartIntervalのspawnをlaunchdに
+// 保留され続けて 7/23=1回・7/24=0回しか起動せず、D2(id280)・D3(id281)が
+// 「投稿されなかった」のではなく「投稿処理が一度も起動しなかった」まま期限切れした。
+// 結果だけ見ると suspended が増えるだけで、原因も損失も画面のどこにも出ない典型的な沈黙障害。
+// 検知を3層で置く: ①取りこぼし本体 ②経路の死活 ③設定の退行。
+// 3つのパスは判定ロジックを fixture で検証できるよう環境変数で差し替え可能にする
+// （checkAiOpsBackup の AIOPS_BACKUP_LOG と同じ規約）。検証: X自動化/test_ops_doctor_x.sh
+const X_AUTOMATION_DIR = path.join(AFFILIATE_ROOT, 'X自動化');
+const X_QUEUE_CSV = process.env.X_QUEUE_CSV || path.join(X_AUTOMATION_DIR, 'data/tweet_queue.csv');
+const X_POSTER_LOG = process.env.X_POSTER_LOG || path.join(X_AUTOMATION_DIR, 'logs/launchd_stderr.log');
+const X_PLIST = process.env.X_PLIST || path.join(process.env.HOME || '', 'Library/LaunchAgents/com.tsumiba.xposter.plist');
+const X_CATCH_UP_HOURS = 48;  // x_poster.py の CATCH_UP_HOURS と一致させること
+const X_LOG_WARN_HOURS = 14;  // 一晩のスリープ(約10-12h)では鳴らさない
+const X_LOG_CRIT_HOURS = 30;  // 丸1日以上起動していない = 経路が死んでいる
+
+// tweet_queue.csv は本文に改行とカンマを含むためスプリットでは壊れる。最小限のCSVパーサ。
+function readTweetQueue(file) {
+  const raw = fs.readFileSync(file, 'utf-8');
+  const rows = [];
+  let row = [], field = '', quoted = false;
+  for (let i = 0; i < raw.length; i++) {
+    const c = raw[i];
+    if (quoted) {
+      if (c === '"') { if (raw[i + 1] === '"') { field += '"'; i++; } else quoted = false; }
+      else field += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ',') { row.push(field); field = ''; }
+    else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+    else if (c !== '\r') field += c;
+  }
+  if (field || row.length) { row.push(field); rows.push(row); }
+  const header = rows.shift() ?? [];
+  return rows.filter((r) => r.length >= header.length)
+    .map((r) => Object.fromEntries(header.map((h, i) => [h, r[i] ?? ''])));
+}
+
+function checkXPostAvailability() {
+  if (!fs.existsSync(X_QUEUE_CSV)) { infos.push('X投稿キュー: 未検出（X自動化/ がないマシン）'); return; }
+
+  // ① 取りこぼし本体: pending なのに予定時刻を過ぎている行
+  const now = Date.now();
+  const overdue = [];
+  for (const r of readTweetQueue(X_QUEUE_CSV)) {
+    if (r.status !== 'pending') continue;
+    const t = new Date(`${r.scheduled_date}T${r.scheduled_time}:00`).getTime();
+    if (Number.isNaN(t) || t >= now) continue;
+    overdue.push({ id: r.id, at: `${r.scheduled_date} ${r.scheduled_time}`, hours: (now - t) / 3600000 });
+  }
+  const lost = overdue.filter((o) => o.hours > X_CATCH_UP_HOURS);
+  const late = overdue.filter((o) => o.hours <= X_CATCH_UP_HOURS);
+  const fmtOverdue = (l) => l.map((o) => `id=${o.id}（${o.at} / ${Math.floor(o.hours)}時間超過）`).join(' / ');
+  if (lost.length) {
+    critical.push(`X投稿の取りこぼし ${lost.length} 件: ${fmtOverdue(lost)}\n      → catch-up窓(${X_CATCH_UP_HOURS}時間)を超えており、放置すると投稿されないまま消える。投稿するか suspended にするか判断すること。`);
+  }
+  if (late.length) {
+    warnings.push(`X投稿が予定時刻を過ぎたまま ${late.length} 件: ${fmtOverdue(late)}\n      → catch-up窓の内側。次のジョブ起動で投稿される見込み。連続するなら投稿経路を疑う。`);
+  }
+
+  // ② 経路の死活: 投稿スクリプトが最後に起動した時刻
+  if (fs.existsSync(X_POSTER_LOG)) {
+    const hits = fs.readFileSync(X_POSTER_LOG, 'utf-8').match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}),\d+ \[INFO\] === X投稿スクリプト起動/gm);
+    const last = hits?.at(-1)?.slice(0, 19);
+    if (!last) {
+      warnings.push('X投稿スクリプトの起動ログが1件もない。ジョブが一度も動いていない可能性。');
+    } else {
+      const h = (now - new Date(last.replace(' ', 'T')).getTime()) / 3600000;
+      if (h > X_LOG_CRIT_HOURS) critical.push(`X投稿スクリプトが ${Math.floor(h)} 時間起動していない（最終 ${last}）。投稿経路が停止＝X流入がゼロのまま気づけない。\n      → launchctl print gui/501/com.tsumiba.xposter で state と runs を確認すること。`);
+      else if (h > X_LOG_WARN_HOURS) warnings.push(`X投稿スクリプトの最終起動が ${Math.floor(h)} 時間前（${last}）。Macの停止時間が長いか、ジョブが保留されている。`);
+      else infos.push(`X投稿ジョブ: 最終起動 ${last}（${Math.floor(h)}時間前）`);
+    }
+  }
+
+  // ③ 設定の退行ガード: StartInterval へ戻されたら鳴らす。
+  // このMacでは StartInterval のspawnがlaunchdに保留され続ける（実測: 1日約11時間の起動に対し
+  // 5分間隔ジョブが0〜1回しか動かない。同条件の StartCalendarInterval ジョブは正常発火）。
+  // plistのコメントは人間が読まないと効かないので、検査をコード側に置く。
+  if (fs.existsSync(X_PLIST)) {
+    const plist = fs.readFileSync(X_PLIST, 'utf-8');
+    if (/^\s*<key>StartInterval<\/key>/m.test(plist)) {
+      critical.push('com.tsumiba.xposter.plist が StartInterval に戻っている。このMacではStartIntervalのspawnがlaunchdに保留され、実測で1日0〜1回しか動かない（X-AVAIL-01）。\n      → StartCalendarInterval（毎時 :00/:30）へ戻すこと。正本: AI運用/戦略/X集客/X投稿可用性修復_X-AVAIL-01_2026-07-25.md');
+    } else if (!/StartCalendarInterval/.test(plist)) {
+      warnings.push('com.tsumiba.xposter.plist にスケジュール指定（StartCalendarInterval）が見当たらない。ジョブが自動起動しない。');
+    }
+  }
+}
+
 // ── 4. draft滞留（公開レビュー待ちのバックログ）─────────────────
 function checkDrafts() {
   const blogDir = path.join(ROOT, 'src/content/blog');
@@ -384,11 +471,14 @@ function checkStrategyResidue() {
       });
     }
   }
-  // X投稿キューは pending（これから投稿される行）だけ検査。posted/suspended は履歴なので無視
-  const queueCsv = path.join(ROOT, 'x-automation/data/tweet_queue.csv');
+  // X投稿キューは pending（これから投稿される行）だけ検査。posted/suspended は履歴なので無視。
+  // 2026-07-25 X-AVAIL-01: ここは repo側 x-automation/data/ を見ていたが、そちらは2026-07-16で
+  // 更新が止まった凍結コピーで、実投稿が読むのは X自動化/data/ の方（XQ-02で正本を分離）。
+  // 投稿されないキューを検査していた＝この検査自体が沈黙障害だったため、正本へ向け直す。
+  const queueCsv = X_QUEUE_CSV;
   if (fs.existsSync(queueCsv)) {
-    const bad = fs.readFileSync(queueCsv, 'utf-8').split('\n')
-      .filter((l) => l.includes('pending') && RESIDUE_PATTERNS.some((re) => re.test(l)));
+    const bad = readTweetQueue(queueCsv)
+      .filter((r) => r.status === 'pending' && RESIDUE_PATTERNS.some((re) => re.test(r.text ?? '')));
     if (bad.length) critical.push(`tweet_queue.csv のpending投稿 ${bad.length} 件に旧戦略の残存表現。投稿される前にsuspend化すること。`);
   }
   const fmt = (list) => list.slice(0, 5).map((h) => `${path.relative(AFFILIATE_ROOT, h.f)}:${h.line}`).join(' / ') + (list.length > 5 ? ` 他${list.length - 5}箇所` : '');
@@ -530,6 +620,7 @@ console.log('🩺 ops-doctor — 事業システム健康診断\n');
 checkGit();
 await checkActions();
 checkQueue();
+checkXPostAvailability();
 checkDrafts();
 checkHandoff();
 checkStructure();
