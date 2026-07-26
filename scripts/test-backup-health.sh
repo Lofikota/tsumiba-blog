@@ -52,7 +52,9 @@ run_case() {  # $1=ケース名 $2=X自動化ログの状態(done|abort|missing|
         node "$DOCTOR" --no-net 2>&1)
   if echo "$out" | grep -q 'X自動化/ '; then :; fi
   # 🚨欄にX自動化の行が出ているか
-  if echo "$out" | sed -n '/🚨/,/⚠️\|ℹ️/p' | grep -q 'X自動化/'; then hit=yes; else hit=no; fi
+  # -E 必須: BSD sed（macOS）の基本正規表現では \| が交替にならずリテラル | になる。
+  # 終了パターンが効かないと🚨行からEOFまで全部拾い、ℹ️欄の行で誤判定する（MNT-X03b）。
+  if echo "$out" | sed -nE '/🚨/,/⚠️|ℹ️/p' | grep -q 'X自動化/'; then hit=yes; else hit=no; fi
   if [ "$hit" = "$expect" ]; then
     echo "✅ $name"
   else
