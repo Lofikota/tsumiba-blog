@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { CATEGORIES } from '../data/categories';
-import { getAffiliatePath } from '../data/affiliateLinks';
+import { resolveAffiliateTarget } from '../data/affiliateLinks';
 
 // 稼働中アフィリエイトリンク(status:'affiliate')のみ掲載。承認が増えたらここに追加する。
 const recommendedAccounts = [
@@ -189,7 +189,13 @@ const orgJsonLd = JSON.stringify({
             {acc.specs.map((spec) => <li>{spec}</li>)}
           </ul>
           <div class="pick-actions">
-            <a class="pick-cta" href={getAffiliatePath(acc.slug)} target="_blank" rel="nofollow sponsored noopener">公式サイトで口座開設</a>
+            {(() => {
+              // 2026-07-26 ASP-V02: 提携未成立の案件は外部送客せず、内部の比較記事へ送る。
+              const t = resolveAffiliateTarget(acc.slug);
+              return t.isPending
+                ? <a class="pick-cta" href={t.href}>取引条件を比較して確認する</a>
+                : <a class="pick-cta" href={t.href} target="_blank" rel="nofollow sponsored noopener">公式サイトで口座開設</a>;
+            })()}
             <a class="pick-review" href={acc.reviewHref}>レビューを読む</a>
           </div>
         </div>

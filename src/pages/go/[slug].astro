@@ -1,5 +1,5 @@
 ---
-import { affiliateLinks, type AffiliateLink } from '../../data/affiliateLinks';
+import { affiliateLinks, pendingFallbackByCategory, type AffiliateLink } from '../../data/affiliateLinks';
 
 export function getStaticPaths() {
   return affiliateLinks.map((link) => ({
@@ -13,14 +13,9 @@ interface Props {
 }
 
 const { link } = Astro.props;
-const fallbackByCategory: Partial<Record<AffiliateLink['category'], string>> = {
-  FX: '/go/dmm-fx/',
-  会計: '/blog/fx-kakuteishinkoku-guide/',
-};
+// フォールバック先の定義は affiliateLinks.ts に集約（AffiliateCTA / トップページと共有）。
 const isPending = link.status === 'pending';
-const rawFallback = fallbackByCategory[link.category] ?? '/start/';
-// pending案件自身がフォールバック先だと自己参照リダイレクトループになるため回避
-const fallbackUrl = rawFallback === `/go/${link.slug}/` ? '/go/jfx/' : rawFallback;
+const fallbackUrl = pendingFallbackByCategory[link.category] ?? '/start/';
 const destinationUrl = isPending ? fallbackUrl : link.destinationUrl;
 const eventLabel = isPending ? `${link.slug}:fallback` : link.slug;
 const googleTagId = import.meta.env.PUBLIC_GOOGLE_TAG_ID ?? import.meta.env.PUBLIC_GA_ID ?? 'AW-17326430733';

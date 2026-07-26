@@ -1,5 +1,5 @@
 ---
-import { getAffiliatePath } from '../data/affiliateLinks';
+import { resolveAffiliateTarget } from '../data/affiliateLinks';
 
 interface Props {
   href?: string;
@@ -14,9 +14,19 @@ interface Props {
 }
 
 const { href, product, text = '公式サイトで確認する', label = 'PR', color = 'blue', note, badge, compact = false, external = true } = Astro.props;
-const ctaHref = product ? getAffiliatePath(product) : href ?? '#';
-const ctaText = text;
-const ctaLabel = product ?? href ?? text;
+// 2026-07-26 ASP-V02: 提携未成立（status:'pending'）の案件は「公式サイトで〜」と書いてある
+// ボタンを押しても報酬が発生せず、遷移先も自サイト内になる。文言とリンク属性が実態と食い違うため、
+// pending時はCTAラベル・rel・計測カテゴリをまとめて内部導線として扱う。
+// 提携が成立したら affiliateLinks.ts の status を 'affiliate' に戻すだけで元の文言・送客に復帰する。
+// mdx側には product="jfx" 形式と href="/go/jfx/" 直書き形式の両方があるため、どちらもslugへ正規化する。
+const slugFromHref = href?.match(/^\/go\/([a-z0-9-]+)\/?$/)?.[1];
+const targetSlug = product ?? slugFromHref;
+const resolved = targetSlug ? resolveAffiliateTarget(targetSlug) : null;
+const isPendingTarget = resolved?.isPending ?? false;
+const ctaHref = resolved ? resolved.href : href ?? '#';
+const ctaText = isPendingTarget ? resolved!.fallbackText : text;
+const ctaLabel = isPendingTarget ? `${targetSlug}:fallback` : targetSlug ?? href ?? text;
+const isExternalLink = external && !isPendingTarget && !ctaHref.startsWith('/');
 
 // CTAボタンは tsumiba の琥珀(#E0A458)に統一（color指定は受け取るが琥珀に正規化）
 const colorMap: Record<string, string> = {
@@ -31,15 +41,15 @@ const bg = colorMap[color] ?? colorMap.blue;
 <div class={`acta-wrap${compact ? ' acta-wrap-compact' : ''}`}>
   {badge && <div class={`acta-badge${compact ? ' acta-badge-compact' : ''}`}>{badge}</div>}
   {note && <p class={`acta-note${compact ? ' acta-note-compact' : ''}`}>{note}</p>}
-  <a href={ctaHref} {...(external ? { target: '_blank', rel: 'noopener noreferrer sponsored nofollow' } : {})}
+  <a href={ctaHref} {...(isExternalLink ? { target: '_blank', rel: 'noopener noreferrer sponsored nofollow' } : {})}
      data-google-event="article_cta_click"
-     data-google-category="affiliate"
+     data-google-category={isPendingTarget ? 'internal_nav' : 'affiliate'}
      data-google-label={ctaLabel}
      class={`acta-btn${compact ? ' acta-btn-compact' : ''}`} style={bg}>
     <span class="acta-arrow">→</span>
     {ctaText}
   </a>
-  <p class={`acta-sub${compact ? ' acta-sub-compact' : ''}`}><span class={`acta-pr${compact ? ' acta-pr-compact' : ''}`}>{label}</span> 公式サイトへ移動します</p>
+  <p class={`acta-sub${compact ? ' acta-sub-compact' : ''}`}><span class={`acta-pr${compact ? ' acta-pr-compact' : ''}`}>{label}</span> {isPendingTarget ? 'サイト内の比較ページへ移動します' : '公式サイトへ移動します'}</p>
 </div>
 
 <style>

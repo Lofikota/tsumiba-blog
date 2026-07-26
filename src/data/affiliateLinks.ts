@@ -27,8 +27,8 @@ export const affiliateLinks: AffiliateLink[] = [
     name: 'DMM FX',
     provider: '株式会社DMM.com証券',
     category: 'FX',
-    destinationUrl: 'https://t.afi-b.com/visit.php?a=S10091B-m3381329&p=B9812887',
-    status: 'affiliate',
+    destinationUrl: 'https://fx.dmm.com/',
+    status: 'pending',
     risk: 'fx',
     disclosure: 'FXには元本割れや預け入れた資金を上回る損失が発生するリスクがあります。',
   },
@@ -37,8 +37,8 @@ export const affiliateLinks: AffiliateLink[] = [
     name: 'DMM CFD',
     provider: '株式会社DMM.com証券',
     category: 'FX',
-    destinationUrl: 'https://t.afi-b.com/visit.php?a=s121925-D401035P&p=B9812887',
-    status: 'affiliate',
+    destinationUrl: 'https://cfd.dmm.com/',
+    status: 'pending',
     risk: 'fx',
     disclosure: 'CFDには元本割れや預け入れた資金を上回る損失が発生するリスクがあります。',
   },
@@ -57,8 +57,8 @@ export const affiliateLinks: AffiliateLink[] = [
     name: 'JFX MATRIX TRADER',
     provider: 'JFX',
     category: 'FX',
-    destinationUrl: 'https://t.afi-b.com/visit.php?a=H3633P-B72322D&p=B9812887',
-    status: 'affiliate',
+    destinationUrl: 'https://www.jfx.co.jp/',
+    status: 'pending',
     risk: 'fx',
     disclosure: 'FXには元本割れや預け入れた資金を上回る損失が発生するリスクがあります。',
   },
@@ -67,8 +67,8 @@ export const affiliateLinks: AffiliateLink[] = [
     name: 'セントラル短資FX',
     provider: 'セントラル短資FX株式会社',
     category: 'FX',
-    destinationUrl: 'https://t.afi-b.com/visit.php?a=g8927k-1302873E&p=B9812887',
-    status: 'affiliate',
+    destinationUrl: 'https://www.central-tanshifx.com/',
+    status: 'pending',
     risk: 'fx',
     disclosure: 'FXには元本割れや預け入れた資金を上回る損失が発生するリスクがあります。',
   },
@@ -77,8 +77,8 @@ export const affiliateLinks: AffiliateLink[] = [
     name: 'FXTF',
     provider: 'FXTF',
     category: 'FX',
-    destinationUrl: 'https://t.afi-b.com/visit.php?a=o19409-1409604&p=B9812887',
-    status: 'affiliate',
+    destinationUrl: 'https://www.fxtrade.co.jp/',
+    status: 'pending',
     risk: 'fx',
     disclosure: 'FXには元本割れや預け入れた資金を上回る損失が発生するリスクがあります。',
   },
@@ -147,8 +147,8 @@ export const affiliateLinks: AffiliateLink[] = [
     name: 'タケルFXスクール',
     provider: '一般社団法人日本FX教育機構',
     category: 'FX',
-    destinationUrl: 'https://t.afi-b.com/visit.php?a=p15610g-L506779T&p=B9812887',
-    status: 'affiliate',
+    destinationUrl: 'https://www.fxschool.or.jp/',
+    status: 'pending',
     risk: 'fx',
     disclosure: 'FXには元本割れや預け入れた資金を上回る損失が発生するリスクがあります。',
   },
@@ -160,4 +160,46 @@ export function getAffiliateLink(slug: string): AffiliateLink | undefined {
 
 export function getAffiliatePath(slug: string): string {
   return `/go/${slug}/`;
+}
+
+/**
+ * 提携が成立していない案件（status:'pending'）の代替導線。
+ * 2026-07-26 ASP-V02: 旧設計はFXのpendingを /go/dmm-fx/ へ逃がしていたが、
+ * afbの現行サイト(SID 987784)では提携が0件で、旧サイト(981288)発行のリンクは
+ * 4本がafi-bの404、残りも成果が承認され得ない状態だった。
+ * 報酬が発生しない外部リンクへ送客し続けないため、代替導線は必ず自サイト内を指す。
+ */
+export const pendingFallbackByCategory: Record<AffiliateLink['category'], string> = {
+  FX: '/blog/fx-kouza-hikaku/',
+  会計: '/blog/fx-kakuteishinkoku-guide/',
+};
+
+const pendingCtaTextByCategory: Record<AffiliateLink['category'], string> = {
+  FX: 'FX口座の比較条件を確認する（PR）',
+  会計: '確定申告の手順を確認する（PR）',
+};
+
+export interface ResolvedAffiliateTarget {
+  /** 実際にaタグへ入れるhref。pending時は自サイト内ページ。 */
+  href: string;
+  /** trueなら報酬が発生する外部送客ではない＝文言・rel・計測ラベルを内部導線として扱う。 */
+  isPending: boolean;
+  /** pending時にCTAラベルを差し替えるための文言。 */
+  fallbackText: string;
+}
+
+/** slugからCTAの実遷移先を解決する。提携未成立の案件は内部導線へ倒す。 */
+export function resolveAffiliateTarget(slug: string): ResolvedAffiliateTarget {
+  const link = getAffiliateLink(slug);
+  if (!link) {
+    return { href: '/start/', isPending: true, fallbackText: 'FX口座の比較条件を確認する（PR）' };
+  }
+  if (link.status === 'pending') {
+    return {
+      href: pendingFallbackByCategory[link.category],
+      isPending: true,
+      fallbackText: pendingCtaTextByCategory[link.category],
+    };
+  }
+  return { href: getAffiliatePath(slug), isPending: false, fallbackText: '' };
 }

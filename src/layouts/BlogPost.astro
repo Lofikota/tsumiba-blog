@@ -83,8 +83,9 @@ const updatedStr = updatedDate?.toLocaleDateString('ja-JP', { year: 'numeric', m
 
 const tocHeadings = headings.filter(h => h.depth === 2);
 
-// モバイル追従CTA（FX記事のみ・控えめ）。サイト優先順位#1のDMM FXへ送客（FxPriorityCTAと整合）。
-const stickyCta = category === 'FX・外貨' ? { href: '/go/dmm-fx/', text: 'DMM FXのキャンペーン条件を見る', label: 'sticky-dmm-fx' } : null;
+// モバイル追従CTA（FX記事のみ・控えめ）。2026-07-26 ASP-V02で送客先を /go/dmm-fx/ から内部比較記事へ変更。
+// 旧設定は「現行サイトで未提携かつ申請停止と判定した案件」へ全FX記事から無条件送客していた。
+const stickyCta = category === 'FX・外貨' ? { href: '/blog/fx-kouza-hikaku/', text: 'FX口座の比較条件を見る', label: 'sticky-fx-compare' } : null;
 
 // 「次に読む」1本指定（リベ大型 原則7）。7ステップの学習順序に沿って次の一歩へ送る。
 const nextRead = getNextRead(slug);
@@ -197,9 +198,9 @@ const nextRead = getNextRead(slug);
     {stickyCta && (
       <div class="sticky-cta" id="stickyCta" hidden>
         <span class="sticky-cta-pr">PR</span>
-        <a class="sticky-cta-link" href={stickyCta.href} rel="sponsored nofollow noopener noreferrer"
+        <a class="sticky-cta-link" href={stickyCta.href}
            data-google-event="article_cta_click"
-           data-google-category="affiliate"
+           data-google-category="internal_nav"
            data-google-label={stickyCta.label}>{stickyCta.text}</a>
         <button type="button" class="sticky-cta-close" id="stickyCtaClose" aria-label="閉じる">×</button>
       </div>
