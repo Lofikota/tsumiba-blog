@@ -1,0 +1,438 @@
+{
+  "fetched": "2026-07-26T03:44:00.364Z",
+  "days": 90,
+  "rows": [
+    {
+      "page": "https://tsumiba.com/blog/fx-funin-shotoku-genjitsu/",
+      "clicks": 1,
+      "impressions": 1,
+      "ctr": 1,
+      "position": 10,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/",
+      "clicks": 0,
+      "impressions": 2,
+      "ctr": 0,
+      "position": 5.5,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/about/",
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 3,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/blog/category/hajimeru/",
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 11,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/blog/central-tanshi-fx-review/",
+      "clicks": 0,
+      "impressions": 14,
+      "ctr": 0,
+      "position": 25.928571428571427,
+      "queries": [
+        {
+          "query": "セントラルfx",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 36
+        },
+        {
+          "query": "セントラル短資",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 43
+        },
+        {
+          "query": "セントラル短資 スプレッド",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 11
+        },
+        {
+          "query": "セントラル短資 スプレッド 広がる",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 11
+        },
+        {
+          "query": "セントラル短資fx 評判",
+          "clicks": 0,
+          "impressions": 7,
+          "position": 33.285714285714285
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/blog/dmm-fx-review/",
+      "clicks": 0,
+      "impressions": 6,
+      "ctr": 0,
+      "position": 32,
+      "queries": [
+        {
+          "query": "dmm f",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 24
+        },
+        {
+          "query": "dmm.f",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 24
+        },
+        {
+          "query": "dmmfx 評判",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 84
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/blog/fx-auto-trade-shoshinsha/",
+      "clicks": 0,
+      "impressions": 9,
+      "ctr": 0,
+      "position": 79.11111111111111,
+      "queries": [
+        {
+          "query": "ea とは fx",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 86
+        },
+        {
+          "query": "fx ea 勝てない",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 68
+        },
+        {
+          "query": "fx 自動 売買 危険",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 62
+        },
+        {
+          "query": "fx自動売買 デメリット",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 100
+        },
+        {
+          "query": "fx自動売買とは",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 70.5
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/blog/fx-dollar-yen-ugoki/",
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 11,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/blog/fx-kouza-hikaku/",
+      "clicks": 0,
+      "impressions": 8,
+      "ctr": 0,
+      "position": 51.875,
+      "queries": [
+        {
+          "query": "fx口座 選び方",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 90
+        },
+        {
+          "query": "jfx cfd",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 18
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/blog/fx-leverage-risk-guide/",
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 4,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/blog/fx-shoshinsha-guide/",
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 10,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/blog/fx-small-start-guide/",
+      "clicks": 0,
+      "impressions": 17,
+      "ctr": 0,
+      "position": 46.35294117647059,
+      "queries": [
+        {
+          "query": "fx 初心者 少額",
+          "clicks": 0,
+          "impressions": 8,
+          "position": 46.625
+        },
+        {
+          "query": "fx 始め方 少額",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 35
+        },
+        {
+          "query": "fx 少額",
+          "clicks": 0,
+          "impressions": 2,
+          "position": 34.5
+        },
+        {
+          "query": "少額 fx",
+          "clicks": 0,
+          "impressions": 4,
+          "position": 49
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/blog/fx-swap-hikaku/",
+      "clicks": 0,
+      "impressions": 7,
+      "ctr": 0,
+      "position": 71,
+      "queries": [
+        {
+          "query": "fx スワップ 比較",
+          "clicks": 0,
+          "impressions": 3,
+          "position": 94.33333333333333
+        },
+        {
+          "query": "メキシコ ペソ スワップ ポイント",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 94
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/blog/fx-yametoke-reason/",
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 8,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/blog/fxtf-knockout-option/",
+      "clicks": 0,
+      "impressions": 3,
+      "ctr": 0,
+      "position": 14.666666666666666,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/blog/fxtf-review/",
+      "clicks": 0,
+      "impressions": 5,
+      "ctr": 0,
+      "position": 10.6,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/blog/gmo-click-fx-review/",
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 50,
+      "queries": [
+        {
+          "query": "gmoクリック証券 fx 滑る",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 50
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/blog/jfx-fxtf-kakuteishinkoku/",
+      "clicks": 0,
+      "impressions": 2,
+      "ctr": 0,
+      "position": 10.5,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/blog/jfx-kouza-kaisetsu-tejun/",
+      "clicks": 0,
+      "impressions": 16,
+      "ctr": 0,
+      "position": 10.1875,
+      "queries": [
+        {
+          "query": "jfx 口座開設審査落ちた",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 20
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/blog/jfx-matrix-trader-tsukaikata/",
+      "clicks": 0,
+      "impressions": 3,
+      "ctr": 0,
+      "position": 7.333333333333333,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/blog/jfx-review/",
+      "clicks": 0,
+      "impressions": 37,
+      "ctr": 0,
+      "position": 31.91891891891892,
+      "queries": [
+        {
+          "query": "jafx review",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 63
+        },
+        {
+          "query": "jforex 評判",
+          "clicks": 0,
+          "impressions": 3,
+          "position": 48.666666666666664
+        },
+        {
+          "query": "jfx",
+          "clicks": 0,
+          "impressions": 11,
+          "position": 40.72727272727273
+        },
+        {
+          "query": "jfx mt4",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 23
+        },
+        {
+          "query": "jfx 評判",
+          "clicks": 0,
+          "impressions": 5,
+          "position": 45.2
+        },
+        {
+          "query": "matrix trader 評判",
+          "clicks": 0,
+          "impressions": 10,
+          "position": 20.5
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/blog/matsui-fx-review/",
+      "clicks": 0,
+      "impressions": 4,
+      "ctr": 0,
+      "position": 38,
+      "queries": [
+        {
+          "query": "dmm fx 松井証券fx（matsui fx） 違い",
+          "clicks": 0,
+          "impressions": 3,
+          "position": 35
+        },
+        {
+          "query": "松井証券fx（matsui fx） 外為ドットコム 違い",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 47
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/blog/oanda-fx-review/",
+      "clicks": 0,
+      "impressions": 2,
+      "ctr": 0,
+      "position": 8.5,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/blog/rakuten-fx-review/",
+      "clicks": 0,
+      "impressions": 6,
+      "ctr": 0,
+      "position": 55.333333333333336,
+      "queries": [
+        {
+          "query": "楽天fx 評判",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 50
+        },
+        {
+          "query": "楽天証券 fx 手数料",
+          "clicks": 0,
+          "impressions": 5,
+          "position": 56.4
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/blog/sbi-fx-alpha-review/",
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 18,
+      "queries": [
+        {
+          "query": "sbi fxα",
+          "clicks": 0,
+          "impressions": 1,
+          "position": 18
+        }
+      ]
+    },
+    {
+      "page": "https://tsumiba.com/privacy/",
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 5,
+      "queries": []
+    },
+    {
+      "page": "https://tsumiba.com/tokushoho/",
+      "clicks": 0,
+      "impressions": 2,
+      "ctr": 0,
+      "position": 5.5,
+      "queries": []
+    }
+  ]
+}
