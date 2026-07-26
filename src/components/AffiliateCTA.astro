@@ -26,7 +26,12 @@ const isPendingTarget = resolved?.isPending ?? false;
 const ctaHref = resolved ? resolved.href : href ?? '#';
 const ctaText = isPendingTarget ? resolved!.fallbackText : text;
 const ctaLabel = isPendingTarget ? `${targetSlug}:fallback` : targetSlug ?? href ?? text;
-const isExternalLink = external && !isPendingTarget && !ctaHref.startsWith('/');
+// 内部導線へ倒した結果、比較記事そのものの上でCTAが自分自身を指す（＝行き止まり）ケースが出る。
+// その場合はFX口座ランキング一覧へ送る。
+const selfLink = ctaHref === Astro.url.pathname;
+const finalHref = selfLink ? '/fx/' : ctaHref;
+const finalText = selfLink ? 'FX口座ランキングで比較する（PR）' : ctaText;
+const isExternalLink = external && !isPendingTarget && !finalHref.startsWith('/');
 
 // CTAボタンは tsumiba の琥珀(#E0A458)に統一（color指定は受け取るが琥珀に正規化）
 const colorMap: Record<string, string> = {
@@ -41,13 +46,13 @@ const bg = colorMap[color] ?? colorMap.blue;
 <div class={`acta-wrap${compact ? ' acta-wrap-compact' : ''}`}>
   {badge && <div class={`acta-badge${compact ? ' acta-badge-compact' : ''}`}>{badge}</div>}
   {note && <p class={`acta-note${compact ? ' acta-note-compact' : ''}`}>{note}</p>}
-  <a href={ctaHref} {...(isExternalLink ? { target: '_blank', rel: 'noopener noreferrer sponsored nofollow' } : {})}
+  <a href={finalHref} {...(isExternalLink ? { target: '_blank', rel: 'noopener noreferrer sponsored nofollow' } : {})}
      data-google-event="article_cta_click"
      data-google-category={isPendingTarget ? 'internal_nav' : 'affiliate'}
      data-google-label={ctaLabel}
      class={`acta-btn${compact ? ' acta-btn-compact' : ''}`} style={bg}>
     <span class="acta-arrow">→</span>
-    {ctaText}
+    {finalText}
   </a>
   <p class={`acta-sub${compact ? ' acta-sub-compact' : ''}`}><span class={`acta-pr${compact ? ' acta-pr-compact' : ''}`}>{label}</span> {isPendingTarget ? 'サイト内の比較ページへ移動します' : '公式サイトへ移動します'}</p>
 </div>

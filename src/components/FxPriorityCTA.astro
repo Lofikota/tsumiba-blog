@@ -14,19 +14,24 @@ const {
   lead = '国内FX口座は「最低取引単位」「スプレッド」「取引ツール」で選びます。まず比較記事で判断軸を押さえてから、気になる会社の詳細を確認してください。',
 } = Astro.props;
 
-const reviews = [
+// 自分自身を指すカードは行き止まりになるため出さない（内部導線化に伴う措置）
+const here = Astro.url.pathname;
+const hubHref = here === '/blog/fx-kouza-hikaku/' ? '/fx/' : '/blog/fx-kouza-hikaku/';
+const hubText = here === '/blog/fx-kouza-hikaku/' ? 'FX口座ランキングで順位と根拠を確認する' : 'FX口座の比較条件をまとめて確認する';
+const allReviews = [
   { href: '/blog/jfx-review/', name: 'JFX', label: 'fx-compare-jfx', note: 'MT4はチャート分析専用で、発注・EAは不可。注文とポジション管理はMATRIX TRADERを使用。' },
   { href: '/blog/fxtf-review/', name: 'FXTF', label: 'fx-compare-fxtf', note: '最低1,000通貨から取引可能。口座・通貨ペアごとのスプレッドや手数料を確認。' },
   { href: '/blog/dmm-fx-review/', name: 'DMM FX', label: 'fx-compare-dmm-fx', note: 'FX取引高4年連続世界第1位（ファイナンス・マグネイト社調べ 2022〜2025年）。' },
 ];
+const reviews = allReviews.filter((r) => r.href !== here);
 ---
 
 <section class="fx-priority" aria-label="FX口座の比較導線">
   <p class="fx-priority-kicker">PR</p>
   <h2>{heading}</h2>
   <p class="fx-priority-lead">{lead}</p>
-  <a href="/blog/fx-kouza-hikaku/" class="fx-priority-card fx-priority-main fx-priority-hero" data-google-event="article_cta_click" data-google-category="internal_nav" data-google-label="fx-compare-hub">
-    <strong>FX口座の比較条件をまとめて確認する</strong>
+  <a href={hubHref} class="fx-priority-card fx-priority-main fx-priority-hero" data-google-event="article_cta_click" data-google-category="internal_nav" data-google-label="fx-compare-hub">
+    <strong>{hubText}</strong>
     <small>スプレッド・最低取引単位・ツールを一覧で比較。少額から始める人が最初に読む記事です。</small>
   </a>
   <div class="fx-priority-grid">
