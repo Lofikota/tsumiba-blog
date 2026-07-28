@@ -123,9 +123,12 @@ JFX_CONTEXT_PATTERN = re.compile(r"JFX|MATRIX\s*TRADER|マトリックス・?ト
 # 生成物ガード（先生層の指示ではなく、出力を機械的に弾く最終防波堤）。
 # 判定根拠の正本: AI運用/データ正本/brokers_*.yaml の brokers[id=jfx] の mt4_ea と notes。
 # 正本の条件が変わったらこの正規表現も見直す（正本→ここは自動同期されない）。
+# BROKER-F02（2026-07-26）: MT4は2026-08-19に提供終了しMT5へ移行するが、
+# 「チャート分析専用・発注機能は未実装」という位置づけはMT5でも変わらない
+# （公式 https://www.jfx.co.jp/mt5/ ）。バージョン名に依存せず検知する。
 JFX_FALSE_CAPABILITY_PATTERNS = [
     re.compile(
-        r"MT4(?:\s*に)?対応|MT4.{0,80}(?:(?:(?:で|から|を使って).{0,16})?"
+        r"(?:MT4|MT5|MetaTrader\s*[45]?)(?:\s*に)?対応|(?:MT4|MT5|MetaTrader\s*[45]?).{0,80}(?:(?:(?:で|から|を使って).{0,16})?"
         r"(?:発注|注文|取引|売買|エントリー).{0,12}"
         r"(?:でき(?!ない|ません|ず)|可能|行え|出せ)|(?:EA|自動売買).{0,18}"
         r"(?:動かせ(?!ない|ません|ず)|使え(?!ない|ません|ず)|でき(?!ない|ません|ず)|可能|対応))",
@@ -134,7 +137,7 @@ JFX_FALSE_CAPABILITY_PATTERNS = [
     re.compile(r"(?:EA|自動売買).{0,24}(?:できる|動かせる|使える|可能|向いている|に対応)", re.IGNORECASE),
 ]
 JFX_MT4_CONNECTOR_PATTERN = re.compile(
-    r"MT4.{0,32}?(?:から|上で|を使って|経由で|で)(.{0,48})",
+    r"(?:MT4|MT5|MetaTrader\s*[45]?).{0,32}?(?:から|上で|を使って|経由で|で)(.{0,48})",
     re.IGNORECASE,
 )
 JFX_OPERATION_PATTERN = re.compile(
@@ -144,7 +147,8 @@ JFX_OPERATION_PATTERN = re.compile(
     r"建て|決済|手仕舞い|クローズ|解消|利確|損切り"
 )
 JFX_OPERATION_NEGATION_PATTERN = re.compile(
-    r"できない|できません|できず|られない|られません|不可|非対応|行わない|しない|使えない|分析専用"
+    r"できない|できません|できず|られない|られません|不可|非対応|行わない|しない|使えない|分析専用|"
+    r"実装されていない|実装されていません|実装されない|未実装|搭載されていない|搭載されていません"
 )
 MATRIX_ORDER_PATTERNS = [
     re.compile(

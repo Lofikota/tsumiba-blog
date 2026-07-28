@@ -69,6 +69,14 @@ const CASES = [
   { group: 'p0-c13r-jfx', expected: 'REJECT', text: 'JFXのMT4では発注でき、チャート分析専用です' },
   { group: 'p0-c13r-jfx', expected: 'REJECT', text: 'JFXのMT4は発注できますがEAは利用できません' },
   { group: 'p0-c13r-jfx', expected: 'ALLOW', text: 'JFXのMT4はチャート分析専用で、発注はMATRIX TRADERから行います' },
+  // BROKER-F02: MT4は2026-08-19に提供終了しMT5へ移行。分析専用の位置づけはMT5でも同じなので
+  // バージョン名を替えただけの誤情報がゲートをすり抜けないことを検査する。
+  { group: 'broker-f02-mt5', expected: 'REJECT', text: 'JFXのMT5では発注できます' },
+  { group: 'broker-f02-mt5', expected: 'REJECT', text: 'JFXのMT5ではEAを動かせる' },
+  { group: 'broker-f02-mt5', expected: 'REJECT', text: 'JFXのMT5で自動売買できる' },
+  { group: 'broker-f02-mt5', expected: 'REJECT', text: 'JFXのMT5から新規ポジションを建てられます' },
+  { group: 'broker-f02-mt5', expected: 'ALLOW', text: 'JFXのMT5チャートは分析専用で、発注はMATRIX TRADERから行います' },
+  { group: 'broker-f02-mt5', expected: 'ALLOW', text: 'JFXは2026年8月19日にMT4の提供を終了しMT5へ移行します' },
   { group: 'p0-c13r-whitelist', expected: 'REJECT', text: '注意点を押さえれば海外FXも選んでよい' },
   { group: 'p0-c13r-whitelist', expected: 'REJECT', text: 'CFDのリスクを理解して取引を始めましょう' },
   { group: 'p0-c13r-whitelist', expected: 'REJECT', text: 'ノックアウトオプションはリスクを確認したうえで申し込めます' },
