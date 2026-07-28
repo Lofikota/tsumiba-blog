@@ -43,7 +43,13 @@ function checkGit() {
 
   checkUncommitted();
 
-  const locks = fs.readdirSync(path.join(ROOT, '.git')).filter((f) => f.includes('.lock'));
+  // git worktree では .git は「gitdirへのポインタを書いたファイル」でディレクトリではない。
+  // readdirSync が ENOTDIR で throw し doctor 全体が落ちていた（診断が診断できない沈黙障害）。
+  // ロック残骸の検知はメインの作業ツリーで足りるので、worktree では飛ばす。
+  const gitDir = path.join(ROOT, '.git');
+  const locks = fs.statSync(gitDir).isDirectory()
+    ? fs.readdirSync(gitDir).filter((f) => f.includes('.lock'))
+    : [];
   if (locks.length) warnings.push(`staleなgitロックが ${locks.length} 件（Coworkサンドボックス残骸の可能性）: ${locks.join(', ')}`);
 
   const lastOrigin = sh('git log -1 --format=%ci origin/main');
@@ -709,6 +715,97 @@ function checkOutputCadence(asOf) {
   }
 }
 
+// ── 10. 削除したページが本番から消えていない（MNT-CACHE-01・2026-07-26）────────
+// 2026-07-26 ASP-V02-b: src/pages/tsumiba-sample.astro を git rm → build → push →
+// デプロイ成功まで完了したのに、本番 https://tsumiba.com/tsumiba-sample/ は HTTP 200 のままだった。
+// オリジンからは消えている（/tsumiba-sample/index.html は404）のに、きれいなURL側だけ
+// `public, s-maxage=604800`（7日）で焼き付いた旧コピーをエッジが返し続けていた
+// （age ヘッダが実時間と同期して増える＝キャッシュ済みオブジェクトの指紋）。
+//
+// これが沈黙障害である理由: 「消したつもり」と「実際の到達性」が最大7日ズレたまま誰も気づかない。
+// 今回消えなかったのは架空の口座条件に「PR」ボタンが付いたページで、放置は景表法・ステマ規制
+// ＋ASP審査のリスクに直結する。noindex 付きで sitemap にも載らなかったため、
+// sitemap検査も dist の href="#" 走査も両方すり抜けた＝既存のどの検査にも引っかからなかった。
+// _redirects・_headers はオリジン応答にしか効かないので、コード側では解決できない
+// （＝直せないから検知して人間へ渡す。パージはCloudflareダッシュボード操作＝人間タスク）。
+//
+// ⚠️ わざと `?cb=<乱数>` を付けない。キャッシュ回避URLは404を返すため、
+// 探している不具合そのものを隠す（本番実測で両方の応答が出たのが診断の決め手だった）。
+// 正本: AI運用/ASP-V02死にリンク是正_2026-07-26.md §③欠陥3
+const DELETED_URL_WINDOW_DAYS = 14;   // エッジTTLは最長7日。その倍を見張ればパージ忘れをTTL満了まで捕捉できる
+const DELETED_URL_MAX_PROBES = 20;    // 一括削除commitで本番へ大量リクエストを撃たないための上限
+const DELETED_URL_TIMEOUT_MS = 8000;
+// テスト注入口: DELETED_URL_ORIGIN（叩き先）/ DELETED_URL_REPO（削除履歴の取得元）。
+// §6-2・§6-3 と同じ <用途>_<対象> 規約で、他検査の注入口を流用しない（MNT-11で踏んだ実バグ）。
+const DELETED_URL_ORIGIN = process.env.DELETED_URL_ORIGIN || 'https://tsumiba.com';
+const DELETED_URL_REPO = process.env.DELETED_URL_REPO || ROOT;
+const PAGE_EXTS = ['.astro', '.md', '.mdx'];
+
+// 削除されたソースファイル → 公開URL。astro.config.mjs は build.format 未指定＝'directory' なので
+// 末尾スラッシュ付きが正（実際に200を返し続けたのも /tsumiba-sample/ の形）。
+// 動的ルートは1URLに定まらず、トップは「削除したのに残っている」の対象になりえないので null。
+function deletedFileToUrl(file) {
+  const page = file.match(/^src\/pages\/(.+)\.(?:astro|md|mdx)$/);
+  if (page) {
+    const p = page[1];
+    if (p.includes('[') || p === 'index') return null;
+    return `/${p.replace(/\/index$/, '')}/`;
+  }
+  const post = file.match(/^src\/content\/blog\/(.+)\.(?:md|mdx)$/);
+  return post && !post[1].includes('[') ? `/blog/${post[1]}/` : null;
+}
+
+// 削除→再追加や別ファイルでの復活は「消したつもり」ではないので候補から外す。
+// 判定の権威は dist/ ではなく作業ツリー: dist/ はビルド成果物で、古いまま残っていたり
+// 未ビルドで存在しなかったりする。実在するページを「消えたはず」と誤判定して偽🚨を出すと
+// 検査そのものが形骸化する（Phase 0 の偽🚨対策と同じ理由）。
+function urlHasSource(repo, url) {
+  const seg = url.slice(1, -1);
+  const bases = seg.startsWith('blog/')
+    ? [path.join(repo, 'src/content/blog', seg.slice(5)), path.join(repo, 'src/pages', seg)]
+    : [path.join(repo, 'src/pages', seg), path.join(repo, 'src/pages', seg, 'index')];
+  return bases.some((b) => PAGE_EXTS.some((e) => fs.existsSync(b + e)));
+}
+
+async function checkDeletedPageReachability() {
+  // localhost は「ネット」ではない。fixture サーバ相手の回帰テストを --no-net で走らせるための例外
+  // （テストを本番と GitHub API に依存させないため。それ以外は --no-net でスキップする既存の流儀どおり）。
+  const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/.test(DELETED_URL_ORIGIN);
+  if (noNet && !isLocal) return;
+
+  const log = shQuiet(DELETED_URL_REPO, `git log --since="${DELETED_URL_WINDOW_DAYS} days ago" --diff-filter=D --name-only --format= -- src/pages src/content/blog`);
+  const urls = [...new Set(log.split('\n').map((f) => f.trim()).filter(Boolean).map(deletedFileToUrl).filter(Boolean))]
+    .filter((u) => !urlHasSource(DELETED_URL_REPO, u));
+  if (!urls.length) { infos.push(`削除ページの到達性: 直近${DELETED_URL_WINDOW_DAYS}日に消えた公開URLなし`); return; }
+
+  const targets = urls.slice(0, DELETED_URL_MAX_PROBES);
+  if (urls.length > targets.length) infos.push(`削除URLが ${urls.length} 件。本番へのリクエストは先頭 ${targets.length} 件のみ検査。`);
+
+  const results = await Promise.all(targets.map(async (u) => {
+    try {
+      // リダイレクトは追わない（301で別ページへ逃がしてあるのは「残存」ではない）。
+      const res = await fetch(`${DELETED_URL_ORIGIN}${u}`, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(DELETED_URL_TIMEOUT_MS) });
+      if (res.status !== 200) return { u, gone: true };
+      // age があるか s-maxage が付いていればエッジ由来。無ければオリジンがまだ配信している＝直す先が違う。
+      const cached = res.headers.get('age') !== null || /s-maxage/.test(res.headers.get('cache-control') ?? '');
+      return { u, gone: false, cached };
+    } catch (e) {
+      return { u, err: e.message };
+    }
+  }));
+
+  const errs = results.filter((r) => r.err);
+  const live = results.filter((r) => r.gone === false);
+  // ネットワーク不通で doctor を落とさない・警告も増やさない（検知できなかっただけで異常ではない）
+  if (errs.length) infos.push(`削除ページの到達性: ${errs.length} 件を確認できず（${errs[0].err}）。ネットワーク不通の可能性。`);
+  for (const r of live) {
+    critical.push(r.cached
+      ? `削除したページ ${DELETED_URL_ORIGIN}${r.u} が本番で HTTP 200（エッジキャッシュに旧コピーが残存）。オリジンからは消えていてもTTL満了（最大7日）まで配信され続ける。\n      → Cloudflareダッシュボード > tsumiba.com > Caching > Configuration > Purge Everything（または該当URLのSingle File Purge）。パージ後 \`curl -sI ${DELETED_URL_ORIGIN}${r.u}\` が404になるまで完了ではない。正本: AI運用/ASP-V02死にリンク是正_2026-07-26.md §③欠陥3`
+      : `削除したページ ${DELETED_URL_ORIGIN}${r.u} が本番で HTTP 200（キャッシュ由来ではない＝オリジンがまだ配信している）。デプロイ未完了か、ビルド出力に実体が残っている疑い → npm run build 後に dist${r.u}index.html が無いことを確認する。`);
+  }
+  if (!live.length && !errs.length) infos.push(`削除ページの到達性: 直近${DELETED_URL_WINDOW_DAYS}日の削除 ${targets.length} 件はすべて本番から消えている`);
+}
+
 // ── 実行 ────────────────────────────────────────────────────────
 // --cadence-as-of=YYYY-MM-DD: カウンタの起点日をずらす（判定ロジックの動作確認用）
 const asOfArg = process.argv.find((a) => a.startsWith('--cadence-as-of='));
@@ -727,6 +824,7 @@ checkRootDocsBackup();
 await checkCvFunnel();
 checkStrategyResidue();
 checkOutputCadence(cadenceAsOf);
+await checkDeletedPageReachability();
 
 if (critical.length) {
   console.log('🚨 要対応（今日中に潰す）');
