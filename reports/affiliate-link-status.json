@@ -1,13 +1,122 @@
 {
-  "checkedAt": "2026-05-24T15:18:34.313Z",
+  "checkedAt": "2026-07-29T10:46:32.453Z",
   "httpCheckDone": false,
   "summary": {
-    "total": 26,
-    "affiliate": 8,
-    "pending": 18,
-    "pendingInArticles": 0,
+    "total": 14,
+    "affiliate": 0,
+    "pending": 14,
+    "pendingInArticles": 5,
+    "blocking": 0,
+    "knownPending": 5,
     "deadLinks": 0
   },
   "issues": [],
+  "knownPending": [
+    {
+      "slug": "dmm-fx",
+      "name": "DMM FX",
+      "status": "pending",
+      "url": "https://fx.dmm.com/",
+      "usedIn": [
+        "dmm-fx-review",
+        "fx-kouza-fukusuu-merit",
+        "fx-loss-cut-shikumi"
+      ],
+      "httpOk": null,
+      "reason": "afb現行サイト(987784)で未提携。ASP-V02で内部導線へ"
+    },
+    {
+      "slug": "jfx",
+      "name": "JFX MATRIX TRADER",
+      "status": "pending",
+      "url": "https://www.jfx.co.jp/",
+      "usedIn": [
+        "fx-best-time",
+        "fx-chart-yomikata",
+        "fx-company-barenai",
+        "fx-demo-tsukaikata",
+        "fx-kakuteishinkoku-guide",
+        "fx-kasegu-koza-erabi",
+        "fx-kouza-campaign-hikaku",
+        "fx-kouza-fukusuu-merit",
+        "fx-kouza-hikaku",
+        "fx-kouza-kaishi-tejun",
+        "fx-osusume-ranking",
+        "fx-shoshinsha-guide",
+        "fx-small-start-guide",
+        "fx-tokudan-jouken",
+        "fx-yametoke-reason",
+        "fxtf-review",
+        "jfx-kouza-kaisetsu-tejun",
+        "jfx-matrix-trader-tsukaikata",
+        "jfx-review",
+        "jfx-vs-fxtf-hikaku",
+        "matsui-fx-review",
+        "sbi-fx-alpha-review"
+      ],
+      "httpOk": null,
+      "reason": "afb現行サイト(987784)で未提携。ASP-V02で内部導線へ"
+    },
+    {
+      "slug": "central-tanshi-fx",
+      "name": "セントラル短資FX",
+      "status": "pending",
+      "url": "https://www.central-tanshifx.com/",
+      "usedIn": [
+        "central-tanshi-fx-review",
+        "fx-kasegu-koza-erabi",
+        "fx-kouza-fukusuu-merit",
+        "fx-kouza-hikaku",
+        "fx-shoshinsha-guide"
+      ],
+      "httpOk": null,
+      "reason": "afb現行サイト(987784)で未提携。ASP-V02で内部導線へ"
+    },
+    {
+      "slug": "fxtf",
+      "name": "FXTF",
+      "status": "pending",
+      "url": "https://www.fxtrade.co.jp/",
+      "usedIn": [
+        "fx-chart-yomikata",
+        "fx-company-barenai",
+        "fx-demo-tsukaikata",
+        "fx-ea-jidoubai-hajimekata",
+        "fx-kakuteishinkoku-guide",
+        "fx-kouza-fukusuu-merit",
+        "fx-kouza-hikaku",
+        "fx-leverage-risk-guide",
+        "fx-loss-cut-shikumi",
+        "fx-osusume-ranking",
+        "fx-shoshinsha-guide",
+        "fx-small-start-guide",
+        "fx-tokudan-jouken",
+        "fx-yametoke-reason",
+        "fxtf-knockout-option",
+        "fxtf-review",
+        "fxtf-swap-point",
+        "fxtf-zero-spread",
+        "jfx-fxtf-kakuteishinkoku",
+        "jfx-vs-fxtf-hikaku",
+        "matsui-fx-review",
+        "sbi-fx-alpha-review"
+      ],
+      "httpOk": null,
+      "reason": "A8提携済みだが MON-A01 の配置allowlist（fxtf-zero-spread:fee）で1枠のみ有効。リテラル上は pending が正"
+    },
+    {
+      "slug": "takeru-fx-school",
+      "name": "タケルFXスクール",
+      "status": "pending",
+      "url": "https://www.fxschool.or.jp/",
+      "usedIn": [
+        "fx-ea-jidoubai-hajimekata",
+        "takeru-fx-school-review"
+      ],
+      "httpOk": null,
+      "reason": "afb現行サイト(987784)で未提携。ASP-V02で内部導線へ"
+    }
+  ],
+  "staleKnownPending": [],
   "deadLinks": []
 }

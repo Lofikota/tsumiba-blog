@@ -8,6 +8,10 @@ on:
     paths:
       - 'src/content/blog/**/*.mdx'
       - 'src/data/affiliateLinks.ts'
+      # 検査する側を書き換えた時も走らせる（2026-07-29 FIX-01）。
+      # 判定ロジックや除外設定(KNOWN_PENDING)の変更が検証されずにmainへ乗るのを防ぐ。
+      - 'scripts/check-affiliate-links.mjs'
+      - '.github/workflows/affiliate-link-check.yml'
   workflow_dispatch:
 
 jobs:

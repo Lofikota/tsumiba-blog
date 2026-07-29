@@ -10,7 +10,11 @@
  *   node scripts/check-affiliate-links.mjs --fix   # 修正ガイド付き
  *   node scripts/check-affiliate-links.mjs --http  # HTTP通信も実施
  *
- * Exit code: 0=問題なし  1=dead/pendingリンクが記事で使用中
+ * Exit code: 0=既知の状態のみ  1=想定外のpending / 未登録slug / HTTP dead
+ *
+ * 2026-07-29 FIX-01: 「pending × 記事使用 = 収益損失」という前提が 2026-07-26 ASP-V02 で
+ * 陳腐化したため、既知の待機案件（KNOWN_PENDING）を終了コードの対象から外した。
+ * 経緯と判定基準は KNOWN_PENDING のコメントを参照。
  */
 
 import fs from 'node:fs';
@@ -81,6 +85,31 @@ async function checkUrl(url) {
   }
 }
 
+/**
+ * 「pending のまま記事に載っているのが正常」な案件と、その理由。
+ *
+ * 2026-07-26 ASP-V02（`AI運用/ASP-V02死にリンク是正_2026-07-26.md`）で、
+ * afbの現行サイト(SID 987784)は提携0件だと確定し、全案件を status:'pending' に倒したうえで
+ * `resolveAffiliateTarget()` が CTA を自サイト内ページへフォールバックさせる設計にした。
+ * この日から「pending × 記事使用」は収益損失の兆候ではなく**設計どおりの待機状態**になっている。
+ * 旧判定のままだと毎回 exit 1 で、Actions が 2026-07-26 から6連続赤になっていた（FIX-01）。
+ *
+ * 判定の分かれ目:
+ *   - ここに載っている slug → 📋 既知の待機として**必ず表示**するが終了コードには影響させない
+ *   - ここに無い slug が pending で記事に出た → ❌ 落とす（提携が外れた／新規に貼られた＝変化の検知）
+ *   - 記事で使われているのに affiliateLinks.ts に未登録 → ❌ 落とす（従来どおり）
+ *
+ * 提携が成立して status:'affiliate' に戻したら、この表からも該当行を削除する。
+ * 使われなくなった行は実行時に 🧹 で棚卸し対象として表示される（この表自体の腐敗防止）。
+ */
+const KNOWN_PENDING = {
+  'dmm-fx':            'afb現行サイト(987784)で未提携。ASP-V02で内部導線へ',
+  'jfx':               'afb現行サイト(987784)で未提携。ASP-V02で内部導線へ',
+  'fxtf':              'A8提携済みだが MON-A01 の配置allowlist（fxtf-zero-spread:fee）で1枠のみ有効。リテラル上は pending が正',
+  'central-tanshi-fx': 'afb現行サイト(987784)で未提携。ASP-V02で内部導線へ',
+  'takeru-fx-school':  'afb現行サイト(987784)で未提携。ASP-V02で内部導線へ',
+};
+
 const ALTERNATIVES = {
   'dmm-fx':              'jfx または fxtf',
   'fp-soudan':           'minna-seimei または hoken-shop-mammoth',
@@ -105,12 +134,19 @@ async function main() {
   // ── Phase 1: 静的チェック ────────────────────────────────────
   console.log('── Phase 1: pending × 記事使用チェック ─────────');
   const issues = [];
+  const knownPending = [];
   const registeredSlugs = new Set(links.map(l => l.slug));
 
   for (const link of links) {
     const inArticles = usedProducts[link.slug] || [];
     if (link.status !== 'affiliate' && inArticles.length > 0) {
-      issues.push({ ...link, usedIn: inArticles, httpOk: null });
+      const entry = { ...link, usedIn: inArticles, httpOk: null };
+      // 既知の待機案件は「表示するが落とさない」。分岐の根拠は KNOWN_PENDING のコメント参照。
+      if (KNOWN_PENDING[link.slug]) {
+        knownPending.push({ ...entry, reason: KNOWN_PENDING[link.slug] });
+      } else {
+        issues.push(entry);
+      }
     }
   }
   // 登録すらないslug
@@ -119,9 +155,12 @@ async function main() {
       issues.push({ slug, name:'(未登録)', status:'NOT_FOUND', url:'', usedIn: articles, httpOk: null });
     }
   }
+  // KNOWN_PENDING の棚卸し: もう pending でも記事使用でもない行は、この表から消してよい
+  const staleKnownPending = Object.keys(KNOWN_PENDING)
+    .filter(slug => !knownPending.some(k => k.slug === slug));
 
   if (issues.length === 0) {
-    console.log('✅ 問題なし\n');
+    console.log('✅ 想定外の問題なし\n');
   } else {
     console.log(`❌ ${issues.length}件の問題:\n`);
     for (const iss of issues) {
@@ -130,6 +169,19 @@ async function main() {
       console.log(`     代替: ${ALTERNATIVES[iss.slug] || '要確認'}`);
     }
     console.log('');
+  }
+
+  if (knownPending.length > 0) {
+    console.log(`📋 既知の待機（ASP提携待ち・意図的にpending / 終了コードには影響させない）: ${knownPending.length}件`);
+    for (const kp of knownPending) {
+      console.log(`  ・${kp.slug.padEnd(20)} 記事${String(kp.usedIn.length).padStart(2)}件  — ${kp.reason}`);
+    }
+    console.log('  → CTAは resolveAffiliateTarget() で自サイト内へフォールバック。送客率は構造的に0のまま。');
+    console.log('  → 根拠: AI運用/ASP-V02死にリンク是正_2026-07-26.md（除外設定は本スクリプトの KNOWN_PENDING）\n');
+  }
+
+  if (staleKnownPending.length > 0) {
+    console.log(`🧹 KNOWN_PENDING の棚卸し候補（pendingでも記事使用でもなくなった）: ${staleKnownPending.join(', ')}\n`);
   }
 
   // ── Phase 2: HTTP通信チェック（--http 指定時のみ）───────────
@@ -155,10 +207,14 @@ async function main() {
       total: links.length,
       affiliate: links.filter(l => l.status === 'affiliate').length,
       pending: links.filter(l => l.status !== 'affiliate').length,
-      pendingInArticles: issues.length,
+      pendingInArticles: issues.length + knownPending.length,
+      blocking: issues.length,
+      knownPending: knownPending.length,
       deadLinks: deadLinks.length,
     },
     issues,
+    knownPending,
+    staleKnownPending,
     deadLinks,
   };
   fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2));
@@ -180,14 +236,15 @@ async function main() {
   console.log('\n══════════════════════════════════════════════');
   console.log(`  affiliate(有効): ${report.summary.affiliate}件`);
   console.log(`  pending(無効):   ${report.summary.pending}件`);
-  console.log(`  ⚠️  pending×記事: ${report.summary.pendingInArticles}件`);
+  console.log(`  ⚠️  pending×記事: ${report.summary.pendingInArticles}件` +
+              `（うち📋既知の待機 ${report.summary.knownPending}件 / ❌要対応 ${report.summary.blocking}件）`);
   if (HTTP_CHECK) console.log(`  💀 HTTP dead:    ${report.summary.deadLinks}件`);
 
   if (issues.length > 0 || deadLinks.length > 0) {
     console.log('\n❌ 収益を損失しているリンクがあります');
     process.exit(1);
   }
-  console.log('\n✅ 全リンク正常');
+  console.log('\n✅ 想定外のリンク異常なし（既知の待機は上記のとおり残っている）');
 }
 
 main().catch(e => { console.error('Fatal:', e.message); process.exit(1); });
