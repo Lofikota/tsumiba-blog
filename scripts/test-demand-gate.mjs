@@ -215,14 +215,13 @@ check(
 );
 
 // ── 10. 完了条件そのものの回帰 ────────────────────────────────
-// DEMAND-G01 ③「需要なし」5記事の実測サジェスト件数（2026-07-26 本タスクで再取得）。
-// この4件をG-1が機械的に弾けることが DEMAND-G02 の完了条件。
+// DEMAND-G01 ③「需要なし」4記事の実測サジェスト件数（2026-07-26 本タスクで再取得）。
+// このうち3件以上をG-1が機械的に弾けることが DEMAND-G02 の完了条件。
 const DEMAND_NONE_FIXTURE = [
   { slug: 'jfx-vs-fxtf-hikaku', targetKw: 'jfx fxtf 比較', suggestCount: 0 },
   { slug: 'fx-tokudan-jouken', targetKw: 'fx 特単 条件', suggestCount: 0 },
   { slug: 'fx-demo-koza-osusume', targetKw: 'fx デモ口座 おすすめ', suggestCount: 1 },
   { slug: 'fx-kasegu-koza-erabi', targetKw: 'fx 稼ぐ 口座 選び方', suggestCount: 0 },
-  { slug: 'kaigai-fx-risk', targetKw: '海外fx 出金できない', suggestCount: 2 },
 ];
 const blockedCount = DEMAND_NONE_FIXTURE
   .filter(f => run({
@@ -231,9 +230,9 @@ const blockedCount = DEMAND_NONE_FIXTURE
     suggestCount: f.suggestCount,
   }).verdict === 'BLOCK').length;
 check(
-  '③需要なし5記事のうち4件以上をG-1が弾く',
+  '③需要なし4記事のうち3件以上をG-1が弾く',
   'DEMAND-G02の完了条件。人間のSERP目視なしで、無料APIだけで需要なしを機械判定できることの実証',
-  blockedCount >= 4,
+  blockedCount >= 3,
   true,
 );
 

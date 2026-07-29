@@ -59,7 +59,7 @@ export const CATEGORIES: Record<string, { slug: string; label: string; descripti
     slug: 'mamoru',
     label: '守る（リスク・税金）',
     description: 'レバレッジのリスク管理、損失への備え、確定申告、会社員が勤務先に知られたくない場合の注意点を整理します。',
-    matchSlugs: ['fx-leverage-risk-guide', 'fx-kakuteishinkoku-guide', 'jfx-fxtf-kakuteishinkoku', 'fx-company-barenai', 'fx-yametoke-reason', 'kaigai-fx-risk', 'kaigai-fx-vs-kokunai-fx'],
+    matchSlugs: ['fx-leverage-risk-guide', 'fx-kakuteishinkoku-guide', 'jfx-fxtf-kakuteishinkoku', 'fx-company-barenai', 'fx-yametoke-reason'],
   },
 };
 

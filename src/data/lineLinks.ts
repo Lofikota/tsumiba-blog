@@ -106,14 +106,6 @@ export const lineRefs: LineRef[] = [
     description: '特典額だけで選んで失敗しないように、キャンペーンの対象条件・リスク・見るポイントを先に整理して届けます。',
   },
   {
-    ref: 'campaign-dmm-fx',
-    label: '案件 DMM FX',
-    source: 'campaign',
-    intent: 'campaign',
-    headline: 'DMM FXのキャンペーン条件を整理するLINE',
-    description: 'キャッシュバックの対象条件・入金額・取引量・期限を、申し込む前に整理して届けます。',
-  },
-  {
     ref: 'campaign-jfx',
     label: '案件 JFX',
     source: 'campaign',

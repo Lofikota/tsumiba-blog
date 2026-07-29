@@ -35,8 +35,6 @@ const NEXT_READ_MAP: Record<string, NextRead> = {
   'fx-kakuteishinkoku-guide': { href: '/blog/fx-company-barenai/', label: '会社に知られたくない人の注意点を見る', note: 'STEP7 続ける・守る' },
   'jfx-fxtf-kakuteishinkoku': { href: '/blog/fx-company-barenai/', label: '会社に知られたくない人の注意点を見る', note: 'STEP7 続ける・守る' },
   'fx-company-barenai': { href: '/blog/fx-kouza-hikaku/', label: '口座選びに進む', note: 'STEP3 口座を選ぶ' },
-  'kaigai-fx-risk': { href: '/blog/fx-kouza-hikaku/', label: '国内FX口座の比較を見る', note: 'STEP3 口座を選ぶ' },
-  'kaigai-fx-vs-kokunai-fx': { href: '/blog/fx-kouza-hikaku/', label: '国内FX口座の比較を見る', note: 'STEP3 口座を選ぶ' },
 };
 
 const DEFAULT_NEXT: NextRead = {

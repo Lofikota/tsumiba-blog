@@ -12,9 +12,26 @@ const noindexSlugs = fs.readdirSync('./src/content/blog')
   .filter((f) => /^noindex:\s*true/m.test(fs.readFileSync(`./src/content/blog/${f}`, 'utf8').match(/^---\n[\s\S]*?\n---/)?.[0] ?? ''))
   .map((f) => f.replace(/\.(md|mdx)$/, ''));
 
+const retiredContentLinks = new Map([
+  ['/blog/kaigai-fx-risk/', '/blog/fx-shoshinsha-guide/'],
+  ['/blog/kaigai-fx-vs-kokunai-fx/', '/blog/fx-shoshinsha-guide/'],
+]);
+
+function rewriteRetiredContentLinks() {
+  return (tree) => {
+    const visit = (node) => {
+      if (node.type === 'link' && retiredContentLinks.has(node.url)) {
+        node.url = retiredContentLinks.get(node.url);
+      }
+      node.children?.forEach(visit);
+    };
+    visit(tree);
+  };
+}
+
 export default defineConfig({
   site: 'https://tsumiba.com',  // 母艦ドメイン（2026-06-13 Cloudflare Pages紐付け完了・Active）
-  integrations: [mdx(), sitemap({
+  integrations: [mdx({ remarkPlugins: [rewriteRetiredContentLinks] }), sitemap({
     filter: (page) => !page.includes('/admin/') && !page.includes('/go/') && !noindexSlugs.some((slug) => page.includes(`/blog/${slug}/`)),
   })],
   output: 'static',
