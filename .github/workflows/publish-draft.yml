@@ -69,6 +69,10 @@ jobs:
 
       - name: LINE通知（公開完了）
         if: steps.commit-content.outputs.committed == 'true'
+        # 通知の失敗を「公開の失敗」と誤報しない。daily-article.yml が2026-07-05に同じ対策を
+        # 入れながら他へ伝播せず、7/6〜7/11に3本が同一原因で赤くなった（OPS-RED4）。
+        # publish-draft は公開待ちdraftを出す現役経路のため、ここだけ先に塞ぐ。
+        continue-on-error: true
         env:
           ARTICLE_SLUG: ${{ inputs.slug }}
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}

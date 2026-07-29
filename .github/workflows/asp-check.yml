@@ -5,6 +5,18 @@ name: ASP承認チェック → キュー自動追加
 # このワークフローが起動してキューを自動更新する。
 # Gmail OAuth は不要。
 
+#
+# 処遇: 【直す】（OPS-RED4 / 2026-07-30）
+#   7/6〜7/11の赤4本のうち、本ワークフローだけを直した。ASP承認の検知は収益ファネルの
+#   右端（提携→承認CVR）に直接効くため（正本: AI運用/戦略/事業案クリティーク_2026-07-26.md）。
+#   7/11の最終runはステップ単位で見ると本体（承認チェック→キュー追加）が全て成功しており、
+#   落ちていたのは末尾のLINE通知だけだった（LINE API 400: property 'to' is invalid）。
+#   LINEは2026-07-05に補助動線へ降格済みで、失敗通知の後継は n8n の ops-notify-failure。
+#   よってLINE通知3ステップを削除し、結果は Job Summary に出す。
+#   → 「exit 0で握り潰す」ではない。本体が失敗すれば従来どおりrunは赤になる。
+#      壊れて誰にも届いていない通知経路を消して、赤＝本体の失敗という意味を回復させた。
+#   scheduleは復活させない。ASP確認は asp-link-ops スキルで人が回す現行運用が正。
+#
 on:
   # Phase 0 pause (2026-07-11): push/scheduled queue mutation disabled. Manual only.
   workflow_dispatch:
@@ -66,44 +78,26 @@ jobs:
             echo "committed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      # ── Step4: LINE通知（承認あり・キュー追加あり）────────
-      - name: LINE通知（ASP承認 + キュー追加）
-        if: steps.commit.outputs.committed == 'true'
+      # ── Step4: 実行結果を Job Summary に出力 ────────────────
+      # 手動実行専用なので、実行者が run の画面で結果を読めれば通知の役目は足りる。
+      # 旧LINE通知3ステップ（OPS-RED4で削除）はここに集約した。
+      - name: 実行結果サマリー
+        if: always()
         env:
-          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          APPROVED_COUNT: ${{ steps.asp-check.outputs.asp_approved_count }}
           APPROVED_LIST: ${{ steps.asp-check.outputs.asp_approved_list }}
           ADDED_COUNT: ${{ steps.add-queue.outputs.queue_added_count }}
           ADDED_SLUGS: ${{ steps.add-queue.outputs.queue_added_slugs }}
+          COMMITTED: ${{ steps.commit.outputs.committed }}
         run: |
-          node scripts/notify-line.mjs \
-            --type asp \
-            --approved "$APPROVED_LIST" \
-            --message "keyword-queue に ${ADDED_COUNT} 件を追加しました。追加: ${ADDED_SLUGS}"
-
-      # ── Step5: LINE通知（承認あり・キュー追加なし）─────────
-      - name: LINE通知（承認あり・既にキュー登録済み）
-        if: |
-          steps.asp-check.outputs.asp_approved_count != '0' &&
-          steps.add-queue.outputs.queue_added_count == '0'
-        env:
-          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-          APPROVED_LIST: ${{ steps.asp-check.outputs.asp_approved_list }}
-        run: |
-          node scripts/notify-line.mjs \
-            --type asp \
-            --approved "$APPROVED_LIST" \
-            --message "(slug重複のためキュー追加なし)"
-
-      # ── Step6: エラー通知 ────────────────────────────────
-      - name: LINE通知（エラー）
-        if: failure()
-        env:
-          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-          RUN_ID: ${{ github.run_id }}
-        run: |
-          node scripts/notify-line.mjs \
-            --type error \
-            --message "ASP承認チェックが失敗しました。GitHub Actions run_id=${RUN_ID} を確認してください。"
+          {
+            echo "## ASP承認チェック結果"
+            echo ""
+            echo "| 項目 | 値 |"
+            echo "| --- | --- |"
+            echo "| 新規承認 | ${APPROVED_COUNT:-0} 件 |"
+            echo "| 承認案件 | ${APPROVED_LIST:-（なし）} |"
+            echo "| キュー追加 | ${ADDED_COUNT:-0} 件 |"
+            echo "| 追加slug | ${ADDED_SLUGS:-（なし）} |"
+            echo "| commit | ${COMMITTED:-false} |"
+          } >> "$GITHUB_STEP_SUMMARY"

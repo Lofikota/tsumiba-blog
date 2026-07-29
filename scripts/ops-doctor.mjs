@@ -122,11 +122,22 @@ function checkUncommitted() {
 async function checkActions() {
   if (noNet) return;
   // kpi-update.yml は手動入力専用(workflow_dispatchのみ)のため監視対象外（実行0件が正常）
-  const workflows = ['daily-article.yml', 'x-post.yml', 'x-generate.yml', 'weekly-kpi.yml'];
+  // affiliate-link-check.yml は 2026-07-30 OPS-RED4 で追加。リポジトリ13本のうち schedule が
+  // 生きている＝自動発火する唯一のワークフローであり、「cronが発火しなくなった」型は
+  // ops-notify-failure(n8n) の非対象（N8N-W2実施記録 §5-2）＝ここでしか検知できない。
+  // 7/26からの9連続失敗が6日間見逃されたのは、これが監視4本の外にあったため（同 §6 補足）。
+  const workflows = ['daily-article.yml', 'x-post.yml', 'x-generate.yml', 'weekly-kpi.yml', 'affiliate-link-check.yml'];
   // Phase 0 (2026-07-11): scheduleを削除して意図停止中（正本: AI運用/戦略/媒体修復実行計画_2026-07-11.md、
   // 停止コミット: 95eeb3c〜039f6ae）。発火しないため過去runの失敗履歴は監視しない（新runが来ない限り
   // 「直近5回失敗」が永久に残り、偽の🚨になるため）。Phase 0解除で自動化を再開する時はここから外すこと。
   const paused = ['daily-article.yml', 'x-generate.yml', 'weekly-kpi.yml'];
+  // ── ここに asp-check / article-image-gen / competitor-monitor / seo-improvement を足さない理由 ──
+  // （2026-07-30 OPS-RED4で判断済み。再調査を防ぐために結論を残す）
+  // 4本とも 2026-07-11 に schedule を削除して意図停止中で、7/6〜7/11の赤は停止前の最後のrunの残骸。
+  // 新runが発生しないため、監視対象に足すと上記 paused と同じ「永久に消えない偽の🚨」になる。
+  // かつ4本の処遇は各ワークフローファイル冒頭のコメントで確定済み（直す=asp-check / 廃止扱い=他3本）。
+  // 「起動して失敗した」型は ops-notify-failure(n8n) が全ワークフローを見るため、ここでの重複は不要。
+  // → Phase 0 を解除して schedule を戻すワークフローが出た時だけ、上の workflows 配列へ足すこと。
   for (const wf of workflows) {
     if (paused.includes(wf)) {
       infos.push(`${wf}: Phase 0停止中（schedule削除済み・手動実行のみ）`);

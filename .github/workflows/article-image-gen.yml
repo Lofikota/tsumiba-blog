@@ -1,5 +1,18 @@
 name: 記事ヒーロー画像 自動生成
 
+#
+# 処遇: 【止める（廃止扱い）】（OPS-RED4 / 2026-07-30）
+#   赤4本の中で唯一、本体そのものが失敗していた
+#   （`Image API error: Billing hard limit has been reached.` / generate-article-images.mjs:296）。
+#   ＝コードのバグではなく、画像APIの支払い上限。金を足さない限り直らない。
+#
+#   ただし足す必要がない。2026-07-18 に画像の作り方が変わっており
+#   （正本: AI運用/戦略/画像生産ライン_2026-07-18.md）、
+#   現行は「Codexが文字なしベース画像を生成 → コードで記事タイトルを合成」。
+#   本ワークフローの「画像APIに毎回課金して生成する」方式は既に置き換わっている。
+#   → 課金を復活させて直すのではなく、廃止扱いで停止を維持する。schedule は復活させない。
+#      画像が必要になったら画像生産ラインの正本に従うこと。
+#
 on:
   # Phase 0 pause (2026-07-11): push/scheduled image generation disabled. Manual only.
   workflow_dispatch:

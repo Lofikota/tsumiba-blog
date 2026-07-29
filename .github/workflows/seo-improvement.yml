@@ -1,5 +1,21 @@
 name: 週次SEO自動改善
 
+#
+# 処遇: 【止める（廃止扱い・再稼働は要判断）】（OPS-RED4 / 2026-07-30）
+#
+# ⛔ schedule を戻さないこと。理由は赤いからではなく、このワークフローの設計そのもの。
+#   本ワークフローは「公開記事の本文をAIが自動でリライトし、人のレビューを経ずに直接
+#   main へ commit & push する」。これは制作フローの品質ゲート
+#   （YOMI → TETSU → AKIRA → 公開 / CLAUDE.md）を構造的に迂回する経路であり、
+#   Phase 0 の目的「公開中媒体の信頼性の修復」と正面から矛盾する。
+#   BROKER-F03/F04 で、自動生成系の記事に事業者スペックの創作が群生していた実績もある。
+#   → 再稼働させるなら、リライト結果を draft か PR に落として人がレビューする形に
+#      作り替えてからにする。schedule を戻すだけの復活は禁止。
+#
+#   6/8〜7/6の赤は本体（リライト→キュー補充→commit&push）が成功したうえで末尾のLINE通知
+#   だけが落ちたもの（LINE API 400: property 'to' is invalid）。LINEは2026-07-05に補助動線
+#   へ降格済みのため、通知2ステップは削除した（通知の修復はしない＝再稼働させないため）。
+#
 on:
   # Phase 0 pause (2026-07-11): automatic rewrites disabled. Manual only.
   workflow_dispatch:
@@ -71,22 +87,19 @@ jobs:
             echo "committed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: LINE通知（SEO完了）
-        if: success()
+      # 旧LINE通知2ステップは OPS-RED4（2026-07-30）で削除。
+      # 冒頭コメントのとおり本ワークフローは再稼働させない方針のため、通知の作り直しもしない。
+      - name: 実行結果サマリー
+        if: always()
         env:
-          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
           REWRITTEN_COUNT: ${{ steps.seo.outputs.rewritten_count }}
           ADDED_COUNT: ${{ steps.refill.outputs.added_count }}
           COMMITTED: ${{ steps.commit.outputs.committed }}
         run: |
-          node scripts/notify-line.mjs --type seo --message "週次SEO改善完了: リライト${REWRITTEN_COUNT:-0}件 / キュー補充${ADDED_COUNT:-0}件 / commit=${COMMITTED:-false}"
-
-      - name: LINE通知（SEO失敗）
-        if: failure()
-        env:
-          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-          RUN_ID: ${{ github.run_id }}
-        run: |
-          node scripts/notify-line.mjs --type error --message "週次SEO改善が失敗しました。GitHub Actions run_id=${RUN_ID} を確認してください。"
+          {
+            echo "## 週次SEO改善結果"
+            echo ""
+            echo "- リライト: ${REWRITTEN_COUNT:-0} 件"
+            echo "- キュー補充: ${ADDED_COUNT:-0} 件"
+            echo "- commit: ${COMMITTED:-false}"
+          } >> "$GITHUB_STEP_SUMMARY"

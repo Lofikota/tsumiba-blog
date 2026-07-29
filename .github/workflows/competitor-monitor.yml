@@ -1,5 +1,15 @@
 name: 競合モニタリング
 
+#
+# 処遇: 【止める（停止を維持）】（OPS-RED4 / 2026-07-30）
+#   競合モニタリングの出力は「次にどの記事を書くか」の材料だが、Phase 0 は新規記事の
+#   増産をしない方針（正本: AI運用/戦略/媒体修復実行計画_2026-07-11.md）。
+#   出力を使う先が無い自動化を動かしても収益ファネルに効かないため、停止を維持する。
+#   7/8の赤は本体（モニタリング→commit&push）が成功したうえで末尾のLINE通知だけが
+#   落ちたもの（LINE API 400: property 'to' is invalid）。LINEは2026-07-05に補助動線へ
+#   降格済みで通知先として役目を終えているため、そのステップだけ削除した。
+#   → Phase 3 で再稼働させる時に同じ赤が即再発する時限爆弾を外すのが目的。schedule は復活させない。
+#
 on:
   # Phase 0 pause (2026-07-11): scheduled commits disabled. Manual only.
   workflow_dispatch:
@@ -43,9 +53,3 @@ jobs:
           git add data/competitor-snapshots.json data/competitor-targets.json KPI管理/competitor-reports/
           git diff --staged --quiet || git commit -m "feat(monitor): 競合モニタリングレポート更新"
           git push
-
-      - name: LINE通知（モニタリング完了）
-        env:
-          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-        run: node scripts/notify-line.mjs --type info --message "競合モニタリング完了"
