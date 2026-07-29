@@ -11,9 +11,15 @@ interface Props {
   badge?: string;
   compact?: boolean;
   external?: boolean;
+  /**
+   * 成果リンクを有効化する配置ID（例: "fxtf-zero-spread:fee"）。
+   * affiliateLinks.ts の allowlist に載っている値を渡した時だけ外部送客になる。
+   * 未指定・allowlist外は、案件が提携済みでも内部導線のまま（BIZ-FIX-ASP01 §3-2B）。
+   */
+  placement?: string;
 }
 
-const { href, product, text = '公式サイトで確認する', label = 'PR', color = 'blue', note, badge, compact = false, external = true } = Astro.props;
+const { href, product, text = '公式サイトで確認する', label = 'PR', color = 'blue', note, badge, compact = false, external = true, placement } = Astro.props;
 // 2026-07-26 ASP-V02: 提携未成立（status:'pending'）の案件は「公式サイトで〜」と書いてある
 // ボタンを押しても報酬が発生せず、遷移先も自サイト内になる。文言とリンク属性が実態と食い違うため、
 // pending時はCTAラベル・rel・計測カテゴリをまとめて内部導線として扱う。
@@ -21,11 +27,12 @@ const { href, product, text = '公式サイトで確認する', label = 'PR', co
 // mdx側には product="jfx" 形式と href="/go/jfx/" 直書き形式の両方があるため、どちらもslugへ正規化する。
 const slugFromHref = href?.match(/^\/go\/([a-z0-9-]+)\/?$/)?.[1];
 const targetSlug = product ?? slugFromHref;
-const resolved = targetSlug ? resolveAffiliateTarget(targetSlug) : null;
+const resolved = targetSlug ? resolveAffiliateTarget(targetSlug, placement) : null;
 const isPendingTarget = resolved?.isPending ?? false;
 const ctaHref = resolved ? resolved.href : href ?? '#';
 const ctaText = isPendingTarget ? resolved!.fallbackText : text;
-const ctaLabel = isPendingTarget ? `${targetSlug}:fallback` : targetSlug ?? href ?? text;
+// 成果CTAは配置IDをそのままGA4ラベルにする（掲載位置別に確定EPCを出すため。FXTF広告改善案 §計測）。
+const ctaLabel = isPendingTarget ? `${targetSlug}:fallback` : placement ?? targetSlug ?? href ?? text;
 // 内部導線へ倒した結果、比較記事そのものの上でCTAが自分自身を指す（＝行き止まり）ケースが出る。
 // その場合はFX口座ランキング一覧へ送る。
 const selfLink = ctaHref === Astro.url.pathname;

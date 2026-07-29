@@ -154,6 +154,46 @@ export const affiliateLinks: AffiliateLink[] = [
   },
 ];
 
+/**
+ * 2026-07-28 MON-A01: A8発行リンクはGitへ置かない。
+ * tsumiba-blog は公開GitHubリポジトリのため、a8mat付きの成果リンクをコミットすると
+ * 公開Git履歴に永久に残る。実値はビルド時に環境変数から注入する。
+ *   - ローカル: .env の PUBLIC_A8_FXTF_URL（.gitignore済み）
+ *   - 本番:     Cloudflare Pages の環境変数 PUBLIC_A8_FXTF_URL
+ * 未設定なら下の配列リテラルどおり status:'pending' のまま＝内部導線へ倒れる（フェイルセーフ）。
+ *
+ * 注意: この昇格処理を配列リテラルの中へ書かないこと。
+ * scripts/quality-gate.mjs と scripts/check-affiliate-links.mjs は
+ * このファイルを正規表現でテキスト解析しており（status:\s*'([^']+)'）、
+ * statusを式にすると両ゲートが黙ってfxtfを認識しなくなる。
+ */
+const a8FxtfUrl: string =
+  (typeof import.meta !== 'undefined' && (import.meta as { env?: Record<string, string | undefined> }).env?.PUBLIC_A8_FXTF_URL) || '';
+
+if (a8FxtfUrl) {
+  const fxtf = affiliateLinks.find((link) => link.slug === 'fxtf');
+  if (fxtf) {
+    fxtf.destinationUrl = a8FxtfUrl;
+    fxtf.status = 'affiliate';
+  }
+}
+
+/**
+ * 成果リンクを有効化する「配置ID」のallowlist。
+ * status:'affiliate' でも、ここに載っていない配置のCTAは内部導線へ倒す。
+ *
+ * 目的: FXTFのCTAは公開27記事に33箇所ある。statusだけで制御すると
+ * 提携成立と同時に33箇所が一斉に外部送客へ復帰してしまう（BIZ-FIX-ASP01 §3-2B）。
+ * 実測EPCが正であることを確認するまで、1配置ずつしか増やさない。
+ *
+ * 命名規則: '<記事slug>:<配置>' 。GA4のイベントラベルにもこの値をそのまま使う。
+ */
+export const affiliatePlacementAllowlist: readonly string[] = ['fxtf-zero-spread:fee'];
+
+export function isAllowedAffiliatePlacement(placement?: string): boolean {
+  return !!placement && affiliatePlacementAllowlist.includes(placement);
+}
+
 export function getAffiliateLink(slug: string): AffiliateLink | undefined {
   return affiliateLinks.find((link) => link.slug === slug);
 }
@@ -188,13 +228,17 @@ export interface ResolvedAffiliateTarget {
   fallbackText: string;
 }
 
-/** slugからCTAの実遷移先を解決する。提携未成立の案件は内部導線へ倒す。 */
-export function resolveAffiliateTarget(slug: string): ResolvedAffiliateTarget {
+/**
+ * slugからCTAの実遷移先を解決する。
+ * 外部送客になるのは「提携成立(status:'affiliate')」かつ「配置IDがallowlistにある」場合だけ。
+ * どちらかを満たさなければ内部導線へ倒す。
+ */
+export function resolveAffiliateTarget(slug: string, placement?: string): ResolvedAffiliateTarget {
   const link = getAffiliateLink(slug);
   if (!link) {
     return { href: '/start/', isPending: true, fallbackText: 'FX口座の比較条件を確認する（PR）' };
   }
-  if (link.status === 'pending') {
+  if (link.status === 'pending' || !isAllowedAffiliatePlacement(placement)) {
     return {
       href: pendingFallbackByCategory[link.category],
       isPending: true,

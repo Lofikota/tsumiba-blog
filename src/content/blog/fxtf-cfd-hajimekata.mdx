@@ -17,7 +17,6 @@ target_kw: "fxtf cfd 始め方"
 secondary_kw: []
 ---
 
-import AffiliateCTA from '../../components/AffiliateCTA.astro';
 import ComparisonTable from '../../components/ComparisonTable.astro';
 import FxPriorityCTA from '../../components/FxPriorityCTA.astro';
 import LineCTA from '../../components/LineCTA.astro';
@@ -41,7 +40,7 @@ import LineCTA from '../../components/LineCTA.astro';
 
 <FxPriorityCTA
   heading="FXTFはCFD・ノックアウトも1口座でできる"
-  lead="FXTFはFX口座と同じアカウントでCFD取引・ノックアウトオプションが使えます。JFXはFX特化なので、商品幅を重視するならFXTFを先に確認してください。"
+  lead="FXTFはFX口座と同じアカウントでCFD取引・ノックアウトオプションが使えます。JFXはFX特化です。取扱商品・取引単位・コストの条件を比べてから判断してください。"
 />
 
 ## FXTFで取引できるCFD商品
@@ -59,7 +58,7 @@ import LineCTA from '../../components/LineCTA.astro';
   ]}
   rows={[
     { category: "株価指数", product: "日経225、NYダウ、NASDAQ100、DAX等", feature: "主要国の株式市場全体に連動。個別株より分散効果がある" },
-    { category: "貴金属", product: "金（ゴールド）、銀", feature: "有事の金として有名。インフレヘッジや分散投資として人気" },
+    { category: "貴金属", product: "金（ゴールド）、銀", feature: "「有事の金」と呼ばれ、インフレヘッジや分散投資の対象として扱われる" },
     { category: "エネルギー", product: "原油（WTI）", feature: "原油価格に連動。地政学リスクや産油国の動向が価格に影響する" },
     { category: "仮想通貨", product: "ビットコイン等（詳細は公式確認）", feature: "価格変動が大きい。少額取引でも損益幅が出やすい" },
   ]}
@@ -99,13 +98,13 @@ FXTFの口座開設は、[FX口座](/blog/central-tanshi-fx-review/)の申し込
 4. 口座番号・パスワードが届く
 5. 入金→取引開始
 
-<AffiliateCTA
-  product="fxtf"
-  text="FXTFで口座開設（無料）"
-  badge="CFD・FX同一口座"
-  note="日経225・金・原油・FXが1口座で取引可能。口座開設・維持費無料。"
-  color="blue"
-/>
+<div class="box-blue">
+<strong>この記事はCFDの解説です</strong><br />
+CFDと[FX](/blog/fxtf-zero-spread/)、[ノックアウトオプション](/blog/fxtf-knockout-option/)はそれぞれ別商品で、コスト体系も取引時間も異なります。口座を開く前に、自分が実際に取引する商品の条件を先に確認してください。<br />
+・FXの取引コストを確認する → [FXTFのゼロスプレッドと建玉連動手数料](/blog/fxtf-zero-spread/)<br />
+・ノックアウトオプションの仕組みとリスクを確認する → [FXTFのノックアウトオプション](/blog/fxtf-knockout-option/)<br />
+・他社と条件を比べる → [FX口座おすすめ比較](/blog/fx-kouza-hikaku/)
+</div>
 
 ### ステップ2：入金
 
@@ -183,8 +182,8 @@ CFD専用の別口座は不要で、同一[証拠金](/blog/fx-leverage-risk-gui
 最初はCFDをFXの練習として試すより、**1商品を絞って[リスク管理](/blog/fx-dollar-yen-ugoki/)の仕組みを覚える**ことを優先してほしい。
 
 <FxPriorityCTA
-  heading="FXTFで口座を開いてCFDも使う"
-  lead="FX・CFD・ノックアウトオプションを1口座で扱えます。JFXはFX特化です。商品幅を優先するならFXTFから確認してください。"
+  heading="口座を決める前に、商品ごとの条件を確認する"
+  lead="FX・CFD・ノックアウトオプションは同一口座で扱えますが、コスト体系と取引時間は商品ごとに異なります。取扱商品・取引単位・コストの条件を比べてから判断してください。"
 />
 
 <LineCTA ref="blog-fx-roundup" />
