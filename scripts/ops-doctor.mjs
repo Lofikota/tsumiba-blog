@@ -30,6 +30,7 @@ const infos = [];
 
 const sh = (cmd) => execSync(cmd, { cwd: ROOT, encoding: 'utf-8' }).trim();
 const daysAgo = (date) => Math.floor((Date.now() - new Date(date).getTime()) / 86400000);
+const hoursAgo = (date) => (Date.now() - new Date(date).getTime()) / 3600000;
 
 // ── 1. git状態（未push・未commit・staleロック）──────────────────
 function checkGit() {
@@ -296,13 +297,21 @@ const N8N_STATUS_FILE = process.env.N8N_STATUS_FILE
   || path.join(AFFILIATE_ROOT, 'AI運用', 'n8n-workflows', '_status', 'latest.json');
 const N8N_SNAPSHOT_WARN_DAYS = 7;    // 週1回は見に行く想定。超えたら注意
 const N8N_SNAPSHOT_CRIT_DAYS = 14;   // 2週間ノーチェックは asp-detect の性質上許容しない
-const N8N_NO_RUN_CRIT_DAYS = 3;      // active なのに3日 trigger実行が無い＝実質止まっている
+const N8N_NO_RUN_CRIT_DAYS = 3;      // トリガー種別が不明な時の既定。3日 trigger実行が無ければ実質止まっている
+
+// 定期実行の猶予（2026-08-01 N8N-D01）。「まだ発火時刻が来ていない」を異常と呼ばないための係数。
+// 1.5＝1回分の取りこぼしは許し、2回連続で来なければ鳴らす。floorは短周期WF（2時間おき等）が
+// 単発のネットワーク遅延で鳴かないための下限。どちらも緩めるための数字ではなく、
+// 「沈黙が証拠になるまで待つ最小時間」を定義するもの。
+const N8N_GRACE_FACTOR = 1.5;
+const N8N_GRACE_FLOOR_HOURS = 6;
 
 // 稼働対象の判定。`demo-` 接頭辞は検証用・教材用で、非稼働が正しい状態
 // （n8n-MCP実行学習_2026-08-01.md §4 の命名規約）。
 const n8nIsProduction = (name) => !name.startsWith('demo-');
 
-const N8N_REFRESH_HOWTO = 'スナップショット更新: n8n MCP の search_workflows / list_credentials / search_executions を実行し、'
+const N8N_REFRESH_HOWTO = 'スナップショット更新: n8n MCP の search_workflows / list_credentials / search_executions '
+  + '＋ 各ワークフローの get_workflow_details を実行し、'
   + '結果を `node "AI運用/scripts/n8n-status-write.mjs"` に渡す（使い方は同スクリプト冒頭）。';
 
 function checkN8nHealth() {
@@ -345,20 +354,56 @@ function checkN8nHealth() {
   // ③ 状態そのものの異常（active でない稼働対象）
   const inactive = prod.filter((w) => w.active !== true).map((w) => w.name);
   if (inactive.length) {
-    critical.push(`n8nの稼働対象 ${inactive.length}/${prod.length} 本が停止中（active:false）: ${inactive.join(' / ')}\n      → 作られただけで一度も価値を出していない。特に asp-detect-approval-mail はASP提携承認メールの検知＝収益ファネルの主ボトルネックの監視装置。\n      → 【人間タスク】各ワークフローを開き、右上のトグルを Active（緑）にする。完了確認＝一覧の Status 列が Active になること。認証接続が先。`);
+    // 停止中のものだけを名指しする。4本すべて停止していた頃の文面が asp-detect を
+    // 固定で名指ししていたが、それが稼働した後も本文に残り「動いているものを止まっている」と
+    // 読ませる誤誘導になっていた（2026-08-01 N8N-D01）。
+    const asp = inactive.includes('asp-detect-approval-mail')
+      ? '\n      → 特に asp-detect-approval-mail はASP提携承認メールの検知＝収益ファネルの主ボトルネックの監視装置。'
+      : '';
+    critical.push(`n8nの稼働対象 ${inactive.length}/${prod.length} 本が停止中（active:false）: ${inactive.join(' / ')}\n      → 作られただけで一度も価値を出していない。${asp}\n      → 【人間タスク】各ワークフローを開き、右上のトグルを Active（緑）にする。完了確認＝一覧の Status 列が Active になること。認証接続が先。`);
   }
 
-  // ④ active を名乗っていても trigger実行が無ければ実際には動いていない（証拠で判定する）
-  const silent = prod.filter((w) => w.active === true
-    && (!w.lastAutoExecutionAt || daysAgo(w.lastAutoExecutionAt) >= N8N_NO_RUN_CRIT_DAYS));
-  for (const w of silent) {
+  // ④ active を名乗っていても、動いた証拠が無ければ実際には動いていない。
+  //    ただし「実行0」の意味はトリガー種別で正反対（2026-08-01 N8N-D01で分離）:
+  //      schedule … 発火すれば必ず execution が残る → 沈黙そのものが証拠。期待間隔×1.5で判定
+  //      event    … 該当データが来た時だけ execution が残る（gmailTrigger/webhook）
+  //                 → 実行0は正常でありうる。ASP提携0件の間 asp-detect の実行履歴は永久に0のまま
+  //    種別は n8n の実データ（トリガーノードの型と rule）から観測ごとに導出してスナップショットに載せる。
+  //    ここで名前ベースの台帳を持たないのは、台帳が静かにドリフトすると「緩い方向」に壊れる＝
+  //    鳴るはずのアラームが鳴らなくなるため。導出できなければ 'unknown' として厳しい既定へ倒す。
+  const silent = [], waiting = [], running = [];
+  for (const w of prod.filter((w) => w.active === true)) {
+    if ((w.triggerKind ?? 'unknown') === 'event') {
+      // イベント駆動は「自動実行が無いこと」を異常と呼べない。代わりに、一度でも
+      // 通し実行された形跡（手動テストを含む）を生存証拠として使う。形跡ゼロ＝
+      // 作っただけで一度も通していない状態で、これは⚠️（失敗を証明できないので🚨にしない）。
+      if (w.lastExecutionAt) { waiting.push(w.name); continue; }
+      warnings.push(`n8n \`${w.name}\` は active だが、実行された形跡が1件もない（手動テストすら無い）。イベント駆動（Gmail/Webhook）なので自動実行0そのものは正常だが、ワークフローが通ること自体が未検証。\n      → n8nで開き「Execute workflow」を1回押して全ノードが緑になるか確認する。`);
+      continue;
+    }
+    const known = w.expectedIntervalHours > 0;
+    const graceHours = known
+      ? Math.max(w.expectedIntervalHours * N8N_GRACE_FACTOR, N8N_GRACE_FLOOR_HOURS)
+      : N8N_NO_RUN_CRIT_DAYS * 24;
+    // 沈黙を数える起点＝最後の自動実行。まだ1度も無ければ有効化・最終編集時刻から数える
+    // （週1トリガーを有効化した直後に「実行が無い」と鳴らさないため）。
+    const anchor = w.lastAutoExecutionAt ?? w.updatedAt ?? null;
+    if (anchor && hoursAgo(anchor) < graceHours) { running.push(w.name); continue; }
+    silent.push(w.name);
+    const basis = known
+      ? `期待間隔 ${w.expectedIntervalHours}時間 の1.5倍（${Math.round(graceHours)}時間）を超過`
+      : `トリガー種別が未記録のため既定 ${N8N_NO_RUN_CRIT_DAYS} 日で判定（スナップショットを新形式で取り直すと精度が上がる）`;
     critical.push(w.lastAutoExecutionAt
-      ? `n8n \`${w.name}\` は active だが、自動実行が ${daysAgo(w.lastAutoExecutionAt)} 日間ない（最終 ${w.lastAutoExecutionAt}）。トリガーが発火していない疑い。\n      → n8nの Executions タブで直近の失敗を確認すること。`
-      : `n8n \`${w.name}\` は active だが、自動実行の履歴が1件もない（手動テスト実行だけ）。トリガー設定が効いていない疑い。\n      → n8nの Executions タブで mode が trigger の実行が出ているか確認すること。`);
+      ? `n8n \`${w.name}\` は active だが、自動実行が ${daysAgo(w.lastAutoExecutionAt)} 日間ない（最終 ${w.lastAutoExecutionAt}／${basis}）。トリガーが発火していない疑い。\n      → n8nの Executions タブで直近の失敗を確認すること。`
+      : `n8n \`${w.name}\` は active だが、自動実行の履歴が1件もない（手動テスト実行だけ／${basis}）。トリガー設定が効いていない疑い。\n      → n8nの Executions タブで mode が trigger の実行が出ているか確認すること。`);
   }
 
   if (!inactive.length && !silent.length && snap.credentialCount !== 0) {
-    infos.push(`n8n: 稼働対象 ${prod.length} 本すべて active・自動実行あり（観測 ${snapAge} 日前）`);
+    const detail = [
+      running.length ? `定期 ${running.length}本=発火間隔内` : null,
+      waiting.length ? `イベント ${waiting.length}本=待機中（${waiting.join(' / ')}）` : null,
+    ].filter(Boolean).join(' / ');
+    infos.push(`n8n: 稼働対象 ${prod.length} 本すべて正常（${detail}／観測 ${snapAge} 日前）`);
   }
 }
 
