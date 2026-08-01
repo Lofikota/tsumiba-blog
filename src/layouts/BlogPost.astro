@@ -22,8 +22,11 @@ interface Props {
 const { title, description, pubDate, updatedDate, heroImage, category, affiliate = true, headings = [], articleType, rating, noindex = false } = Astro.props;
 const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 const catInfo = CATEGORIES[category];
-const ogImage = heroImage ?? `/og/${slug}.svg`;
+// XなどSVGのカード表示が不安定なクローラー向けに、未生成記事もPNGを返す。
+// 個別heroImageができた記事は従来どおりそちらを優先する。
+const ogImage = heroImage ?? `/og/${slug}.png`;
 const SITE_URL = 'https://tsumiba.com';
+const absoluteOgImage = new URL(ogImage, SITE_URL).toString();
 const AUTHOR = { '@type': 'Organization', name: 'tsumiba編集部', url: `${SITE_URL}/about/` };
 
 // BreadcrumbList スキーマ
@@ -43,7 +46,7 @@ const articleJsonLd = JSON.stringify({
   '@type': articleType === 'review' ? 'Review' : 'Article',
   headline: title,
   description,
-  image: heroImage ? [heroImage] : [`${SITE_URL}/og/${slug}.svg`, `${SITE_URL}/thumbnails/${slug}.svg`],
+  image: [absoluteOgImage],
   datePublished: pubDate.toISOString(),
   dateModified: (updatedDate ?? pubDate).toISOString(),
   author: AUTHOR,

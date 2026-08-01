@@ -1,6 +1,26 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 
+const escapeXml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+function wrapTitle(title: string, maxChars = 17, maxLines = 3) {
+  const chars = [...title];
+  const lines: string[] = [];
+
+  while (chars.length > 0 && lines.length < maxLines) {
+    lines.push(chars.splice(0, maxChars).join(''));
+  }
+  if (chars.length > 0) {
+    lines[maxLines - 1] = [...lines[maxLines - 1]].slice(0, maxChars - 1).join('') + '…';
+  }
+  return lines;
+}
+
 export async function getStaticPaths() {
   const posts = (await getCollection('blog')).filter(p => !p.data.draft);
   return posts.map(post => ({ params: { slug: post.id }, props: { post } }));
@@ -19,16 +39,14 @@ export const GET: APIRoute = ({ props }) => {
   };
   const accent = catColor[category] ?? '#1B3A5B';
 
-  // タイトルを24文字で折り返す
-  const words = title.split('');
-  const lines: string[] = [];
-  let cur = '';
-  for (const ch of words) {
-    cur += ch;
-    if (cur.length >= 24) { lines.push(cur); cur = ''; }
-  }
-  if (cur) lines.push(cur);
-  const titleLines = lines.slice(0, 2);
+  // Xカードの安全領域に収める。長いタイトルは3行目を省略記号で閉じる。
+  const titleLines = wrapTitle(title);
+  const titleSvg = titleLines
+    .map(
+      (line, index) =>
+        `<text x="140" y="${260 + index * 64}" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="48" font-weight="900" fill="#fff">${escapeXml(line)}</text>`,
+    )
+    .join('');
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
@@ -47,15 +65,13 @@ export const GET: APIRoute = ({ props }) => {
 
   <!-- カテゴリバッジ -->
   <rect x="140" y="140" width="${category.length * 22 + 40}" height="46" rx="23" fill="${accent}"/>
-  <text x="${140 + (category.length * 22 + 40) / 2}" y="170" font-family="'Noto Sans JP', sans-serif" font-size="22" font-weight="700" fill="#fff" text-anchor="middle">${category}</text>
+  <text x="${140 + (category.length * 22 + 40) / 2}" y="170" font-family="'Noto Sans JP', sans-serif" font-size="22" font-weight="700" fill="#fff" text-anchor="middle">${escapeXml(category)}</text>
 
-  <!-- タイトル1行目 -->
-  ${titleLines[0] ? `<text x="140" y="280" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="52" font-weight="900" fill="#fff">${titleLines[0]}</text>` : ''}
-  <!-- タイトル2行目 -->
-  ${titleLines[1] ? `<text x="140" y="350" font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-size="52" font-weight="900" fill="#fff">${titleLines[1]}</text>` : ''}
+  <!-- タイトル（最大3行） -->
+  ${titleSvg}
 
   <!-- 区切り線 -->
-  <rect x="140" y="390" width="80" height="4" rx="2" fill="#FBBF24"/>
+  <rect x="140" y="430" width="80" height="4" rx="2" fill="#FBBF24"/>
 
   <!-- サイト名 -->
   <text x="140" y="460" font-family="'Noto Sans JP', sans-serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.75)">tsumiba</text>

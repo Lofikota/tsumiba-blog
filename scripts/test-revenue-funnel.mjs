@@ -7,9 +7,12 @@ import { fileURLToPath } from 'node:url';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
 const routes = [
-  { article: 'fx-kouza-hikaku', broker: 'fxtf' },
-  { article: 'dmm-fx-review', broker: 'dmm-fx' },
-  { article: 'jfx-review', broker: 'jfx' },
+  {
+    article: 'fxtf-zero-spread',
+    broker: 'fxtf',
+    placement: 'fxtf-zero-spread:fee',
+    aspLink: /https:\/\/(?:[^"'<>]+\.)?a8\.net\//,
+  },
 ];
 
 const readBuiltPage = (...segments) => {
@@ -18,11 +21,12 @@ const readBuiltPage = (...segments) => {
   return fs.readFileSync(file, 'utf8');
 };
 
-const results = routes.map(({ article, broker }) => {
+const results = routes.map(({ article, broker, placement, aspLink }) => {
   const articleHtml = readBuiltPage('blog', article);
   assert.match(articleHtml, /article_view/, `${article}: article_view がありません`);
   assert.match(articleHtml, /data-google-event="article_cta_click"/, `${article}: CTAイベントがありません`);
   assert.ok(articleHtml.includes(`/go/${broker}/`), `${article}: /go/${broker}/ 導線がありません`);
+  assert.ok(articleHtml.includes(`data-google-label="${placement}"`), `${article}: 配置ID ${placement} がありません`);
   assert.doesNotMatch(articleHtml, /data-google-event="affiliate_click"/, `${article}: 記事側で affiliate_click が発火します`);
 
   const goHtml = readBuiltPage('go', broker);
@@ -30,7 +34,7 @@ const results = routes.map(({ article, broker }) => {
   assert.match(goHtml, /affiliate_click/, `${broker}: ASP送客イベントがありません`);
   assert.ok(goHtml.indexOf('go_page_view') < goHtml.indexOf('affiliate_click'), `${broker}: イベント順序が逆です`);
   assert.match(goHtml, /id="goButton"/, `${broker}: 手動送客ボタンがありません`);
-  assert.match(goHtml, /https:\/\/t\.afi-b\.com\//, `${broker}: 稼働ASPリンクではありません`);
+  assert.match(goHtml, aspLink, `${broker}: A8成果リンクが注入されていません`);
 
   return { article, broker, result: 'OK' };
 });

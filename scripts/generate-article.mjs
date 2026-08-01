@@ -207,7 +207,7 @@ ${brokerFactsBlock}
 - 本文：1万字を目標（最低8,000字。水増し禁止・1文字1文字が読者の判断か行動に直結する内容のみ）
 - MDXとしてそのまま保存できる完全な記事を書く
 - frontmatterに title, description, pubDate, updatedDate, category, tags, affiliate, articleType を含める（articleTypeは review / guide / comparison / news のいずれか）
-- heroImageは書かない（画像生成工程が無いため実在しないパスになる。OG画像は /og/[slug].svg で自動生成される）
+- heroImageは書かない（画像生成工程が無いため実在しないパスになる。OG画像は /og/[slug].png で自動生成される）
 - pubDateとupdatedDateは ${today}
 - 本文冒頭に「> アフィリエイト広告を含みます」を入れる
 
