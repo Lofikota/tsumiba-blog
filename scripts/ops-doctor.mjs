@@ -274,6 +274,94 @@ function checkXPostAvailability() {
   }
 }
 
+// ── 3-2. n8nワークフローの稼働（N8N-G01・2026-08-01）────────────
+// 2026-07-29に構築した本番WF4本が、3日間 active:false / 認証情報0件 / 実行0 のまま
+// 「構築完了」として扱われていた。asp-detect-approval-mail はASP提携承認メールの検知＝
+// 収益ファネルの主ボトルネックの監視装置で、止まっている間は承認メールが届いても気づけない。
+//
+// なぜ n8n を直接見に行かないか: n8n Cloud の状態を読むには Public API キー（X-N8N-API-KEY）
+// の新設が要り、境界定義§4-2「秘密情報の金庫を2つにしない」に抵触する。
+// n8n MCP は OAuth 接続でキー不要だが、**Claude Code のセッション内からしか呼べない**。
+// つまり遠隔の状態そのものはスクリプトから原理的に観測できない。
+//
+// 代わりに観測するのは「**観測が行われた事実の鮮度**」。MCPを持つセッションが残した
+// スナップショットを読み、①異常な状態が写っていれば鳴らす ②スナップショット自体が
+// 古ければ「誰も見ていない」として鳴らす。X投稿ログの最終起動時刻(§3)・正本ミラーの
+// 差分日数(§6-3)と同じ、痕跡の古さで死活を判定する型。
+//
+// active:true だけでは不十分な理由: 実測した13実行はすべて mode:"manual"（AIのテスト実行）
+// だった。active は「動くはずだ」という**主張**で、trigger実行の履歴だけが**証拠**になる。
+// 正本: AI運用/n8n稼働検知の設計_2026-08-01.md ／ AI運用/n8n-MCP実行学習_2026-08-01.md §1-1
+const N8N_STATUS_FILE = process.env.N8N_STATUS_FILE
+  || path.join(AFFILIATE_ROOT, 'AI運用', 'n8n-workflows', '_status', 'latest.json');
+const N8N_SNAPSHOT_WARN_DAYS = 7;    // 週1回は見に行く想定。超えたら注意
+const N8N_SNAPSHOT_CRIT_DAYS = 14;   // 2週間ノーチェックは asp-detect の性質上許容しない
+const N8N_NO_RUN_CRIT_DAYS = 3;      // active なのに3日 trigger実行が無い＝実質止まっている
+
+// 稼働対象の判定。`demo-` 接頭辞は検証用・教材用で、非稼働が正しい状態
+// （n8n-MCP実行学習_2026-08-01.md §4 の命名規約）。
+const n8nIsProduction = (name) => !name.startsWith('demo-');
+
+const N8N_REFRESH_HOWTO = 'スナップショット更新: n8n MCP の search_workflows / list_credentials / search_executions を実行し、'
+  + '結果を `node "AI運用/scripts/n8n-status-write.mjs"` に渡す（使い方は同スクリプト冒頭）。';
+
+function checkN8nHealth() {
+  if (!fs.existsSync(N8N_STATUS_FILE)) {
+    critical.push(`n8nの稼働スナップショットが無い（${N8N_STATUS_FILE}）。n8n Cloud上のワークフローが動いているか誰も確認していない状態。\n      → ${N8N_REFRESH_HOWTO}`);
+    return;
+  }
+
+  let snap;
+  try {
+    snap = JSON.parse(fs.readFileSync(N8N_STATUS_FILE, 'utf-8'));
+  } catch (e) {
+    critical.push(`n8n稼働スナップショットが壊れている（${N8N_STATUS_FILE}）: ${e.message}\n      → ${N8N_REFRESH_HOWTO}`);
+    return;
+  }
+  if (!snap?.observedAt || !Array.isArray(snap.workflows)) {
+    critical.push(`n8n稼働スナップショットの形式が不正（observedAt / workflows[] が無い）。\n      → ${N8N_REFRESH_HOWTO}`);
+    return;
+  }
+
+  // ① 観測の失効: 状態が正常でも、見ていない期間が伸びれば「気づけない」状態は同じ
+  const snapAge = daysAgo(snap.observedAt);
+  if (snapAge >= N8N_SNAPSHOT_CRIT_DAYS) {
+    critical.push(`n8nの稼働確認が ${snapAge} 日行われていない（最終確認 ${snap.observedAt}）。この間にワークフローが止まっても検知できない。\n      → ${N8N_REFRESH_HOWTO}`);
+  } else if (snapAge >= N8N_SNAPSHOT_WARN_DAYS) {
+    warnings.push(`n8nの稼働確認が ${snapAge} 日前（${snap.observedAt}）。そろそろ再確認すること。`);
+  }
+
+  const prod = snap.workflows.filter((w) => n8nIsProduction(w.name ?? ''));
+  if (!prod.length) {
+    infos.push(`n8n: 稼働対象のワークフローが0本（観測 ${snapAge} 日前）`);
+    return;
+  }
+
+  // ② 認証情報ゼロ = Gmail等に触る全ノードが実行時に必ず落ちる。人間のOAuth接続が唯一の解
+  if (snap.credentialCount === 0) {
+    critical.push(`n8nインスタンスに認証情報が0件。Gmail等に触るノードは実行時に必ず失敗する（稼働対象 ${prod.length} 本）。\n      → 【人間タスク】https://yoshikou.app.n8n.cloud を開き、左メニュー「Overview」→「Credentials」→「Add credential」で Gmail を選び、yoshikou888@gmail.com でGoogleログインを完了する。完了確認＝Credentials一覧にGmailの行が1件見えること。`);
+  }
+
+  // ③ 状態そのものの異常（active でない稼働対象）
+  const inactive = prod.filter((w) => w.active !== true).map((w) => w.name);
+  if (inactive.length) {
+    critical.push(`n8nの稼働対象 ${inactive.length}/${prod.length} 本が停止中（active:false）: ${inactive.join(' / ')}\n      → 作られただけで一度も価値を出していない。特に asp-detect-approval-mail はASP提携承認メールの検知＝収益ファネルの主ボトルネックの監視装置。\n      → 【人間タスク】各ワークフローを開き、右上のトグルを Active（緑）にする。完了確認＝一覧の Status 列が Active になること。認証接続が先。`);
+  }
+
+  // ④ active を名乗っていても trigger実行が無ければ実際には動いていない（証拠で判定する）
+  const silent = prod.filter((w) => w.active === true
+    && (!w.lastAutoExecutionAt || daysAgo(w.lastAutoExecutionAt) >= N8N_NO_RUN_CRIT_DAYS));
+  for (const w of silent) {
+    critical.push(w.lastAutoExecutionAt
+      ? `n8n \`${w.name}\` は active だが、自動実行が ${daysAgo(w.lastAutoExecutionAt)} 日間ない（最終 ${w.lastAutoExecutionAt}）。トリガーが発火していない疑い。\n      → n8nの Executions タブで直近の失敗を確認すること。`
+      : `n8n \`${w.name}\` は active だが、自動実行の履歴が1件もない（手動テスト実行だけ）。トリガー設定が効いていない疑い。\n      → n8nの Executions タブで mode が trigger の実行が出ているか確認すること。`);
+  }
+
+  if (!inactive.length && !silent.length && snap.credentialCount !== 0) {
+    infos.push(`n8n: 稼働対象 ${prod.length} 本すべて active・自動実行あり（観測 ${snapAge} 日前）`);
+  }
+}
+
 // ── 4. draft滞留（公開レビュー待ちのバックログ）─────────────────
 function checkDrafts() {
   const blogDir = path.join(ROOT, 'src/content/blog');
@@ -827,6 +915,7 @@ checkGit();
 await checkActions();
 checkQueue();
 checkXPostAvailability();
+checkN8nHealth();
 checkDrafts();
 checkHandoff();
 checkStructure();

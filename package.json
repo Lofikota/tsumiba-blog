@@ -47,6 +47,7 @@
     "doctor": "node scripts/ops-doctor.mjs",
     "test:funnel": "node scripts/test-revenue-funnel.mjs",
     "test:deleted": "bash scripts/test-deleted-page-reachability.sh",
+    "test:n8n": "node scripts/test-n8n-health.mjs",
     "x:sync-d1": "wrangler d1 execute x-tweet-queue --file=x-automation/data/d1_sync.sql --remote"
   },
   "license": "ISC",
