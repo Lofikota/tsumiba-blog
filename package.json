@@ -21,6 +21,8 @@
     "images:compose": "node scripts/compose-article-image.mjs",
     "images:dry": "node scripts/generate-article-images.mjs --all --limit 3 --dry-run",
     "images:fix-op": "node scripts/fix-openai-1password-ref.mjs",
+    "images:audit": "node scripts/link-hero-images.mjs",
+    "images:link": "node scripts/link-hero-images.mjs --apply",
     "article:autopilot": "node ../scripts/article-autopilot.mjs",
     "article:links": "node scripts/internal-links.mjs",
     "seo:improve": "node scripts/seo-analyzer.mjs",
