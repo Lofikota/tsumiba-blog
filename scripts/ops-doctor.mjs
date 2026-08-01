@@ -295,6 +295,7 @@ function checkXPostAvailability() {
 // 正本: AI運用/n8n稼働検知の設計_2026-08-01.md ／ AI運用/n8n-MCP実行学習_2026-08-01.md §1-1
 const N8N_STATUS_FILE = process.env.N8N_STATUS_FILE
   || path.join(AFFILIATE_ROOT, 'AI運用', 'n8n-workflows', '_status', 'latest.json');
+const N8N_STATUS_POLICY_FILE = path.join(AFFILIATE_ROOT, 'AI運用', 'n8n-workflows', '_status', 'policy.json');
 const N8N_SNAPSHOT_WARN_DAYS = 7;    // 週1回は見に行く想定。超えたら注意
 const N8N_SNAPSHOT_CRIT_DAYS = 14;   // 2週間ノーチェックは asp-detect の性質上許容しない
 const N8N_NO_RUN_CRIT_DAYS = 3;      // トリガー種別が不明な時の既定。3日 trigger実行が無ければ実質止まっている
@@ -340,9 +341,35 @@ function checkN8nHealth() {
     warnings.push(`n8nの稼働確認が ${snapAge} 日前（${snap.observedAt}）。そろそろ再確認すること。`);
   }
 
-  const prod = snap.workflows.filter((w) => n8nIsProduction(w.name ?? ''));
+  // 戦略判断による停止と故障停止を分離する。policy.json は「警報を消す例外表」ではなく、
+  // reason と解除条件を必須にした期限付きの経営判断。ファイルが壊れていれば安全側へ倒し、
+  // 全ワークフローを通常の稼働対象として扱う。
+  let pausedNames = new Set();
+  let pauseRows = [];
+  if (fs.existsSync(N8N_STATUS_POLICY_FILE)) {
+    try {
+      const policy = JSON.parse(fs.readFileSync(N8N_STATUS_POLICY_FILE, 'utf-8'));
+      pauseRows = Array.isArray(policy.intentionallyPaused)
+        ? policy.intentionallyPaused.filter((row) => row?.name && row?.reason && row?.resumeWhen)
+        : [];
+      pausedNames = new Set(pauseRows.map((row) => row.name));
+    } catch (e) {
+      warnings.push(`n8n停止ポリシーが壊れているため適用しない（${N8N_STATUS_POLICY_FILE}）: ${e.message}`);
+    }
+  }
+
+  const allProd = snap.workflows.filter((w) => n8nIsProduction(w.name ?? ''));
+  const intentionallyPaused = allProd.filter((w) => pausedNames.has(w.name));
+  const prod = allProd.filter((w) => !pausedNames.has(w.name));
+  if (intentionallyPaused.length) {
+    const details = intentionallyPaused.map((w) => {
+      const row = pauseRows.find((item) => item.name === w.name);
+      return `${w.name}（解除=${row.resumeWhen}）`;
+    });
+    infos.push(`n8n: 戦略上の意図的停止 ${intentionallyPaused.length} 本: ${details.join(' / ')}`);
+  }
   if (!prod.length) {
-    infos.push(`n8n: 稼働対象のワークフローが0本（観測 ${snapAge} 日前）`);
+    infos.push(`n8n: 現在の稼働対象ワークフローが0本（観測 ${snapAge} 日前）`);
     return;
   }
 
