@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { CATEGORIES } from '../data/categories';
+import { getRelatedHeading, getArticlePurpose } from '../data/relatedLabels';
 
 interface Props {
   currentSlug: string;
@@ -29,18 +30,24 @@ const catColors: Record<string, { bg: string; text: string }> = {
   '家計・節約':   { bg: '#D1FAE5', text: '#065F46' },
 };
 const cc = catColors[category] ?? { bg: '#E5E7EB', text: '#374151' };
+
+// 用途ラベル付き関連リスト（正本: ブログ視認性デザイン基準_リベ大型.md §1 #10）
+// 「▼口座を選ぶ前に／スプレッド比較：〈タイトル〉」の形式。ラベル未登録の記事は従来表示のまま。
+const relatedHeading = getRelatedHeading(currentSlug);
+const headingText = relatedHeading ? `▼${relatedHeading}` : `「${category}」の関連記事`;
 ---
 
 {related.length > 0 && (
   <section class="related-posts">
     <div class="related-header">
       <p class="related-label">Related</p>
-      <h2 class="related-title">「{category}」の関連記事</h2>
+      <h2 class="related-title">{headingText}</h2>
       <a class="related-all" href={catUrl}>一覧を見る →</a>
     </div>
     <div class="related-grid">
       {related.map(post => {
         const dateStr = post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        const purpose = getArticlePurpose(post.id);
         return (
           <a href={`/blog/${post.id}/`} class="related-card">
             <div class="related-thumb" style={`background:${cc.bg}`}>
@@ -48,7 +55,10 @@ const cc = catColors[category] ?? { bg: '#E5E7EB', text: '#374151' };
             </div>
             <div class="related-body">
               <span class="related-cat" style={`background:${cc.bg};color:${cc.text}`}>{category}</span>
-              <p class="related-post-title">{post.data.title}</p>
+              <p class="related-post-title">
+                {purpose && <span class="related-purpose">{purpose}：</span>}
+                {post.data.title}
+              </p>
               <span class="related-date">{dateStr}</span>
             </div>
           </a>
@@ -151,6 +161,10 @@ const cc = catColors[category] ?? { bg: '#E5E7EB', text: '#374151' };
     -webkit-box-orient: vertical;
     overflow: hidden;
     color: #1f2937;
+  }
+  /* 用途ラベル：「なぜ今それを読むか」を担う。ブランド色（ネイビー）で本文タイトルと区別する */
+  .related-purpose {
+    color: #1B3A5B;
   }
   .related-date {
     font-size: 0.72rem;
