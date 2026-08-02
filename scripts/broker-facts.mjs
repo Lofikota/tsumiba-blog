@@ -9,11 +9,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { resolveAffiliateRoot } from './lib/affiliate-root.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const FACTS_PATH = path.join(ROOT, 'data/broker-facts.json');
-const AFFILIATE_ROOT = path.join(ROOT, '..');
+const AFFILIATE_ROOT = resolveAffiliateRoot(ROOT);
 
 export const USAGE_RULE = [
   '**このブロックの使い方（厳守）**',

@@ -21,10 +21,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { resolveAffiliateRoot } from './lib/affiliate-root.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
-const AFFILIATE_ROOT = path.join(ROOT, '..');
+const AFFILIATE_ROOT = resolveAffiliateRoot(ROOT);
 const SOURCE_DIR = path.join(AFFILIATE_ROOT, 'AI運用/データ正本');
 const OUTPUT_PATH = path.join(ROOT, 'data/broker-facts.json');
 const BLOG_DIR = path.join(ROOT, 'src/content/blog');

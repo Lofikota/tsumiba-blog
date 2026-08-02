@@ -32,6 +32,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { resolveAffiliateRoot } from './lib/affiliate-root.mjs';
 
 // .env を複数の場所から探してロードする（dotenvなしで実装）
 function loadEnv(...paths) {
@@ -53,7 +54,7 @@ function loadEnv(...paths) {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
-const AFFILIATE_ROOT = path.join(ROOT, '..');
+const AFFILIATE_ROOT = resolveAffiliateRoot(ROOT);
 
 // ANTHROPIC_API_KEY を探す（X自動化/.env → tsumiba-blog/.env の順）
 loadEnv(
