@@ -20,7 +20,24 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
-const AFFILIATE_ROOT = path.join(ROOT, '..');
+
+// Affiliate/ の解決は「リポジトリの1つ上」と決め打ちにしない。
+// git worktree（tsumiba-blog/.claude/worktrees/<name>）から実行すると ROOT/.. が
+// .claude/worktrees/ になり、AI運用/ 配下のチェックが全滅していた（実在するのに🚨、
+// 逆に鳴るべきバックアップ・旧戦略スキャンは「このマシンには無い」で沈黙）。
+// 目印（AI運用/）が実在するディレクトリまで親を辿ることで、階層の深さに依存しなくなる。
+const AFFILIATE_ROOT = resolveAffiliateRoot(ROOT);
+
+function resolveAffiliateRoot(start) {
+  if (process.env.AFFILIATE_ROOT) return path.resolve(process.env.AFFILIATE_ROOT);
+  let dir = path.resolve(start);
+  for (;;) {
+    if (fs.existsSync(path.join(dir, 'AI運用'))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) return path.resolve(start, '..'); // 見つからないマシンは従来どおり
+    dir = parent;
+  }
+}
 const REPO_API = 'https://api.github.com/repos/Lofikota/tsumiba-blog';
 const noNet = process.argv.includes('--no-net');
 
