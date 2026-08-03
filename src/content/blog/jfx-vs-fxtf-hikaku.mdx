@@ -58,7 +58,7 @@ FXは元本保証のない取引です。[レバレッジ](/blog/fx-leverage-ris
   ]}
   rows={[
     { item: "運営会社", fxtf: "ゴールデンウェイ・ジャパン株式会社", jfx: "JFX株式会社", highlight: "" },
-    { item: "ドル円スプレッド（目安）", fxtf: "原則固定0.2銭（例外あり）", jfx: "原則固定0.2銭（例外あり）", highlight: "" },
+    { item: "ドル円スプレッド（AM9:00〜翌AM3:00）", fxtf: "0.0銭（ゼロスプレッド・原則固定／例外あり）※別途手数料", jfx: "0.2銭（原則固定・例外あり）", highlight: "" },
     { item: "最小取引単位", fxtf: "1,000通貨", jfx: "1,000通貨", highlight: "" },
     { item: "MetaTrader対応", fxtf: "○（MT4で取引・EA可／MT5は未提供）", jfx: "△（MT5チャート分析専用・発注/EA不可）", highlight: "" },
     { item: "CFD取引", fxtf: "○（日経225・ゴールド等）", jfx: "×", highlight: "" },
@@ -68,7 +68,9 @@ FXは元本保証のない取引です。[レバレッジ](/blog/fx-leverage-ris
   ]}
 />
 
-どちらも主要スペックは近い。[ドル円](/blog/fx-best-time/)の[スプレッド](/blog/central-tanshi-fx-review/)や最小取引単位は横並びだ。
+どちらも主要スペックは近い。最小取引単位は1,000通貨で横並びだ。
+
+[スプレッド](/blog/central-tanshi-fx-review/)は提示の形が違う（FXTFはゼロ[スプレッド](/blog/fx-spread-hikaku/)＋[手数料](/blog/fxtf-zero-spread/)、JFXは原則固定）ため、次章で時間帯ごとに比較する。
 
 差が出るのは**商品の幅**と**使い込みの深さ**の2点になる。
 
@@ -76,17 +78,37 @@ FXは元本保証のない取引です。[レバレッジ](/blog/fx-leverage-ris
 
 ## スプレッド詳細比較（主要通貨ペア）
 
-[ドル円](/blog/fx-best-time/)だけでなく、主要通貨ペアの[スプレッド](/blog/central-tanshi-fx-review/)も比較する。2026年時点の公式情報ベース。
+[ドル円](/blog/fx-best-time/)だけでなく、主要通貨ペアの[スプレッド](/blog/central-tanshi-fx-review/)も比較する。
 
-| 通貨ペア | [FXTF](/blog/fxtf-review/) | [JFX](/blog/jfx-fxtf-kakuteishinkoku/) | 備考 |
-|----------|------|-----|------|
-| [ドル円](/blog/fx-best-time/)（USD/JPY） | 原則0.2銭 | 原則0.2銭 | ほぼ同等 |
-| ユーロ円（EUR/JPY） | 原則0.4銭 | 原則0.4銭 | ほぼ同等 |
-| ポンド円（GBP/JPY） | 原則0.6銭 | 原則0.8銭 | [FXTF](/blog/fxtf-review/)が有利 |
-| ユーロドル（EUR/USD） | 原則0.3pips | 原則0.3pips | ほぼ同等 |
-| 豪[ドル円](/blog/fx-best-time/)（AUD/JPY） | 原則0.6銭 | 原則0.6銭 | ほぼ同等 |
+2社は提示の形が違う。[FXTF](/blog/fxtf-review/)は全通貨ペア一律のゼロ[スプレッド](/blog/fx-spread-hikaku/)制、[JFX](/blog/jfx-fxtf-kakuteishinkoku/)は通貨ペアごとの原則固定だ。
 
-[ドル円](/blog/fx-best-time/)・ユーロ円はほぼ横並び。ポンド円では[FXTF](/blog/fxtf-review/)が若干有利になる場合がある。最新[スプレッド](/blog/fx-spread-hikaku/)は必ず各公式サイトで確認してほしい（市場環境で変動する）。
+どちらも「AM9:00〜翌AM3:00」と「それ以外の時間帯」で条件が変わるため、時間帯を分けて並べる。
+
+| 通貨ペア | [FXTF](/blog/fxtf-review/)（AM9:00〜翌AM3:00 ／ 時間外の上限） | [JFX](/blog/jfx-fxtf-kakuteishinkoku/)（AM9:00〜翌AM3:00 ／ 時間外） |
+|----------|------|-----|
+| [ドル円](/blog/fx-best-time/)（USD/JPY） | 0.0銭 ／ 3.8銭 | 0.2銭 ／ 5.9銭 |
+| ユーロ円（EUR/JPY） | 0.0銭 ／ 5.8銭 | 0.4銭 ／ 9.9銭 |
+| ポンド円（GBP/JPY） | 0.0銭 ／ 9.8銭 | 0.9銭 ／ 19.9銭 |
+| ユーロドル（EUR/USD） | 0.0pips ／ 3.8pips | 0.3pips ／ 時間帯の区分なし |
+| 豪[ドル円](/blog/fx-best-time/)（AUD/JPY） | 0.0銭 ／ 5.8銭 | 0.5銭 ／ 9.9銭 |
+
+**この表を「FXTFのほうが安い」と読まないでほしい。**
+
+[FXTF](/blog/fxtf-review/)のFX取引には[スプレッド](/blog/fx-spread-hikaku/)とは別に**建玉連動[手数料](/blog/fxtf-zero-spread/)**がかかる。
+
+一方[JFX](/blog/jfx-fxtf-kakuteishinkoku/)は公式サイトで「取引[手数料](/blog/fxtf-zero-spread/)は無料、[スプレッド](/blog/fx-spread-hikaku/)がお客様のコストとなります」と案内している。
+
+つまり[FXTF](/blog/fxtf-review/)は「[スプレッド](/blog/fx-spread-hikaku/)0＋[手数料](/blog/fxtf-zero-spread/)」、[JFX](/blog/jfx-fxtf-kakuteishinkoku/)は「[スプレッド](/blog/fx-spread-hikaku/)のみ」というコスト構造の違いだ。
+
+比べるべきは表示[スプレッド](/blog/fx-spread-hikaku/)ではなく、[手数料](/blog/fxtf-zero-spread/)を足した実質[コスト](/blog/fx-spread-hikaku/)になる。
+
+<div class="box-yellow">
+<strong>数値の出典と有効期間</strong><br />
+<strong>FXTF</strong>：公式「MT4 スプレッド・スワップ」「GX-FX スプレッド・スワップ」（2026年8月3日確認）<br />
+<strong>JFX</strong>：公式「MATRIX TRADERスプレッド情報」掲載日2026年7月6日・配信期間2026年8月1日AM5:30まで（2026年8月3日時点で公式サイトに掲示されている値）<br />
+<strong>注意</strong>：米ドル/円・ユーロ/米ドル・ユーロ/円・ポンド/米ドル・ポンド/円・豪ドル/円の「大口」のスプレッドは、JFXの原則固定の対象外<br />
+<strong>共通</strong>：いずれも変更される場合があります。申込前に必ず各公式サイトで最新条件を確認してください
+</div>
 
 ### 「原則固定」の注意点
 
@@ -132,7 +154,13 @@ FXは元本保証のない取引です。[レバレッジ](/blog/fx-leverage-ris
 
 FXTFを比較するときは、[コスト](/blog/fx-spread-hikaku/)の構造と取引ツールを確認したい。
 
-**[ゼロスプレッド](/blog/fxtf-zero-spread/)制（原則固定）**を採用しており、FX取引の入口[コスト](/blog/fx-spread-hikaku/)が分かりやすい。[ドル円](/blog/fx-best-time/)・ユーロ円など主要通貨ペアのスプレッドが原則0.2銭に固定されている（例外時間帯あり）。
+**[ゼロスプレッド](/blog/fxtf-zero-spread/)制（原則固定・例外あり）**を採用しており、FX取引の入口[コスト](/blog/fx-spread-hikaku/)が分かりやすい。
+
+各営業日AM9:00〜翌AM3:00は、[ドル円](/blog/fx-best-time/)・ユーロ円を含むFX全通貨ペアが0.0銭で提示される。
+
+AM3:00〜AM9:00は上限値が適用され、[ドル円](/blog/fx-best-time/)は3.8銭になる。
+
+ただし建玉連動[手数料](/blog/fxtf-zero-spread/)が別途かかるため、**[スプレッド](/blog/fx-spread-hikaku/)0＝取引[コスト](/blog/fx-spread-hikaku/)ゼロではない**点は必ず押さえておきたい。
 
 一言でまとめると：
 
@@ -180,7 +208,11 @@ FXTFを比較するときは、[コスト](/blog/fx-spread-hikaku/)の構造と�
 
 ### デイトレード・スキャルピングをしたい
 
-→ **どちらでも可**。[スプレッド](/blog/fx-spread-hikaku/)はほぼ横並び。JFXは[MATRIX TRADER](/blog/jfx-kouza-kaisetsu-tejun/)、FXTFは同社の取引ツールについて、注文方法・対応機能を公式情報で比較して選びたい。
+→ **コスト構造で選ぶ**。FXTFは[スプレッド](/blog/fx-spread-hikaku/)0.0銭＋建玉連動[手数料](/blog/fxtf-zero-spread/)、JFXは[スプレッド](/blog/fx-spread-hikaku/)0.2銭のみ（AM9:00〜翌AM3:00）。
+
+取引量が増えるほど[手数料](/blog/fxtf-zero-spread/)の影響が効いてくるため、自分の想定ロット数で試算して比べたい。
+
+ツール面では、JFXは[MATRIX TRADER](/blog/jfx-kouza-kaisetsu-tejun/)、FXTFはMT4が中心になる。注文方法・対応機能は公式情報で確認してほしい。
 
 ### EA（自動売買）を目的に選びたい
 
