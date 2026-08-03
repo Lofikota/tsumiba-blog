@@ -40,7 +40,10 @@ const FACT_FIELDS = [
   ['margin_call', '追証'],
   ['app', 'スマホアプリ'],
   ['demo', 'デモ口座'],
-  ['mt4_ea', 'MT4・EA'],
+  // ラベルにバージョン名（MT4）を焼き付けない。JFXのMT4は2026-08-19に提供終了し、
+  // 正本の統一表現もMT5基準へ改定済み（BROKER-F02）。「MT4・EA」のままだと、値がMT5の話でも
+  // ラベルだけがMT4を主張して先生層へ渡る。D-25で記事側の見出しを「MetaTrader対応」へ寄せたのと同じ扱いにする。
+  ['mt4_ea', 'MetaTrader・EA'],
   ['kyc', '本人確認'],
   ['age_requirement', '年齢条件'],
   ['campaign', 'キャンペーン'],
