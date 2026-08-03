@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-03T01:08:45.878Z",
+  "generated_at": "2026-08-03T01:19:37.173Z",
   "generator": "scripts/sync-broker-facts.mjs",
   "warning": "このファイルは自動生成物。手で編集しないこと。正本はsource.pathのYAML",
   "source": {
     "path": "AI運用/データ正本/brokers_2026-07-12.yaml",
     "updated": "2026-07-15",
-    "sha256": "32539adaa625aa1e034a722d399a997e2d375adfe4087e1624c93e23c6b3f063"
+    "sha256": "bf254ff19aa297beebc713cf35295bd94d7bdce39b77d96d0b80b5471b88c6ad"
   },
   "stale_after_days": 90,
   "brokers": [
