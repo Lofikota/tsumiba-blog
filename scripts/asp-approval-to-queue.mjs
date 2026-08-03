@@ -124,10 +124,10 @@ const PROGRAM_MAP = [
     match: ['jfx', 'matrix trader', 'matrixtrader'],
     entry: {
       slug: 'jfx-review',
-      keyword: 'JFX 評判 MATRIX TRADER MT4チャート',
+      keyword: 'JFX 評判 MATRIX TRADER MT5チャート',
       type: 'review',
       category: 'FX・外貨',
-      notes: 'JFXの国内FX取引条件とMATRIX TRADERを公式情報ベースで比較。MT4はチャート分析専用で、発注・EA自動売買は不可と明記する',
+      notes: 'JFXの国内FX取引条件とMATRIX TRADERを公式情報ベースで比較。MT5チャートは分析専用で発注機能が実装されていない（EAによる自動売買も不可）、注文はMATRIX TRADERから行うと明記する。MT4は2026年8月19日に提供終了しMT5へ移行するため、バージョン名に事実を紐づけない',
     },
   },
   {
