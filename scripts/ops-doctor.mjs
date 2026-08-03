@@ -17,10 +17,11 @@ import fs from 'fs';
 import path from 'path';
 import { execSync, execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
+import { resolveAffiliateRoot } from './lib/affiliate-root.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
-const AFFILIATE_ROOT = path.join(ROOT, '..');
+const AFFILIATE_ROOT = resolveAffiliateRoot(ROOT);
 const REPO_API = 'https://api.github.com/repos/Lofikota/tsumiba-blog';
 const noNet = process.argv.includes('--no-net');
 
