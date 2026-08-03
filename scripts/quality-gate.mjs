@@ -173,8 +173,57 @@ function splitSentences(content) {
   return text.split(/[。\n]/).map(s => s.trim()).filter(Boolean);
 }
 
-function extractStructuredSafetySegments(content) {
+// D-27: マークダウン表は「列見出しにJFX・セル側にはJFXの語なし」という形になるため、
+// 行単位（＝文単位）の検査では列とセルが結び付かず、JFX列に誤った可否が入っても検知できない。
+// 実例: fxtf-review の「| MetaTrader対応 | ✅ あり | ✅ あり |」は行にJFXが無いため
+// BROKER-F02・F05の2回の掃討をすり抜けた。ヘッダ行からJFX列を特定し、
+// 行見出し＋当該セルを1セグメントへ復元してJFX文脈の検査へ載せる。
+// （JFXが行見出し側にある表は行内にJFXが出るため、既存の文単位検査で拾える）
+const MARKDOWN_DIVIDER_RE = /^\s*\|[\s:|-]+\|\s*$/;
+// セルが可否を条件付きで明示している場合、行見出しの「MetaTrader対応」は列ラベルであって
+// 主張ではない。結合すると統一表現どおりの正しい表記が JFX_MT4_CAPABLE_RE で落ちるため切り離す。
+const TABLE_CELL_QUALIFIED_RE = /分析専用|不可|できない|できません|非対応|未提供|実装されていない|提供終了/i;
+
+function splitMarkdownRow(line) {
+  return line
+    .trim()
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split('|')
+    // 「[MT4](/blog/...)対応」のリンク記法はMT4と対応の連結を断ち切り検知漏れになるため、
+    // アンカーテキストだけに落としてから判定する。
+    .map((cell) => cell.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').trim());
+}
+
+function extractJfxTableSegments(content) {
   const segments = [];
+  const lines = content.split('\n');
+  for (let index = 0; index < lines.length; index += 1) {
+    if (!/^\s*\|/.test(lines[index])) continue;
+    if (!MARKDOWN_DIVIDER_RE.test(lines[index + 1] ?? '')) continue;
+    const headerCells = splitMarkdownRow(lines[index]);
+    const jfxColumns = headerCells
+      .map((cell, column) => (JFX_CONTEXT_RE.test(cell) ? column : -1))
+      .filter((column) => column > 0);
+    let row = index + 2;
+    for (; row < lines.length && /^\s*\|/.test(lines[row]); row += 1) {
+      if (jfxColumns.length === 0) continue;
+      const cells = splitMarkdownRow(lines[row]);
+      const rowHead = cells[0] ?? '';
+      for (const column of jfxColumns) {
+        const cell = cells[column];
+        if (!cell) continue;
+        const head = TABLE_CELL_QUALIFIED_RE.test(cell) ? '' : rowHead;
+        segments.push(`JFX ${head} ${cell}`.replace(/\s+/g, ' ').trim());
+      }
+    }
+    index = row - 1;
+  }
+  return segments;
+}
+
+function extractStructuredSafetySegments(content) {
+  const segments = extractJfxTableSegments(content);
   const frontmatter = content.match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
   const frontmatterLines = frontmatter.split('\n');
   for (let index = 0; index < frontmatterLines.length; index += 1) {
