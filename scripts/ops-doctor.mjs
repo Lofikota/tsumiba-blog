@@ -978,6 +978,121 @@ async function checkDeletedPageReachability() {
   if (!live.length && !errs.length) infos.push(`削除ページの到達性: 直近${DELETED_URL_WINDOW_DAYS}日の削除 ${targets.length} 件はすべて本番から消えている`);
 }
 
+// ── 11. ASP認証ブロックの継続（MNT-BROWSER01・2026-08-07）────────────
+// 2026-08-06（ASP-AUTO02）と 2026-08-07（ASP-VC01）の2日連続で、ValueCommerceログインが
+// 同一原因「Claude in Chrome 拡張が未接続＝1Passwordの注入先ブラウザが0台」で失敗した。
+// この1点で afb（FXTF提携申請）・A8（適合2件への再申請）・VC（ログイン）の3経路が同時に止まる
+// ＝収益ファネル右端の単一障害点。しかも切れたことに人間もAIも事前に気づけず、
+// 毎回タスクを起動してから発覚していた（2セッション分の着手コストが無駄になった）。
+//
+// なぜ「拡張の接続状態」を直接見に行かないか:
+//   接続状態を叩く手段は MCP の list_connected_browsers だけで、これは Claude Code の
+//   セッション内にしか存在しない。ops-doctor は素のNodeスクリプトなので原理的に呼べない
+//   （§3-2 の n8n が踏破済みの壁と同型。実測: globalThis にMCP由来のシンボルは1つも無い）。
+//   Chromeプロファイルからサインイン状態を読む案も採らない —— 拡張の内部ストレージは
+//   暗号化＋非公開形式で、読めても契約が無く静かにドリフトする（読み違えたまま「正常」を
+//   返す検査＝検知装置そのものの沈黙障害になる）。
+//
+// 代わりに観測するのは「**詰まりが続いている事実**」。状態正本 asp_revenue_funnel_*.json は
+// 既に blocked_auth / blocker:asp_login を持っており、外部依存を1つも増やさずに判定できる。
+// X投稿ログの最終起動時刻(§3-2)・正本ミラーの差分日数(§6-3)と同じ、痕跡で死活を判定する型。
+//
+// ⚠️ 起点に last_attempt_at を使わないこと（MNT-BROWSER01で最初に検討して却下した案）。
+//   last_attempt_at は「AIが試して弾かれた日」で、詰まっている間むしろ毎日今日へ更新される
+//   （実データ: 08-06 → 08-07）。そこからの経過日数で判定すると常に0日となり、
+//   **鳴るはずのアラームが永久に鳴らない**。継続日数の起点は「詰まりが始まった日」であり、
+//   台帳に blocked_since が無い以上、submit されないまま経過した区間の始まり＝authorized_at が正。
+//   （将来 blocked_since 相当のフィールドが増えたら、そちらを優先すること）
+// 正本: AI運用/VC成果地点確認_ASP-VC01_2026-08-07.md §5-3（B案）／ASP-AUTO02（前回の同一ブロッカー）
+const ASP_AUTH_BLOCK_CRIT_DAYS = 3;   // 3日＝2セッション分の空振りが確定する境目。以降は「たまたま」ではない
+// テスト注入口: ASP_FUNNEL_STATE_DIR（§6-3 と同じ <対象>_<用途> 規約。他検査の注入口を流用しない）
+const ASP_FUNNEL_STATE_DIR = process.env.ASP_FUNNEL_STATE_DIR
+  || path.join(AFFILIATE_ROOT, 'AI運用', 'データ正本');
+const ASP_FUNNEL_STATE_PREFIX = 'asp_revenue_funnel_';
+
+// blocker ごとの復旧手順。CLAUDE.mdの人間タスク形式（何をするか／やるとどうなるか／手順／完了確認）を
+// 1〜2行へ圧縮する。場所だけの指示（「拡張を有効にする」等）は本人が動けないため書かない。
+const ASP_BLOCKER_FIX = {
+  asp_login: '【人間タスク】Chromeを開き、右上ツールバーの Claude アイコンからサイドパネルを開いて Claude アカウントで「Sign in」する（＝1Passwordの注入先ブラウザを1台に戻す作業）。'
+    + 'これで afb（FXTF提携申請）・A8（適合2件の再申請）・VC（ログイン）の3経路が同時に開く。完了確認＝サイドパネル上部に自分のアカウント名が表示されること。',
+};
+const ASP_BLOCKER_FIX_DEFAULT = '【人間タスク】この blocker を解消しないと当該ASPの申請が1件も進まない。'
+  + '状態正本の application_queue と直近の実施記録（AI運用/ASP*）を照合して原因を特定すること。';
+
+// 状態正本はファイル名に日付が入る。ハードコードすると次の版を作った日から静かに古い値を読み続けるので、
+// prefix一致の中で名前が最大のもの（＝日付が新しいもの）を選ぶ（asp-funnel-report.mjs と同じ規約）。
+function resolveAspFunnelState() {
+  if (!fs.existsSync(ASP_FUNNEL_STATE_DIR)) return null;
+  const files = fs.readdirSync(ASP_FUNNEL_STATE_DIR)
+    .filter((f) => f.startsWith(ASP_FUNNEL_STATE_PREFIX) && f.endsWith('.json'))
+    .sort();
+  return files.length ? path.join(ASP_FUNNEL_STATE_DIR, files.at(-1)) : null;
+}
+
+// 詰まりの起点。submit まで進んでいない限り authorized_at からの全区間が「進んでいない時間」。
+// 例外的に submitted_at がある（＝一度は進んだ）行では、その後の再ブロックとみなし last_attempt_at を使う。
+function aspBlockAnchor(q) {
+  return (q.submitted_at ? (q.last_attempt_at ?? q.authorized_at) : (q.authorized_at ?? q.last_attempt_at)) ?? null;
+}
+
+// checkAspAuthBlock のメッセージは必ず "ASP認証" で始まる契約（test-asp-auth-block.mjs がこれで行を拾う）。
+function checkAspAuthBlock() {
+  const stateFile = resolveAspFunnelState();
+  if (!stateFile) {
+    // 対象ディレクトリごと無いマシン（CI・worktree）では鳴らさない。既存検査と同じ「無い環境ではスキップ」。
+    if (!fs.existsSync(ASP_FUNNEL_STATE_DIR)) { infos.push('ASP認証ブロック: 状態正本のディレクトリ未検出（このマシンには無い）'); return; }
+    warnings.push(`ASP認証ブロックの検査を実行できない（${ASP_FUNNEL_STATE_DIR} に ${ASP_FUNNEL_STATE_PREFIX}*.json が無い）。収益ファネルの状態正本そのものが失われている疑い。`);
+    return;
+  }
+
+  let state;
+  try {
+    state = JSON.parse(fs.readFileSync(stateFile, 'utf-8'));
+  } catch (e) {
+    critical.push(`ASP認証ブロックの検査に失敗（状態正本が壊れている: ${path.basename(stateFile)}）: ${e.message}\n      → node AI運用/asp-link-factory/src/validate.mjs で検証し、直すまでファネル監視（n8n asp-revenue-funnel）も同時に無効。`);
+    return;
+  }
+
+  const queue = Array.isArray(state.application_queue) ? state.application_queue : [];
+  // offer_id → asp_id。どのASPで詰まっているかを名指しできないと、人間タスクの宛先が決まらない。
+  const aspOf = new Map((state.program_catalog ?? []).map((p) => [p.offer_id, p.asp_id]));
+  const blocked = queue.filter((q) => q.status === 'blocked_auth');
+  if (!blocked.length) {
+    infos.push(`ASP認証ブロック: なし（application_queue ${queue.length}件）`);
+    return;
+  }
+
+  // 同一原因で複数件が同時に止まるのが本症状（実測2件）。1件ずつ🚨を出すと同じ文面が並んで形骸化するため、
+  // (ASP × blocker) で束ね、最も古い詰まりの日数で判定する。
+  const groups = new Map();
+  for (const q of blocked) {
+    const key = `${aspOf.get(q.offer_id) ?? '不明ASP'}::${q.blocker ?? 'blocker未記録'}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(q);
+  }
+
+  for (const [key, rows] of groups) {
+    const [aspId, blocker] = key.split('::');
+    const ages = rows.map((q) => { const a = aspBlockAnchor(q); return a ? daysAgo(a) : null; }).filter((d) => d !== null);
+    const days = ages.length ? Math.max(...ages) : null;
+    const ids = rows.map((q) => q.application_id).join(' / ');
+    const lastAttempt = rows.map((q) => q.last_attempt_at).filter(Boolean).sort().at(-1) ?? '記録なし';
+
+    if (days === null) {
+      warnings.push(`ASP認証ブロック ${rows.length}件（${aspId} / ${blocker}）だが、経過日数を測る日付（authorized_at・last_attempt_at）が1件も無い。滞留を数えられない＝放置に気づけない: ${ids}`);
+      continue;
+    }
+    if (days < ASP_AUTH_BLOCK_CRIT_DAYS) {
+      infos.push(`ASP認証ブロック ${days}日目（${aspId} / ${blocker} / ${rows.length}件・最終試行 ${lastAttempt}）。${ASP_AUTH_BLOCK_CRIT_DAYS}日で🚨に上がる。`);
+      continue;
+    }
+    critical.push(`ASP認証ブロックが ${days} 日継続（${aspId} / blocker=${blocker} / 対象 ${rows.length}件・最終試行 ${lastAttempt}）: ${ids}\n`
+      + `      → 提携申請が1件も出せない＝収益ファネル右端が停止したまま。同一原因で複数経路が同時に止まる単一障害点で、起動して初めて発覚する型（2026-08-06 ASP-AUTO02 / 08-07 ASP-VC01 の2日連続）。\n`
+      + `      → ${ASP_BLOCKER_FIX[blocker] ?? ASP_BLOCKER_FIX_DEFAULT}\n`
+      + `      正本: AI運用/VC成果地点確認_ASP-VC01_2026-08-07.md §5-3`);
+  }
+}
+
 // ── 実行 ────────────────────────────────────────────────────────
 // --cadence-as-of=YYYY-MM-DD: カウンタの起点日をずらす（判定ロジックの動作確認用）
 const asOfArg = process.argv.find((a) => a.startsWith('--cadence-as-of='));
@@ -998,6 +1113,7 @@ await checkCvFunnel();
 checkStrategyResidue();
 checkOutputCadence(cadenceAsOf);
 await checkDeletedPageReachability();
+checkAspAuthBlock();
 
 if (critical.length) {
   console.log('🚨 要対応（今日中に潰す）');
