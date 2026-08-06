@@ -58,7 +58,7 @@ FXは元本保証のない取引です。[レバレッジ](/blog/fx-leverage-ris
   ]}
   rows={[
     { item: "運営会社", fxtf: "ゴールデンウェイ・ジャパン株式会社", jfx: "JFX株式会社", highlight: "" },
-    { item: "ドル円スプレッド（AM9:00〜翌AM3:00）", fxtf: "0.0銭（ゼロスプレッド・原則固定／例外あり）※別途手数料", jfx: "0.2銭（原則固定・例外あり）", highlight: "" },
+    { item: "ドル円スプレッド（AM9:00〜翌AM3:00）", fxtf: "0.0銭（ゼロスプレッド・原則固定／例外あり）※別途、建玉連動手数料あり", jfx: "0.2銭（原則固定・例外あり）", highlight: "" },
     { item: "最小取引単位", fxtf: "1,000通貨", jfx: "1,000通貨", highlight: "" },
     { item: "MetaTrader対応", fxtf: "○（MT4で取引・EA可／MT5は未提供）", jfx: "△（MT5チャート分析専用・発注/EA不可）", highlight: "" },
     { item: "CFD取引", fxtf: "○（日経225・ゴールド等）", jfx: "×", highlight: "" },
@@ -80,11 +80,11 @@ FXは元本保証のない取引です。[レバレッジ](/blog/fx-leverage-ris
 
 [ドル円](/blog/fx-best-time/)だけでなく、主要通貨ペアの[スプレッド](/blog/central-tanshi-fx-review/)も比較する。
 
-2社は提示の形が違う。[FXTF](/blog/fxtf-review/)は全通貨ペア一律のゼロ[スプレッド](/blog/fx-spread-hikaku/)制、[JFX](/blog/jfx-fxtf-kakuteishinkoku/)は通貨ペアごとの原則固定だ。
+2社は提示の形が違う。[FXTF](/blog/fxtf-review/)は全通貨ペア一律のゼロ[スプレッド](/blog/fx-spread-hikaku/)制（スプレッドとは別に建玉連動手数料がかかる）、[JFX](/blog/jfx-fxtf-kakuteishinkoku/)は通貨ペアごとの原則固定だ。
 
 どちらも「AM9:00〜翌AM3:00」と「それ以外の時間帯」で条件が変わるため、時間帯を分けて並べる。
 
-| 通貨ペア | [FXTF](/blog/fxtf-review/)（AM9:00〜翌AM3:00 ／ 時間外の上限） | [JFX](/blog/jfx-fxtf-kakuteishinkoku/)（AM9:00〜翌AM3:00 ／ 時間外） |
+| 通貨ペア | [FXTF](/blog/fxtf-review/)（AM9:00〜翌AM3:00 ／ 時間外の上限）※別途、建玉連動手数料あり | [JFX](/blog/jfx-fxtf-kakuteishinkoku/)（AM9:00〜翌AM3:00 ／ 時間外） |
 |----------|------|-----|
 | [ドル円](/blog/fx-best-time/)（USD/JPY） | 0.0銭 ／ 3.8銭 | 0.2銭 ／ 5.9銭 |
 | ユーロ円（EUR/JPY） | 0.0銭 ／ 5.8銭 | 0.4銭 ／ 9.9銭 |
@@ -98,7 +98,7 @@ FXは元本保証のない取引です。[レバレッジ](/blog/fx-leverage-ris
 
 一方[JFX](/blog/jfx-fxtf-kakuteishinkoku/)は公式サイトで「取引[手数料](/blog/fxtf-zero-spread/)は無料、[スプレッド](/blog/fx-spread-hikaku/)がお客様のコストとなります」と案内している。
 
-つまり[FXTF](/blog/fxtf-review/)は「[スプレッド](/blog/fx-spread-hikaku/)0＋[手数料](/blog/fxtf-zero-spread/)」、[JFX](/blog/jfx-fxtf-kakuteishinkoku/)は「[スプレッド](/blog/fx-spread-hikaku/)のみ」というコスト構造の違いだ。
+つまり[FXTF](/blog/fxtf-review/)は「[スプレッド](/blog/fx-spread-hikaku/)0＋建玉連動[手数料](/blog/fxtf-zero-spread/)」、[JFX](/blog/jfx-fxtf-kakuteishinkoku/)は「[スプレッド](/blog/fx-spread-hikaku/)のみ」というコスト構造の違いだ。
 
 比べるべきは表示[スプレッド](/blog/fx-spread-hikaku/)ではなく、[手数料](/blog/fxtf-zero-spread/)を足した実質[コスト](/blog/fx-spread-hikaku/)になる。
 
