@@ -110,6 +110,7 @@ const googleAdsConversionSendTo = import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_S
         <h1>{isPending ? '現在使える導線へ移動します' : `${link.name} 公式サイトへ移動します`}</h1>
         <p>{isPending ? `${link.name} はASPリンクの動作確認が完了していないため、確認済みの関連導線へ移動します。` : link.disclosure}</p>
         <p class="go-small">{isPending ? '未確認の外部リンクへは送客しません。申込前には必ず公式条件とリスクをご確認ください。' : '掲載情報やキャンペーン条件は変更される場合があります。申込前に公式サイトで最新情報をご確認ください。'}</p>
+        <p class="go-small">この広告は当サイトが作成したものであり、広告主が作成したものではありません。掲載している感想や評価はあくまでも当サイト（作成者）自身のものであり、広告主のものではありません。</p>
         <a class="go-button" id="goButton" href={destinationUrl} rel="sponsored nofollow noopener noreferrer">{isPending ? '確認済みの導線へ進む' : '公式サイトを開く'}</a>
       </section>
     </main>
