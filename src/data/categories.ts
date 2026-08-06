@@ -14,7 +14,7 @@ export const CATEGORIES: Record<string, { slug: string; label: string; descripti
   'DMM FX': {
     slug: 'dmm-fx',
     label: 'DMM FX',
-    description: 'DMM FXはリンク確認中です。条件、ツール、スプレッド、向いている人、申し込み前の注意点を参考情報として整理します。',
+    description: 'DMM FXの条件、ツール、スプレッド、向いている人、申し込み前の注意点を整理した記事の一覧です。',
     matchSlugs: ['dmm-fx-review'],
   },
   'JFX': {
