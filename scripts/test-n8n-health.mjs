@@ -89,9 +89,11 @@ const cases = [
   ['認証0件なら🚨',
     fixture('nocred', { observedAt: daysAgoISO(0), credentialCount: 0, workflows: [wf('a-b-c')] }),
     /🚨 .*認証情報が0件/],
+  // 期待値は「稼働対象ワークフローが0本」だけを見る。719e120（意図的停止の導入）で前置きが
+  // 「稼働対象の」→「現在の稼働対象」に変わりテストだけ取り残された。意味の核以外を含めない。
   ['demo- は稼働対象に数えない',
     fixture('demo', { observedAt: daysAgoISO(0), credentialCount: 2, workflows: [wf('demo-x', { active: false, lastAutoExecutionAt: null })] }),
-    /稼働対象のワークフローが0本/],
+    /稼働対象ワークフローが0本/, 'quiet'],
 
   // ── 2026-08-01 N8N-D01: 構造的な誤警報2種の回帰テスト ─────────────
   // どちらも「実行履歴0」だが正常。閾値を緩めるのではなく、実行0の意味を
