@@ -981,6 +981,14 @@ async function checkDeletedPageReachability() {
 // ── 11. ASP認証ブロックの継続（MNT-BROWSER01・2026-08-07）────────────
 // 2026-08-06（ASP-AUTO02）と 2026-08-07（ASP-VC01）の2日連続で、ValueCommerceログインが
 // 同一原因「Claude in Chrome 拡張が未接続＝1Passwordの注入先ブラウザが0台」で失敗した。
+//
+// 【2026-08-07 MON-C01-R で原因が変わった。復旧文言だけ差し替えた（検知ロジックは無変更）】
+//   list_connected_browsers は `Browser 1`（macOS・ローカル）を返し、実ブラウザでVCログイン画面まで
+//   到達できた＝**Chrome拡張の接続は回復済み**。詰まっているのは request_credentials（3回とも
+//   transport_error / retryable）で、1Passwordとのハンドシェイク側。最有力候補は
+//   「Chromeプロファイル20個のうち Claude拡張は20個すべて・1Password拡張は5個にしか無い」不一致。
+//   ＝旧文言「Claudeにサインインしろ」に従っても状況は1ミリも動かない。原因が変わったら
+//   ASP_BLOCKER_FIX を必ず追随させること（詰まりの検知は正しいまま、案内だけがドリフトする）。
 // この1点で afb（FXTF提携申請）・A8（適合2件への再申請）・VC（ログイン）の3経路が同時に止まる
 // ＝収益ファネル右端の単一障害点。しかも切れたことに人間もAIも事前に気づけず、
 // 毎回タスクを起動してから発覚していた（2セッション分の着手コストが無駄になった）。
@@ -1003,7 +1011,9 @@ async function checkDeletedPageReachability() {
 //   **鳴るはずのアラームが永久に鳴らない**。継続日数の起点は「詰まりが始まった日」であり、
 //   台帳に blocked_since が無い以上、submit されないまま経過した区間の始まり＝authorized_at が正。
 //   （将来 blocked_since 相当のフィールドが増えたら、そちらを優先すること）
-// 正本: AI運用/VC成果地点確認_ASP-VC01_2026-08-07.md §5-3（B案）／ASP-AUTO02（前回の同一ブロッカー）
+// 正本（復旧手順）: AI運用/顧客適合案件_提携申請パック_MON-C01_2026-07-28.md §0-R-4
+//                    ／ AI運用/戦略/affiliate-dashboard.md「### 人間」#25
+// 正本（この検査を作った経緯・B案の採用理由）: AI運用/VC成果地点確認_ASP-VC01_2026-08-07.md §5-3
 const ASP_AUTH_BLOCK_CRIT_DAYS = 3;   // 3日＝2セッション分の空振りが確定する境目。以降は「たまたま」ではない
 // テスト注入口: ASP_FUNNEL_STATE_DIR（§6-3 と同じ <対象>_<用途> 規約。他検査の注入口を流用しない）
 const ASP_FUNNEL_STATE_DIR = process.env.ASP_FUNNEL_STATE_DIR
@@ -1013,8 +1023,10 @@ const ASP_FUNNEL_STATE_PREFIX = 'asp_revenue_funnel_';
 // blocker ごとの復旧手順。CLAUDE.mdの人間タスク形式（何をするか／やるとどうなるか／手順／完了確認）を
 // 1〜2行へ圧縮する。場所だけの指示（「拡張を有効にする」等）は本人が動けないため書かない。
 const ASP_BLOCKER_FIX = {
-  asp_login: '【人間タスク】Chromeを開き、右上ツールバーの Claude アイコンからサイドパネルを開いて Claude アカウントで「Sign in」する（＝1Passwordの注入先ブラウザを1台に戻す作業）。'
-    + 'これで afb（FXTF提携申請）・A8（適合2件の再申請）・VC（ログイン）の3経路が同時に開く。完了確認＝サイドパネル上部に自分のアカウント名が表示されること。',
+  asp_login: '【人間タスク】Chromeで「Claudeのサイドパネルを使っているプロファイル」を開き、アドレスバーに chrome://extensions と入れて 1Password 拡張が入っているか見る。'
+    + '無ければ https://chromewebstore.google.com/detail/aeblfdkhhhdcdjpifhhbdiojplfjncoa から追加し、あればツールバーの 1Password アイコンからサインインする（＝Claude拡張と1Password拡張を同じプロファイルへ揃える作業）。'
+    + 'これで afb（FXTF提携申請）・A8（適合2件の再申請）・VC（ログイン）の3経路が同時に開く。'
+    + '完了確認＝chrome://extensions に「1Password」が有効で表示され、ツールバーのアイコンを押すとロック画面ではなく金庫の項目一覧が出ること。',
 };
 const ASP_BLOCKER_FIX_DEFAULT = '【人間タスク】この blocker を解消しないと当該ASPの申請が1件も進まない。'
   + '状態正本の application_queue と直近の実施記録（AI運用/ASP*）を照合して原因を特定すること。';
@@ -1087,9 +1099,9 @@ function checkAspAuthBlock() {
       continue;
     }
     critical.push(`ASP認証ブロックが ${days} 日継続（${aspId} / blocker=${blocker} / 対象 ${rows.length}件・最終試行 ${lastAttempt}）: ${ids}\n`
-      + `      → 提携申請が1件も出せない＝収益ファネル右端が停止したまま。同一原因で複数経路が同時に止まる単一障害点で、起動して初めて発覚する型（2026-08-06 ASP-AUTO02 / 08-07 ASP-VC01 の2日連続）。\n`
+      + `      → 提携申請が1件も出せない＝収益ファネル右端が停止したまま。複数経路が同時に止まる単一障害点で、起動して初めて発覚する型（2026-08-06 ASP-AUTO02 / 08-07 ASP-VC01 / 08-07 MON-C01-R）。\n`
       + `      → ${ASP_BLOCKER_FIX[blocker] ?? ASP_BLOCKER_FIX_DEFAULT}\n`
-      + `      正本: AI運用/VC成果地点確認_ASP-VC01_2026-08-07.md §5-3`);
+      + `      正本: AI運用/顧客適合案件_提携申請パック_MON-C01_2026-07-28.md §0-R-4 ／ AI運用/戦略/affiliate-dashboard.md「### 人間」#25`);
   }
 }
 
