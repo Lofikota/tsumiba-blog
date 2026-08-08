@@ -176,7 +176,9 @@ function checkQueue() {
   const items = Array.isArray(q) ? q : (q.keywords ?? q.queue ?? []);
   const counts = {};
   for (const it of items) counts[it.status] = (counts[it.status] ?? 0) + 1;
-  infos.push(`キュー: ${items.length}件（${Object.entries(counts).map(([k, v]) => `${k}=${v}`).join(' / ')}）`);
+  // ラベルは「キュー」単独にしない。同じ画面に X投稿キューの行が並ぶため、記事生成の在庫を
+  // X投稿の在庫と読み違える事故が起きていた（2026-08-08 X-QUEUE-01）。実体のパスまで書く。
+  infos.push(`記事生成キュー（data/keyword-queue.json）: ${items.length}件（${Object.entries(counts).map(([k, v]) => `${k}=${v}`).join(' / ')}）`);
 
   for (const it of items) {
     const file = path.join(blogDir, `${it.slug}.mdx`);
@@ -817,21 +819,6 @@ function gitTouches(cwd, since, until, pathspec, filter = 'AM') {
 }
 
 // CSVは本文に改行・カンマ・引用符を含むので行分割では壊れる。最小限のパーサで読む。
-function parseCsv(text) {
-  const rows = []; let row = [], field = '', quoted = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (quoted) {
-      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else quoted = false; } else field += c;
-    } else if (c === '"') quoted = true;
-    else if (c === ',') { row.push(field); field = ''; }
-    else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
-    else if (c !== '\r') field += c;
-  }
-  if (field || row.length) { row.push(field); rows.push(row); }
-  return rows;
-}
-
 // 窓内の各日に「どの種別のアウトプットが出たか」を集める（1日1カウントはSetで担保）
 function collectOutputUnits(since, until) {
   const units = new Map();
@@ -871,16 +858,14 @@ function collectOutputUnits(since, until) {
 
   // X投稿: 実投稿されたtweetのみ（status=pending のキュー投入は燃料に数えない）。
   // 実データのstatus値は 'posted'。将来 'published' に変わっても拾えるよう両方受ける。
-  const queueCsv = path.join(ROOT, 'x-automation/data/tweet_queue.csv');
-  if (fs.existsSync(queueCsv)) {
-    const rows = parseCsv(fs.readFileSync(queueCsv, 'utf-8'));
-    const head = rows[0] ?? [];
-    const si = head.indexOf('status'), pi = head.indexOf('posted_at');
-    if (si >= 0 && pi >= 0) {
-      for (const r of rows.slice(1)) {
-        if (!['posted', 'published'].includes(r[si])) continue;
-        mark((r[pi] ?? '').slice(0, 10), 'X投稿');
-      }
+  // 2026-08-08 X-QUEUE-01: ここは repo側 x-automation/data/ を見ていたが、そちらは投稿エンジンが
+  // 読まない凍結コピーで posted_at の最新が 2026-05-20。窓が14日である限り X投稿は構造的に必ず
+  // 0日となり、実投稿があっても欠測として数え続けていた（①〜③の検査は既に X_QUEUE_CSV へ
+  // 寄せてあり、同じ画面の中で別ファイルを見ていた）。投稿エンジンが読む正本へ統一する。
+  if (fs.existsSync(X_QUEUE_CSV)) {
+    for (const r of readTweetQueue(X_QUEUE_CSV)) {
+      if (!['posted', 'published'].includes(r.status)) continue;
+      mark((r.posted_at ?? '').slice(0, 10), 'X投稿');
     }
   }
   return units;
