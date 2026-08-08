@@ -106,6 +106,8 @@ const KNOWN_PENDING = {
   'dmm-fx':            'afb現行サイト(987784)で未提携。ASP-V02で内部導線へ',
   'jfx':               'afb現行サイト(987784)で未提携。ASP-V02で内部導線へ',
   'fxtf':              'A8提携済みだが MON-A01 の配置allowlist（fxtf-zero-spread:fee）で1枠のみ有効。リテラル上は pending が正',
+  'gmo-click-fx':      'ValueCommerce現行サイト(3777087)で2026-08-08申請、提携待ち。承認まで内部導線へ',
+  'matsui-fx':         'ValueCommerce現行サイト(3777087)で2026-08-08申請、提携待ち。承認まで内部導線へ',
   'central-tanshi-fx': 'afb現行サイト(987784)で未提携。ASP-V02で内部導線へ',
   'takeru-fx-school':  'afb現行サイト(987784)で未提携。ASP-V02で内部導線へ',
 };

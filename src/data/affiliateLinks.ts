@@ -155,11 +155,12 @@ export const affiliateLinks: AffiliateLink[] = [
 ];
 
 /**
- * 2026-07-28 MON-A01: A8発行リンクはGitへ置かない。
- * tsumiba-blog は公開GitHubリポジトリのため、a8mat付きの成果リンクをコミットすると
+ * ASP発行の成果リンクはGitへ置かない。
+ * tsumiba-blog は公開GitHubリポジトリのため、成果リンクをコミットすると
  * 公開Git履歴に永久に残る。実値はビルド時に環境変数から注入する。
- *   - ローカル: .env の PUBLIC_A8_FXTF_URL（.gitignore済み）
- *   - 本番:     Cloudflare Pages の環境変数 PUBLIC_A8_FXTF_URL
+ *   - A8 FXTF: PUBLIC_A8_FXTF_URL
+ *   - ValueCommerce GMOクリックFX: PUBLIC_VC_GMO_CLICK_FX_URL
+ *   - ValueCommerce 松井FX: PUBLIC_VC_MATSUI_FX_URL
  * 未設定なら下の配列リテラルどおり status:'pending' のまま＝内部導線へ倒れる（フェイルセーフ）。
  *
  * 注意: この昇格処理を配列リテラルの中へ書かないこと。
@@ -167,16 +168,20 @@ export const affiliateLinks: AffiliateLink[] = [
  * このファイルを正規表現でテキスト解析しており（status:\s*'([^']+)'）、
  * statusを式にすると両ゲートが黙ってfxtfを認識しなくなる。
  */
-const a8FxtfUrl: string =
-  (typeof import.meta !== 'undefined' && (import.meta as { env?: Record<string, string | undefined> }).env?.PUBLIC_A8_FXTF_URL) || '';
+const publicEnv =
+  (typeof import.meta !== 'undefined' && (import.meta as { env?: Record<string, string | undefined> }).env) || {};
 
-if (a8FxtfUrl) {
-  const fxtf = affiliateLinks.find((link) => link.slug === 'fxtf');
-  if (fxtf) {
-    fxtf.destinationUrl = a8FxtfUrl;
-    fxtf.status = 'affiliate';
-  }
+function activateAffiliateLink(slug: string, destinationUrl: string | undefined): void {
+  if (!destinationUrl) return;
+  const link = affiliateLinks.find((candidate) => candidate.slug === slug);
+  if (!link) return;
+  link.destinationUrl = destinationUrl;
+  link.status = 'affiliate';
 }
+
+activateAffiliateLink('fxtf', publicEnv.PUBLIC_A8_FXTF_URL);
+activateAffiliateLink('gmo-click-fx', publicEnv.PUBLIC_VC_GMO_CLICK_FX_URL);
+activateAffiliateLink('matsui-fx', publicEnv.PUBLIC_VC_MATSUI_FX_URL);
 
 /**
  * 成果リンクを有効化する「配置ID」のallowlist。
@@ -188,7 +193,9 @@ if (a8FxtfUrl) {
  *
  * 命名規則: '<記事slug>:<配置>' 。GA4のイベントラベルにもこの値をそのまま使う。
  */
-export const affiliatePlacementAllowlist: readonly string[] = ['fxtf-zero-spread:fee'];
+export const affiliatePlacementAllowlist: readonly string[] = [
+  'fxtf-zero-spread:fee',
+];
 
 export function isAllowedAffiliatePlacement(placement?: string): boolean {
   return !!placement && affiliatePlacementAllowlist.includes(placement);

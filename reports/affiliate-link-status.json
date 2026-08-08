@@ -1,13 +1,13 @@
 {
-  "checkedAt": "2026-07-29T10:46:32.453Z",
+  "checkedAt": "2026-08-08T10:56:28.137Z",
   "httpCheckDone": false,
   "summary": {
     "total": 14,
     "affiliate": 0,
     "pending": 14,
-    "pendingInArticles": 5,
+    "pendingInArticles": 7,
     "blocking": 0,
-    "knownPending": 5,
+    "knownPending": 7,
     "deadLinks": 0
   },
   "issues": [],
@@ -103,6 +103,28 @@
       ],
       "httpOk": null,
       "reason": "A8提携済みだが MON-A01 の配置allowlist（fxtf-zero-spread:fee）で1枠のみ有効。リテラル上は pending が正"
+    },
+    {
+      "slug": "gmo-click-fx",
+      "name": "GMOクリック証券 FXネオ",
+      "status": "pending",
+      "url": "https://www.click-sec.com/corp/guide/fx/",
+      "usedIn": [
+        "gmo-click-fx-review"
+      ],
+      "httpOk": null,
+      "reason": "ValueCommerce現行サイト(3777087)で2026-08-08申請、提携待ち。承認まで内部導線へ"
+    },
+    {
+      "slug": "matsui-fx",
+      "name": "松井証券 MATSUI FX",
+      "status": "pending",
+      "url": "https://www.matsui.co.jp/service/fx/",
+      "usedIn": [
+        "matsui-fx-review"
+      ],
+      "httpOk": null,
+      "reason": "ValueCommerce現行サイト(3777087)で2026-08-08申請、提携待ち。承認まで内部導線へ"
     },
     {
       "slug": "takeru-fx-school",
