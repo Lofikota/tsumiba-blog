@@ -207,6 +207,9 @@ const X_CATCH_UP_HOURS = 48;  // x_poster.py の CATCH_UP_HOURS と一致させ�
 const X_LOG_WARN_HOURS = 14;  // 一晩のスリープ(約10-12h)では鳴らさない
 const X_LOG_CRIT_HOURS = 30;  // 丸1日以上起動していない = 経路が死んでいる
 const X_PENDING_WARN = 3;     // これを下回ったら補充のリードタイムが足りない（承認は人が押すため即日補充できない）
+const X_METRICS_STALE_DAYS = 14;  // 実測がこれ以上古いと「勝ちパターン」が現実から離れる
+const X_METRICS_CSV = process.env.X_METRICS_CSV || path.join(X_AUTOMATION_DIR, 'data/metrics_log.csv');
+const X_PATTERNS_JSON = process.env.X_PATTERNS_JSON || path.join(X_AUTOMATION_DIR, 'data/winning_patterns.json');
 const X_SILENT_CRIT_HOURS = 72;  // 在庫ゼロがこの時間続いたら「たまたま切れた」ではなく供給が止まっている
 
 // tweet_queue.csv は本文に改行とカンマを含むためスプリットでは壊れる。最小限のCSVパーサ。
@@ -303,6 +306,30 @@ function checkXPostAvailability() {
     warnings.push(`X投稿キューの残りが ${pendingRows.length} 本（${silentText}）。${X_PENDING_WARN}本を切ると数日で弾切れになる。\n      → 朝の承認メールに未処理が溜まっていないか、n8n の x_draft_queue に pending_review が残っていないかを見ること。`);
   } else {
     infos.push(`X投稿キューの残り: ${pendingRows.length} 本（${silentText}）`);
+  }
+
+  // ⑥ 学習の空回り: 実測が古い／「勝ちパターン」が実測に基づいていない（2026-08-08 追加）
+  // 実害: data/feedback.json が source_mode="fallback_prepost_queue" のまま2ヶ月半放置され、
+  // 「投稿前にAIが自分でつけたスコア」を読者の反応として学習していた。読者は一度も登場していない。
+  // 投稿は出続け、学習も回っているように見えるので、①〜④のどれでも検知できない型。
+  // 実測の鮮度と、学習の入力が実測かどうかの2点だけを見る。
+  if (fs.existsSync(X_METRICS_CSV)) {
+    const ageDays = (now - fs.statSync(X_METRICS_CSV).mtimeMs) / 86400000;
+    if (ageDays > X_METRICS_STALE_DAYS) {
+      warnings.push(`X投稿の実測が ${Math.floor(ageDays)} 日前から更新されていない（しきい値 ${X_METRICS_STALE_DAYS} 日）。\n      → 実測が古いまま「勝ちパターン」を使うと、現実から離れた基準で毎日生成し続けることになる。\n      → 更新: Claude Code のセッションで x-mcp から取得 → X自動化/x_learn_from_metrics.py。X APIの.env鍵では読み取り401（X実測分析_2026-08-08.md §5）。`);
+    } else {
+      infos.push(`X投稿の実測: ${Math.floor(ageDays)} 日前に更新`);
+    }
+  } else {
+    warnings.push('X投稿の実測ログ（X自動化/data/metrics_log.csv）が無い。投稿の成績を一度も測っていない状態。\n      → 何が効いたか分からないまま生成を回すことになる。x-mcp で取得すること。');
+  }
+  if (fs.existsSync(X_PATTERNS_JSON)) {
+    try {
+      const mode = JSON.parse(fs.readFileSync(X_PATTERNS_JSON, 'utf-8')).source_mode;
+      if (mode !== 'real_metrics') {
+        critical.push(`X投稿の「勝ちパターン」が実測に基づいていない（source_mode=${mode}）。\n      → AIが自分でつけた点数を読者の反応として学習している状態。2026-05〜08に2ヶ月半これが起きた。\n      → X自動化/x_learn_from_metrics.py で実測から作り直すこと。`);
+      }
+    } catch { warnings.push('X投稿の勝ちパターン（winning_patterns.json）が壊れていて読めない。'); }
   }
 }
 
