@@ -204,6 +204,8 @@ const X_PLIST = process.env.X_PLIST || path.join(process.env.HOME || '', 'Librar
 const X_CATCH_UP_HOURS = 48;  // x_poster.py の CATCH_UP_HOURS と一致させること
 const X_LOG_WARN_HOURS = 14;  // 一晩のスリープ(約10-12h)では鳴らさない
 const X_LOG_CRIT_HOURS = 30;  // 丸1日以上起動していない = 経路が死んでいる
+const X_PENDING_WARN = 3;     // これを下回ったら補充のリードタイムが足りない（承認は人が押すため即日補充できない）
+const X_SILENT_CRIT_HOURS = 72;  // 在庫ゼロがこの時間続いたら「たまたま切れた」ではなく供給が止まっている
 
 // tweet_queue.csv は本文に改行とカンマを含むためスプリットでは壊れる。最小限のCSVパーサ。
 function readTweetQueue(file) {
@@ -273,6 +275,32 @@ function checkXPostAvailability() {
     } else if (!/StartCalendarInterval/.test(plist)) {
       warnings.push('com.tsumiba.xposter.plist にスケジュール指定（StartCalendarInterval）が見当たらない。ジョブが自動起動しない。');
     }
+  }
+
+  // ④ 弾切れ: 投稿する在庫そのものが尽きている（N8N-X04・2026-08-08 追加）
+  // ①は「pendingがあるのに投稿されていない」を見る検査で、在庫がある前提に立っている。
+  // pending=0 のとき①は言うことが無いので**必ず沈黙する**。
+  // 実害: 2026-08-05 19:00 を最後に pending が0本になり、投稿処理は毎30分正常に起動して
+  // 「投稿予定ツイートなし」とログに書いて終了し続けた。3日間X流入がゼロでも誰にも鳴らなかった。
+  // 取りこぼし（在庫はあるが出ない）と弾切れ（在庫が無い）は別の観測量なので、別に数える。
+  const rows = readTweetQueue(X_QUEUE_CSV);
+  const pendingRows = rows.filter((r) => r.status === 'pending');
+  const postedAts = rows
+    .filter((r) => r.status === 'posted' && r.posted_at)
+    .map((r) => new Date(r.posted_at.replace(' ', 'T')).getTime())
+    .filter((t) => !Number.isNaN(t));
+  const lastPostedAt = postedAts.length ? Math.max(...postedAts) : null;
+  const silentHours = lastPostedAt === null ? Infinity : (now - lastPostedAt) / 3600000;
+  const silentText = lastPostedAt === null
+    ? '投稿実績が1件もない'
+    : `最後の投稿から ${Math.floor(silentHours)} 時間経過`;
+
+  if (pendingRows.length === 0 && silentHours > X_SILENT_CRIT_HOURS) {
+    critical.push(`X投稿キューが弾切れ: pending 0本・${silentText}。投稿処理は正常に起動しているが、出すタマが無いまま止まっている＝X流入がゼロ。\n      → 補充経路: n8n quality-dojo-loop（合格品を x_draft_queue へ）→ 毎朝07:00の承認メールでボタンを押す → X自動化/pull_n8n_drafts.py が回収。手動なら X自動化/add_tweet.py。\n      → 補充の詰まりどころを見るとき: tail -20 X自動化/logs/pull_n8n_drafts.log`);
+  } else if (pendingRows.length < X_PENDING_WARN) {
+    warnings.push(`X投稿キューの残りが ${pendingRows.length} 本（${silentText}）。${X_PENDING_WARN}本を切ると数日で弾切れになる。\n      → 朝の承認メールに未処理が溜まっていないか、n8n の x_draft_queue に pending_review が残っていないかを見ること。`);
+  } else {
+    infos.push(`X投稿キューの残り: ${pendingRows.length} 本（${silentText}）`);
   }
 }
 
